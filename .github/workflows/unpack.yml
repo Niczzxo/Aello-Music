@@ -8,12 +8,14 @@ jobs:
       contents: write
     steps:
       - uses: actions/checkout@v4
-      - name: Reassemble and unpack
+      - name: Download and unpack source archive
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
-          cat averon-source.zip.part-* > averon-source.zip
+          gh release download source-drop -p averon-source.zip --repo ${{ github.repository }}
           unzip -o -q averon-source.zip
           cp -a averon-push/. .
-          rm -rf averon-push averon-source.zip averon-source.zip.part-*
+          rm -rf averon-push averon-source.zip
       - name: Commit full tree
         run: |
           git config user.name "Averon Bot"
