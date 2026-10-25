@@ -1142,6 +1142,18 @@ object YouTube {
             innerTube.unlikeVideo(WEB_REMIX, videoId)
     }
 
+    // Averon: dislike a video (same like service, dislike endpoint).
+    suspend fun dislikeVideo(videoId: String) = runCatching {
+        innerTube.dislikeVideo(WEB_REMIX, videoId)
+    }
+
+    // Averon: public like/dislike counts (Return YouTube Dislike data, as
+    // used elsewhere in this module). Negative values mean unavailable.
+    suspend fun videoLikeCounts(videoId: String): Result<Pair<Long, Long>> =
+        innerTube.getMediaInfo(videoId).map {
+            (it.like?.toLong() ?: -1L) to (it.dislike?.toLong() ?: -1L)
+        }
+
     suspend fun likePlaylist(playlistId: String, like: Boolean) = runCatching {
         if (like)
             innerTube.likePlaylist(WEB_REMIX, playlistId)

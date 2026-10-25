@@ -15,6 +15,7 @@ import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 
@@ -1369,6 +1370,57 @@ fun HomeScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 contentPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues(),
             ) {
+                // Averon: YouTube login card — shown at the top of Home until the
+                // user is logged in, so login (and its personalised, ad-free home)
+                // is one tap away the moment the app opens.
+                if (!isLoggedIn && !localOnly) {
+                    item(key = "youtube_login_card", contentType = "login_card") {
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(
+                                    start = AppleTokens.Gutter,
+                                    end = AppleTokens.Gutter,
+                                    top = AppleTokens.ItemGap,
+                                )
+                                .animateItem(),
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                verticalAlignment = Alignment.CenterVertically,
+                            ) {
+                                Image(
+                                    painter = painterResource(R.drawable.beatwave_logo),
+                                    contentDescription = "Averon Logo",
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(RoundedCornerShape(10.dp)),
+                                    contentScale = ContentScale.Crop,
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column(modifier = Modifier.weight(1f)) {
+                                    Text(
+                                        text = stringResource(R.string.video_login_card_title),
+                                        style = MaterialTheme.typography.titleMedium,
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.video_login_card_subtitle),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                                Button(
+                                    onClick = { navController.navigate("login") },
+                                ) {
+                                    Text(stringResource(R.string.video_login_button))
+                                }
+                            }
+                        }
+                    }
+                }
+
                 // Screen title, scrolled with the content rather than pinned in the
                 // app bar: the bar is transparent chrome here, and a large title that
                 // scrolls away is what gives the first screenful its weight.

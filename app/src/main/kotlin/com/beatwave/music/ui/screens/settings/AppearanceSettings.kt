@@ -254,7 +254,7 @@ fun AppearanceSettings(
     )
     val (defaultOpenTab, onDefaultOpenTabChange) = rememberEnumPreference(
         DefaultOpenTabKey,
-        defaultValue = NavigationTab.HOME
+        defaultValue = NavigationTab.VIDEO
     )
     val (lyricsPosition, onLyricsPositionChange) = rememberEnumPreference(
         LyricsTextPositionKey,
@@ -457,6 +457,7 @@ fun AppearanceSettings(
                     NavigationTab.HOME -> stringResource(R.string.home)
                     NavigationTab.SEARCH -> stringResource(R.string.search)
                     NavigationTab.LIBRARY -> stringResource(R.string.filter_library)
+                    NavigationTab.VIDEO -> stringResource(R.string.video)
                 }
             }
         )
@@ -1133,6 +1134,7 @@ fun AppearanceSettings(
                                 NavigationTab.HOME -> stringResource(R.string.home)
                                 NavigationTab.SEARCH -> stringResource(R.string.search)
                                 NavigationTab.LIBRARY -> stringResource(R.string.filter_library)
+                                NavigationTab.VIDEO -> stringResource(R.string.video)
                             }
                         )
                     },
@@ -1620,6 +1622,7 @@ enum class NavigationTab {
     HOME,
     SEARCH,
     LIBRARY,
+    VIDEO,
 }
 
 enum class LyricsPosition {

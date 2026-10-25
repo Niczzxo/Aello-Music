@@ -58,6 +58,8 @@ import com.beatwave.music.ui.screens.recognition.RecognitionHistoryScreen
 import com.beatwave.music.ui.screens.recognition.RecognitionScreen
 import com.beatwave.music.ui.screens.search.OnlineSearchResult
 import com.beatwave.music.ui.screens.search.SearchScreen
+import com.beatwave.music.ui.screens.video.VideoPlayerScreen
+import com.beatwave.music.ui.screens.video.VideoScreen
 import com.beatwave.music.ui.screens.settings.AboutScreen
 import com.beatwave.music.ui.screens.settings.SuggestionScreen
 import com.beatwave.music.ui.screens.settings.AccountSettingsScreen
@@ -130,6 +132,25 @@ fun NavGraphBuilder.navigationBuilder(
 
     sharedComposable(Screens.Library.route) {
         LibraryScreen(navController)
+    }
+
+    // Averon: in-app video section (tab) + video player screen.
+    sharedComposable(Screens.Video.route) {
+        VideoScreen(navController)
+    }
+
+    sharedComposable(
+        route = "video_player/{videoId}",
+        arguments = listOf(
+            navArgument("videoId") {
+                type = NavType.StringType
+            },
+        ),
+    ) {
+        VideoPlayerScreen(
+            navController = navController,
+            videoId = it.arguments?.getString("videoId").orEmpty(),
+        )
     }
 
     sharedComposable(Screens.Settings.route) {

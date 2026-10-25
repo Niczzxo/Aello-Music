@@ -370,7 +370,7 @@ private val themeColorCache = android.util.LruCache<String, androidx.compose.ui.
 // Measured 2026-08-05 on SM-M346B, Home scroll p50: true => record 1.9ms / issue 4.6ms,
 // false => record 16.9ms / issue 19.7ms. The gap is the forced full-tree re-record in
 // LayerBackdropNode.draw(); the fix is to give the subtree RenderNodes, not to drop glass.
-private val TabRootRoutes = setOf(Screens.Home.route, Screens.Library.route, Screens.Settings.route)
+private val TabRootRoutes = setOf(Screens.Home.route, Screens.Library.route, Screens.Settings.route, Screens.Video.route)
 
 private const val DIAG_DISABLE_BACKDROP = false
 
@@ -1076,7 +1076,7 @@ class MainActivity : ComponentActivity() {
 
                 val (useNewMiniPlayerDesign) = rememberPreference(UseNewMiniPlayerDesignKey, defaultValue = true)
                 val defaultOpenTab = remember {
-                    dataStore[DefaultOpenTabKey].toEnum(defaultValue = NavigationTab.HOME)
+                    dataStore[DefaultOpenTabKey].toEnum(defaultValue = NavigationTab.VIDEO)
                 }
                 val tabOpenedFromShortcut = remember {
                     when (intent?.action) {
@@ -1105,6 +1105,7 @@ class MainActivity : ComponentActivity() {
                     when (tabOpenedFromShortcut ?: defaultOpenTab) {
                         NavigationTab.HOME, NavigationTab.SEARCH -> Screens.Home.route
                         NavigationTab.LIBRARY -> Screens.Library.route
+                        NavigationTab.VIDEO -> Screens.Video.route
                     }
                 }
 
@@ -2987,7 +2988,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         Image(
                             painter = painterResource(com.beatwave.music.R.drawable.beatwave_logo),
-                            contentDescription = "BeatWave Logo",
+                            contentDescription = "Averon Logo",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = androidx.compose.ui.layout.ContentScale.Fit
                         )
@@ -2997,7 +2998,7 @@ class MainActivity : ComponentActivity() {
                 Spacer(Modifier.height(24.dp))
 
                 Text(
-                    text = "BEATWAVE",
+                    text = "AVERON",
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.ExtraBold,
                     letterSpacing = 4.sp,

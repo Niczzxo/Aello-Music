@@ -485,6 +485,24 @@ class InnerTube {
         }
     }
 
+    // Averon: dislike uses the same like service as likeVideo, with the
+    // dislike endpoint the web client itself posts to. Not wrapped in
+    // withRetry either — same mutation double-fire reason as likeVideo.
+    suspend fun dislikeVideo(
+        client: YouTubeClient,
+        videoId: String,
+    ) = run {
+        httpClient.post("like/dislike") {
+            ytClient(client, setLogin = true)
+            setBody(
+                LikeBody(
+                    context = client.toContext(locale, visitorData, dataSyncId),
+                    target = LikeBody.Target.VideoTarget(videoId)
+                )
+            )
+        }
+    }
+
     suspend fun subscribeChannel(
         client: YouTubeClient,
         channelId: String,

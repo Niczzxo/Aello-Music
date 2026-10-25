@@ -159,7 +159,7 @@ fun AboutScreen(
             }
 
             Text(
-                text = "BeatWave",
+                text = "Averon",
                 style = MaterialTheme.typography.displaySmall.copy(
                     fontFamily = rememberBrandFontFamily(),
                     fontWeight = FontWeight.Bold,
@@ -221,37 +221,13 @@ fun AboutScreen(
                     icon = painterResource(R.drawable.github),
                     title = { Text(stringResource(R.string.github_repository)) },
                     description = { Text(stringResource(R.string.view_source_code)) },
-                    onClick = { uriHandler.safeOpenUri(context, "https://github.com/beatlabs790/BeatWave") }
-                ),
-                Material3SettingsItem(
-                    icon = painterResource(R.drawable.discord),
-                    title = { Text(stringResource(R.string.discord_channel)) },
-                    description = { Text(stringResource(R.string.join_discord)) },
-                    onClick = { uriHandler.safeOpenUri(context, "https://discord.gg/spbuDTePSR") }
+                    onClick = { uriHandler.safeOpenUri(context, "https://github.com/Niczzxo/Averon") }
                 )
             )
         )
 
         Spacer(modifier = Modifier.height(27.dp))
 
-        // Support Section
-        Material3SettingsGroup(
-            title = stringResource(R.string.support_section),
-            items = listOf(
-                Material3SettingsItem(
-                    icon = painterResource(R.drawable.favorite),
-                    title = { Text(stringResource(R.string.support_upi)) },
-                    description = { Text(DonationUpiId) },
-                    onClick = { uriHandler.safeOpenUri(context, DonationUpiUri) }
-                ),
-                Material3SettingsItem(
-                    icon = painterResource(R.drawable.book),
-                    title = { Text("Buy The Story Of BeatWave - The Book") },
-                    description = { Text("https://beatwavebook.vercel.app") },
-                    onClick = { uriHandler.safeOpenUri(context, "https://beatwavebook.vercel.app") }
-                ),
-            )
-        )
         Spacer(modifier = Modifier.height(27.dp))
 
         // App Information Section
@@ -272,7 +248,7 @@ fun AboutScreen(
                     icon = painterResource(R.drawable.license_vivi),
                     title = { Text(stringResource(R.string.license)) },
                     description = { Text("GPL-3.0 • Free Open Source Software") },
-                    onClick = { uriHandler.safeOpenUri(context, "https://github.com/beatlabs790/BeatWave/blob/main/LICENSE") }
+                    onClick = { uriHandler.safeOpenUri(context, "https://github.com/Niczzxo/Averon/blob/main/LICENSE") }
                 ),
             )
         )

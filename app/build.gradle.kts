@@ -42,7 +42,9 @@ android {
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
-        applicationId = "com.beatwave.music"
+        // Averon: own package so it installs cleanly alongside/after any
+        // com.beatwave.music install (original BeatWave or older Averon builds).
+        applicationId = "com.averon.music"
         minSdk = 26
         targetSdk = 36
         versionCode = appVersionCode

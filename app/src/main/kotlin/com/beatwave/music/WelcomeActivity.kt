@@ -367,7 +367,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                             Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(10.dp)) {
                                 androidx.compose.foundation.Image(
                                     painter = painterResource(com.beatwave.music.R.drawable.beatwave_logo),
-                                    contentDescription = "BeatWave Logo",
+                                    contentDescription = "Averon Logo",
                                     modifier = Modifier.fillMaxSize(),
                                     contentScale = androidx.compose.ui.layout.ContentScale.Fit
                                 )
@@ -1340,7 +1340,7 @@ fun BeatWaveSonicWaveformVisualizer(modifier: Modifier = Modifier) {
             ) {
                 androidx.compose.foundation.Image(
                     painter = painterResource(com.beatwave.music.R.drawable.beatwave_logo),
-                    contentDescription = "BeatWave Logo",
+                    contentDescription = "Averon Logo",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = androidx.compose.ui.layout.ContentScale.Fit
                 )
