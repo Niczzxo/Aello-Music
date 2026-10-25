@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Averon Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -750,7 +750,7 @@ fun ContentSettings(
                     onClick = {
                         clientProbeOutput?.let { text ->
                             val clipboard = context.getSystemService(ClipboardManager::class.java)
-                            clipboard?.setPrimaryClip(ClipData.newPlainText("BeatWave client probe", text))
+                            clipboard?.setPrimaryClip(ClipData.newPlainText("Averon client probe", text))
                         }
                         showClientProbeDialog = false
                     },
@@ -1361,7 +1361,7 @@ fun ContentSettings(
         val currentIntervalText = intervalOptions.find { it.first == wrappedIntervalDays }?.second ?: "$wrappedIntervalDays Days"
 
         Material3SettingsGroup(
-            title = "BeatWave Wrapped",
+            title = "Averon Wrapped",
             items = listOf(
                 Material3SettingsItem(
                     icon = painterResource(R.drawable.trending_up),

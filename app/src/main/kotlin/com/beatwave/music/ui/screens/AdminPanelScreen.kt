@@ -1125,7 +1125,7 @@ fun DjMashupStudioTab(bottomPadding: androidx.compose.ui.unit.Dp = 0.dp) {
     var keyMatchTolerance by remember { mutableStateOf("Harmonic Key (Camelot ±1)") }
 
     var isSimulating by remember { mutableStateOf(false) }
-    var simulatedCurrentTrack by remember { mutableStateOf("Track 1 - Line 1: 'BeatWave Harmonic'") }
+    var simulatedCurrentTrack by remember { mutableStateOf("Track 1 - Line 1: 'Averon Harmonic'") }
     var simulationBeatBpm by remember { mutableIntStateOf(128) }
 
     val coroutineScope = rememberCoroutineScope()

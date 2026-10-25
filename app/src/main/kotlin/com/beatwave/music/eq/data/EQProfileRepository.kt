@@ -56,7 +56,35 @@ class EQProfileRepository @Inject constructor(
     companion object {
         private const val KEY_PROFILES = "eq_profiles"
         private const val KEY_ACTIVE_PROFILE_ID = "active_profile_id"
+        // True only when the user explicitly turned EQ off (setActiveProfile(null)).
+        // The built-in default profile is seeded only when this is false, so an
+        // explicit off is never overridden by a later app start.
+        private const val KEY_EQ_DISABLED = "eq_disabled"
+        // True once the built-in default profile has been seeded, so deleting it
+        // (an explicit choice) does not resurrect it on the next app start.
+        private const val KEY_DEFAULT_SEEDED = "eq_default_seeded"
+        private const val DEFAULT_PROFILE_ID = "averon_enhanced"
     }
+
+    /**
+     * Built-in gentle enhancement curve: a little bass warmth, a little presence
+     * and air, with -1 dB preamp headroom so loud tracks do not clip. This is the
+     * sound every playback (music and video) uses until the user picks their own
+     * profile or turns EQ off — sound stays enhanced, it is never flat by default.
+     */
+    private fun averonEnhancedProfile() = SavedEQProfile(
+        id = DEFAULT_PROFILE_ID,
+        name = "Averon Enhanced",
+        deviceModel = "Averon",
+        bands = listOf(
+            ParametricEQBand(frequency = 70.0, gain = 3.0, q = 0.9, filterType = FilterType.LSC),
+            ParametricEQBand(frequency = 4000.0, gain = 2.0, q = 1.41, filterType = FilterType.PK),
+            ParametricEQBand(frequency = 10000.0, gain = 2.5, q = 0.9, filterType = FilterType.HSC),
+        ),
+        preamp = -1.0,
+        isCustom = true,
+        isActive = true,
+    )
 
     init {
         loadProfiles()
@@ -80,6 +108,26 @@ class EQProfileRepository @Inject constructor(
             println("Error loading EQ profiles: ${e.message}")
             _profiles.value = emptyList()
             _activeProfile.value = null
+        }
+
+        // Fresh install (no profiles at all, never seeded, never explicitly turned
+        // off): seed the built-in enhanced profile as active, so music and video
+        // are enhanced from the very first playback. Both playback services collect
+        // activeProfile, so this one seed covers every sound in the app.
+        if (_activeProfile.value == null &&
+            _profiles.value.isEmpty() &&
+            !prefs.getBoolean(KEY_EQ_DISABLED, false) &&
+            !prefs.getBoolean(KEY_DEFAULT_SEEDED, false)
+        ) {
+            val default = averonEnhancedProfile()
+            val profilesJson = json.encodeToString<List<SavedEQProfile>>(listOf(default))
+            prefs.edit {
+                putString(KEY_PROFILES, profilesJson)
+                putString(KEY_ACTIVE_PROFILE_ID, default.id)
+                putBoolean(KEY_DEFAULT_SEEDED, true)
+            }
+            _profiles.value = listOf(default)
+            _activeProfile.value = default
         }
     }
 
@@ -134,13 +182,20 @@ class EQProfileRepository @Inject constructor(
         val currentProfiles = _profiles.value
 
         if (profileId == null) {
-            // Deactivate all profiles
+            // Deactivate all profiles — an explicit off, so the default seed must
+            // not come back on the next app start.
             _activeProfile.value = null
-            prefs.edit { remove(KEY_ACTIVE_PROFILE_ID) }
+            prefs.edit {
+                remove(KEY_ACTIVE_PROFILE_ID)
+                putBoolean(KEY_EQ_DISABLED, true)
+            }
         } else {
             val profile = currentProfiles.find { it.id == profileId }
             _activeProfile.value = profile
-            prefs.edit { putString(KEY_ACTIVE_PROFILE_ID, profileId) }
+            prefs.edit {
+                putString(KEY_ACTIVE_PROFILE_ID, profileId)
+                putBoolean(KEY_EQ_DISABLED, false)
+            }
         }
     }
 

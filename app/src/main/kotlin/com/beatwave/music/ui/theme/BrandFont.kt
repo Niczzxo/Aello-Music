@@ -15,7 +15,7 @@ import com.beatwave.music.constants.BrandFontEnabledKey
 import com.beatwave.music.utils.rememberPreference
 
 /** The product wordmark. */
-const val BrandName = "BeatWave"
+const val BrandName = "Averon"
 
 /** Chillax — display face for artist titles. */
 val ChillaxFontFamily: FontFamily by lazy {

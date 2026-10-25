@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Averon Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -59,10 +59,10 @@ class DiscordRPC(
         }
         if (button2Visible) {
             val resolvedText = resolveVariables(
-                button2Text.ifEmpty { "Visit BeatWave" },
+                button2Text.ifEmpty { "Visit Averon" },
                 song
             )
-            buttonsList.add(resolvedText to "https://github.com/beatlabs790/BeatWave")
+            buttonsList.add(resolvedText to "https://github.com/Niczzxo/Averon")
         }
 
         val type = when (activityType) {

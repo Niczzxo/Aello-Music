@@ -14,7 +14,7 @@
     android:id="@android:id/background"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:theme="@style/Theme.Widget.BeatWave">
+    android:theme="@style/Theme.Widget.Averon">
 
     <ImageView
         android:id="@+id/widget_np_wide_bg"

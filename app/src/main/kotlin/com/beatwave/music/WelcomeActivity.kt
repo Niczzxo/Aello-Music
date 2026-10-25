@@ -711,7 +711,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                                 title = "Import Spotify Liked Songs",
                                 description = when {
                                     isImportingSpotifyLiked -> "Importing Spotify Liked Songs... ($importedSpotifyLikedCount)"
-                                    spotifyLikedImportDone -> "Imported $importedSpotifyLikedCount liked songs into BeatWave library!"
+                                    spotifyLikedImportDone -> "Imported $importedSpotifyLikedCount liked songs into Averon library!"
                                     else -> "Sync your Spotify Liked Songs directly into your local library."
                                 },
                                 shape = bottomCardShape,
@@ -804,7 +804,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "BeatWave is open-source and depends on community support to grow. Your help makes a difference!",
+                        text = "Averon is open-source and depends on community support to grow. Your help makes a difference!",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontFamily = GoogleSansFlex
                         ),
@@ -833,7 +833,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                                 )
                             },
                             onClick = {
-                                uriHandler.safeOpenUri(context, "https://github.com/beatlabs790/BeatWave")
+                                uriHandler.safeOpenUri(context, "https://github.com/Niczzxo/Averon")
                             }
                         )
 

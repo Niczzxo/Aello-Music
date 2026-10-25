@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Averon Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -680,7 +680,7 @@ private fun RoomStatusCard(
         val link = "https://beatwave.de5.net/sync/$roomCode"
         val sendIntent = Intent().apply {
             action = Intent.ACTION_SEND
-            putExtra(Intent.EXTRA_TEXT, "Join my BeatWave Sync session! Listen together in realtime: $link")
+            putExtra(Intent.EXTRA_TEXT, "Join my Averon Sync session! Listen together in realtime: $link")
             type = "text/plain"
         }
         val shareIntent = Intent.createChooser(sendIntent, null)
@@ -694,7 +694,7 @@ private fun RoomStatusCard(
         }
         coroutineScope.launch(Dispatchers.IO) {
             val playlistId = "sync_${System.currentTimeMillis()}"
-            val playlistName = "BeatWave Sync ($roomCode)"
+            val playlistName = "Averon Sync ($roomCode)"
             database.insert(PlaylistEntity(id = playlistId, name = playlistName))
             val songEntities = queue.map { track ->
                 SongEntity(
@@ -817,7 +817,7 @@ private fun RoomStatusCard(
                 icon = R.drawable.link,
                 label = stringResource(R.string.copy_link),
                 onClick = {
-                    copy("BeatWave Sync Link", "https://beatwave.de5.net/sync/$roomCode")
+                    copy("Averon Sync Link", "https://beatwave.de5.net/sync/$roomCode")
                 }
             )
         }

@@ -36,9 +36,10 @@ sealed class Screens(
 
     object Home : Screens(
         // Averon: the music tab is labelled "Music" — Video is the first tab.
+        // Music icon, not the home/house icon.
         titleId = R.string.music,
         route = "home",
-        icon = R.drawable.accord_home,
+        icon = R.drawable.music_note,
     )
 
     object Search : Screens(

@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Averon Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -398,7 +398,7 @@ fun AodScreen(
                 Spacer(modifier = Modifier.height(4.dp))
 
                 Text(
-                    text = mediaMetadata?.artists?.joinToString { it.name } ?: "BeatWave",
+                    text = mediaMetadata?.artists?.joinToString { it.name } ?: "Averon",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
                     color = Color.White.copy(alpha = (dimLevel * 0.6f).coerceIn(0.2f, 0.75f)),

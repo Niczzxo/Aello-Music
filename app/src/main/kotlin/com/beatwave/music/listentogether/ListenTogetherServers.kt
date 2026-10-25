@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Averon Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -20,16 +20,16 @@ object ListenTogetherServers {
     private const val ServersJson = """
         [
           {
-            "name": "BeatWave Sync (Global)",
+            "name": "Averon Sync (Global)",
             "url": "wss://devilmi-vivi-music-listen-together.hf.space",
             "location": "Global",
-            "operator": "BeatWave"
+            "operator": "Averon"
           },
           {
-            "name": "BeatWave Sync (USA)",
+            "name": "Averon Sync (USA)",
             "url": "wss://vivimusic-listen-together.onrender.com",
             "location": "USA",
-            "operator": "BeatWave"
+            "operator": "Averon"
           }
         ]
     """

@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Averon Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -47,7 +47,7 @@ import com.beatwave.music.utils.rememberPreference
 
 /**
  * Automatically prompts the user with a "What's New" changelog summary
- * when they install BeatWave or update to a new version.
+ * when they install Averon or update to a new version.
  */
 @Composable
 fun WhatsNewPromptHost(
@@ -89,7 +89,7 @@ fun WhatsNewPromptHost(
         title = {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "Welcome to BeatWave",
+                    text = "Welcome to Averon",
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
@@ -115,7 +115,7 @@ fun WhatsNewPromptHost(
 
                 ChangelogHighlightItem(
                     emoji = "👥",
-                    title = "BeatWave Sync (Listen Together)",
+                    title = "Averon Sync (Listen Together)",
                     description = "Real-time synchronized playback with friends, instant room share links, QR codes, and live in-room chat."
                 )
 

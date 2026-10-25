@@ -83,7 +83,7 @@ class CrashHandler private constructor(
         }
 
         return buildString {
-            appendLine("BeatWave Crash Report")
+            appendLine("Averon Crash Report")
             appendLine("=".repeat(50))
             appendLine()
             appendLine("Manufacturer: ${Build.MANUFACTURER}")

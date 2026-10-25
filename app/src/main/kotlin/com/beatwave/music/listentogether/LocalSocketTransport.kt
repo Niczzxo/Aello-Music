@@ -22,7 +22,7 @@ class LocalSocketTransport(
     private val onLog: (String) -> Unit
 ) {
     private val serviceType = "_beatwave-sync._tcp"
-    private val serviceName = "BeatWaveOffline"
+    private val serviceName = "AveronOffline"
     private val port = 8282
 
     private var serverSocket: ServerSocket? = null

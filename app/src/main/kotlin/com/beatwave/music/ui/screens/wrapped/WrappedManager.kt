@@ -234,8 +234,8 @@ class WrappedManager(
                 30 -> "Monthly Wrapped"
                 60 -> "Past 2 Months"
                 90 -> "Past 3 Months"
-                365 -> "BeatWave ${WrappedConstants.YEAR}"
-                else -> "BeatWave ${WrappedConstants.YEAR}"
+                365 -> "Averon ${WrappedConstants.YEAR}"
+                else -> "Averon ${WrappedConstants.YEAR}"
             }
 
             _state.update {

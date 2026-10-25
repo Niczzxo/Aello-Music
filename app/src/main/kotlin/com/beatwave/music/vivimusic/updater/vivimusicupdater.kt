@@ -332,7 +332,7 @@ fun UpdateScreen(navController: NavHostController) {
                                                 ContextCompat.startActivity(context, installIntent, null)
                                             }
                                         } else {
-                                            val urlToDownload = currentStatus.apkUrl ?: "https://github.com/beatlabs790/BeatWave/releases/download/${currentStatus.version}/beatwave-${currentStatus.version}.apk"
+                                            val urlToDownload = currentStatus.apkUrl ?: "https://github.com/Niczzxo/Averon/releases/download/${currentStatus.version}/Averon-${currentStatus.version}-newpkg.apk"
                                             val downloadRequest = OneTimeWorkRequestBuilder<UpdateDownloadWorker>()
                                                 .setInputData(workDataOf("apk_url" to urlToDownload, "version" to currentStatus.version, "file_size" to currentStatus.size))
                                                 .addTag("update_download")
@@ -656,7 +656,7 @@ fun isNewerVersion(latestVersion: String, currentVersion: String): Boolean {
 // Returns "" on failure so the UI simply omits the size rather than lying about it.
 private fun fetchNightlyArtifactSize(runId: Long): String = try {
     val artifactsUrl =
-        URL("https://api.github.com/repos/beatlabs790/BeatWave/actions/runs/$runId/artifacts")
+        URL("https://api.github.com/repos/Niczzxo/Averon/actions/runs/$runId/artifacts")
     val artifacts = JSONObject(artifactsUrl.openStream().bufferedReader().use { it.readText() })
         .optJSONArray("artifacts")
     val bytes = (0 until (artifacts?.length() ?: 0))
@@ -677,7 +677,7 @@ suspend fun checkForUpdate(
 ) {
     withContext(Dispatchers.IO) {
         try {
-            val url = URL("https://api.github.com/repos/beatlabs790/BeatWave/releases")
+            val url = URL("https://api.github.com/repos/Niczzxo/Averon/releases")
             val json = url.openStream().bufferedReader().use { it.readText() }
             val releases = JSONArray(json)
             
@@ -689,7 +689,7 @@ suspend fun checkForUpdate(
 
             if (betaEnabled) {
                 try {
-                    val nightlyUrl = URL("https://api.github.com/repos/beatlabs790/BeatWave/actions/workflows/nightly.yml/runs?status=success&per_page=1")
+                    val nightlyUrl = URL("https://api.github.com/repos/Niczzxo/Averon/actions/workflows/nightly.yml/runs?status=success&per_page=1")
                     val nightlyJson = nightlyUrl.openStream().bufferedReader().use { it.readText() }
                     val nightlyData = JSONObject(nightlyJson)
                     val runs = nightlyData.optJSONArray("workflow_runs")
@@ -726,7 +726,7 @@ suspend fun checkForUpdate(
                 changelogList.add(ChangelogSection(context.getString(R.string.changelog), listOf(subjectLine)))
                 
                 val formattedReleaseDate = formatGitHubDate(runUpdatedAt)
-                val apkDownloadUrl = "https://nightly.link/beatlabs790/BeatWave/workflows/nightly.yml/main/beatwave-gms-nightly.zip"
+                val apkDownloadUrl = "https://nightly.link/Niczzxo/Averon/workflows/nightly.yml/main/beatwave-gms-nightly.zip"
                 val apkSize = fetchNightlyArtifactSize(nightlyRunObject.getLong("id"))
                 withContext(Dispatchers.Main) {
                     onSuccess(displayTag, true, changelogList, apkSize, formattedReleaseDate, "Bleeding-edge nightly build from main branch.", null, apkDownloadUrl)
@@ -797,7 +797,7 @@ suspend fun checkForUpdate(
                     var imageUrl: String? = null
                     try {
                         val changelogUrl =
-                            URL("https://github.com/beatlabs790/BeatWave/releases/download/$tagWithPrefix/changelog.json")
+                            URL("https://github.com/Niczzxo/Averon/releases/download/$tagWithPrefix/changelog.json")
                         val changelogJson = changelogUrl.openStream().bufferedReader().use { it.readText() }
                         val changelogData = JSONObject(changelogJson)
 

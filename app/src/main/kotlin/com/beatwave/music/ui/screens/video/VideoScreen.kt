@@ -308,6 +308,9 @@ fun VideoScreen(navController: NavController) {
     var feedShorts by remember { mutableStateOf<List<VideoSearchItem>>(emptyList()) }
     var feedLoading by remember { mutableStateOf(false) }
     var feedError by remember { mutableStateOf<String?>(null) }
+    // Short technical cause (exception class + message) shown under the friendly
+    // error text, so a failed feed load can be diagnosed from a screenshot.
+    var feedErrorDetail by remember { mutableStateOf<String?>(null) }
 
     val scope = rememberCoroutineScope()
     val nowPlaying by VideoPlaybackService.nowPlaying.collectAsState()
@@ -315,6 +318,7 @@ fun VideoScreen(navController: NavController) {
     fun loadFeed(feed: VideoFeed) {
         feedLoading = true
         feedError = null
+        feedErrorDetail = null
         scope.launch {
             val result = withContext(Dispatchers.IO) {
                 if (feed.kioskId != null) {
@@ -341,6 +345,9 @@ fun VideoScreen(navController: NavController) {
                 feedShorts = allShorts.take(20)
             }.onFailure {
                 feedError = "Couldn't load videos. Check your connection and try again."
+                feedErrorDetail = ("${it.javaClass.simpleName}: ${it.message ?: ""}").take(160)
+                feedLong = emptyList()
+                feedShorts = emptyList()
             }
             feedLoading = false
         }
@@ -526,6 +533,13 @@ fun VideoScreen(navController: NavController) {
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text(feedError ?: "")
+                        if (feedErrorDetail != null) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                feedErrorDetail ?: "",
+                                style = MaterialTheme.typography.bodySmall,
+                            )
+                        }
                         Spacer(modifier = Modifier.height(8.dp))
                         Button(onClick = { loadFeed(selectedFeed) }) {
                             Text(stringResource(R.string.video_retry))

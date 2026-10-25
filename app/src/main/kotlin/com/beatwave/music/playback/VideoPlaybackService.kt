@@ -44,6 +44,7 @@ import com.beatwave.music.MainActivity
 import com.beatwave.music.R
 import com.beatwave.music.eq.EqualizerService
 import com.beatwave.music.eq.audio.CustomEqualizerAudioProcessor
+import com.beatwave.music.eq.data.EQProfileRepository
 import com.music.innertube.YouTube
 import com.music.innertube.models.YouTubeClient
 import com.music.innertube.models.response.PlayerResponse
@@ -54,6 +55,8 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.File
@@ -78,6 +81,9 @@ class VideoPlaybackService : Service() {
 
     @Inject
     lateinit var equalizerService: EqualizerService
+
+    @Inject
+    lateinit var eqProfileRepository: EQProfileRepository
 
     private val serviceScope = CoroutineScope(SupervisorJob() + Dispatchers.Main)
 
@@ -140,6 +146,23 @@ class VideoPlaybackService : Service() {
                 }
             }
         })
+
+        // Same EQ wiring as MusicService: video gets the active profile (the
+        // built-in "Averon Enhanced" by default) even when MusicService never ran
+        // in this process — which is the normal case now that Video is the
+        // landing tab. Profile changes apply to video too, live.
+        serviceScope.launch {
+            eqProfileRepository.activeProfile.collect { profile ->
+                if (profile != null) {
+                    equalizerService.applyProfile(profile)
+                } else {
+                    equalizerService.disable()
+                }
+                if (player.isPlaying) {
+                    player.seekTo(player.currentPosition)
+                }
+            }
+        }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {

@@ -88,7 +88,7 @@ object DebugLogs {
     fun tree(context: Context): FileLoggingTree = FileLoggingTree(file(context))
 
     private fun deviceHeader(context: Context): String = buildString {
-        appendLine("BeatWave Debug Log")
+        appendLine("Averon Debug Log")
         appendLine("=".repeat(50))
         appendLine("Time: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date())}")
         appendLine("Manufacturer: ${Build.MANUFACTURER}")

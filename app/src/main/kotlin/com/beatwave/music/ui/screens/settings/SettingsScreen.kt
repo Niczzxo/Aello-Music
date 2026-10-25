@@ -342,13 +342,6 @@ fun SettingsScreen(
                 )
                 SettingsDivider()
                 SettingsNavItem(
-                    icon = painterResource(R.drawable.book),
-                    iconTint = Color(0xFFFF9500),
-                    title = "Buy The Story Of BeatWave - The Book",
-                    onClick = { uriHandler.safeOpenUri(context, "https://beatwavebook.vercel.app") },
-                )
-                SettingsDivider()
-                SettingsNavItem(
                     icon = painterResource(R.drawable.edit),
                     iconTint = Color(0xFF34C759),
                     title = "Suggestions & Feedback",

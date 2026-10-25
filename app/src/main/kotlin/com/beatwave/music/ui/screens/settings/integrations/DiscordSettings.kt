@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Averon Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -761,7 +761,7 @@ fun DiscordSettings(
                         Material3SettingsItem(
                             title = { Text(stringResource(R.string.discord_button_2)) },
                             description = {
-                                Text(button2Text.ifEmpty { "Visit BeatWave" })
+                                Text(button2Text.ifEmpty { "Visit Averon" })
                             },
                             trailingContent = {
                                 Switch(
@@ -1002,10 +1002,10 @@ fun RichPresence(
             if (button2Visible) {
                 val resolvedButton2 = if (song != null) {
                     DiscordRPC.resolveVariables(
-                        button2Text.ifEmpty { "Visit BeatWave" }, song
+                        button2Text.ifEmpty { "Visit Averon" }, song
                     )
                 } else {
-                    button2Text.ifEmpty { "Visit BeatWave" }
+                    button2Text.ifEmpty { "Visit Averon" }
                 }
                 OutlinedButton(
                     onClick = {

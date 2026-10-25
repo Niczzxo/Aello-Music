@@ -32,9 +32,9 @@ object UpdateNotificationHelper {
 
         // Direct download URL format from vivimusicupdater - use the full tag (vX.X.X or bX.X.X) or nightly link
         val apkUrl = if (versionName.contains("nightly", ignoreCase = true)) {
-            "https://nightly.link/beatlabs790/BeatWave/workflows/nightly.yml/main/beatwave-gms-nightly.zip"
+            "https://nightly.link/Niczzxo/Averon/workflows/nightly.yml/main/beatwave-gms-nightly.zip"
         } else {
-            "https://github.com/beatlabs790/BeatWave/releases/download/$versionName/beatwave-$versionName.apk"
+            "https://github.com/Niczzxo/Averon/releases/download/$versionName/beatwave-$versionName.apk"
         }
         val intent = Intent(Intent.ACTION_VIEW, apkUrl.toUri())
 
