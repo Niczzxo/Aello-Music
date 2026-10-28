@@ -1,0 +1,3602 @@
+Downloading https://services.gradle.org/distributions/gradle-9.4.1-bin.zip
+.............10%.............20%.............30%.............40%.............50%.............60%..............70%.............80%.............90%.............100%
+
+Welcome to Gradle 9.4.1!
+
+Here are the highlights of this release:
+ - Java 26 support
+ - Non-class-based JVM tests
+ - Enhanced console progress bar
+
+For more details see https://docs.gradle.org/9.4.1/release-notes.html
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.4.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+Calculating task graph as no cached configuration is available for tasks: assembleUniversalGmsRelease
+
+> Configure project :app
+WARNING: The option setting 'android.newDsl=false' is deprecated.
+The current default is 'true'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+WARNING: API 'applicationVariants' is obsolete and has been replaced with 'AndroidComponentsExtension'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+The legacy variant API is disabled by default in AGP 9.0, but can be re-enabled by adding 
+    android.newDsl=false
+to this project's gradle.properties file.
+For more information, see http://developer.android.com/build/r/new-dsl.
+
+To determine what is calling applicationVariants, use -Pandroid.debug.obsoleteApi=true on the command line to display more information.
+WARNING: API 'testVariants' is obsolete and has been replaced with 'AndroidComponentsExtension'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+The legacy variant API is disabled by default in AGP 9.0, but can be re-enabled by adding 
+    android.newDsl=false
+to this project's gradle.properties file.
+For more information, see http://developer.android.com/build/r/new-dsl.
+
+To determine what is calling testVariants, use -Pandroid.debug.obsoleteApi=true on the command line to display more information.
+WARNING: API 'unitTestVariants' is obsolete and has been replaced with 'AndroidComponentsExtension'.
+It will be removed in version 10.0 of the Android Gradle plugin.
+The legacy variant API is disabled by default in AGP 9.0, but can be re-enabled by adding 
+    android.newDsl=false
+to this project's gradle.properties file.
+For more information, see http://developer.android.com/build/r/new-dsl.
+
+To determine what is calling unitTestVariants, use -Pandroid.debug.obsoleteApi=true on the command line to display more information.
+w: file:///home/runner/work/Averon/Averon/app/build.gradle.kts:39:1: 'fun Project.android(configure: Action<BaseAppModuleExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.ApplicationExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :artistvideo
+w: file:///home/runner/work/Averon/Averon/artistvideo/build.gradle.kts:7:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :betterlyrics
+w: file:///home/runner/work/Averon/Averon/betterlyrics/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :innertube
+w: file:///home/runner/work/Averon/Averon/innertube/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :jiosaavn
+w: file:///home/runner/work/Averon/Averon/jiosaavn/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :kizzy
+w: file:///home/runner/work/Averon/Averon/kizzy/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :kugou
+w: file:///home/runner/work/Averon/Averon/kugou/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :lastfm
+w: file:///home/runner/work/Averon/Averon/lastfm/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :lrclib
+w: file:///home/runner/work/Averon/Averon/lrclib/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :musixmatchlyrics
+w: file:///home/runner/work/Averon/Averon/musixmatchlyrics/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :paxsenixlyrics
+w: file:///home/runner/work/Averon/Averon/paxsenixlyrics/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :shazamkit
+w: file:///home/runner/work/Averon/Averon/shazamkit/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :simpmusic
+w: file:///home/runner/work/Averon/Averon/simpmusic/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :spine
+w: file:///home/runner/work/Averon/Averon/spine/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :spotify
+w: file:///home/runner/work/Averon/Averon/spotify/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Configure project :youlyplus
+w: file:///home/runner/work/Averon/Averon/youlyplus/build.gradle.kts:6:1: 'fun Project.android(configure: Action<LibraryExtension>): Unit' is deprecated. Replaced by com.android.build.api.dsl.LibraryExtension.
+This class is not used for the public extensions in AGP when android.newDsl=true, which is the default in AGP 9.0, and will be removed in AGP 10.0.
+
+> Task :canvas:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :applecanvas:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :vivimusiccanvas:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :canvas:processResources NO-SOURCE
+> Task :applecanvas:processResources NO-SOURCE
+> Task :vivimusiccanvas:processResources NO-SOURCE
+> Task :betterlyrics:preBuild UP-TO-DATE
+> Task :app:preBuild UP-TO-DATE
+> Task :artistvideo:preBuild UP-TO-DATE
+> Task :app:preUniversalGmsReleaseBuild UP-TO-DATE
+> Task :betterlyrics:preReleaseBuild UP-TO-DATE
+> Task :artistvideo:preReleaseBuild UP-TO-DATE
+> Task :artistvideo:mergeReleaseJniLibFolders
+> Task :app:mergeUniversalGmsReleaseJniLibFolders
+> Task :betterlyrics:mergeReleaseJniLibFolders
+> Task :innertube:preBuild UP-TO-DATE
+> Task :innertube:preReleaseBuild UP-TO-DATE
+> Task :betterlyrics:mergeReleaseNativeLibs NO-SOURCE
+> Task :artistvideo:mergeReleaseNativeLibs NO-SOURCE
+> Task :innertube:mergeReleaseJniLibFolders
+> Task :innertube:mergeReleaseNativeLibs NO-SOURCE
+> Task :artistvideo:copyReleaseJniLibsProjectOnly
+> Task :betterlyrics:copyReleaseJniLibsProjectOnly
+> Task :jiosaavn:preBuild UP-TO-DATE
+> Task :kizzy:preBuild UP-TO-DATE
+> Task :jiosaavn:preReleaseBuild UP-TO-DATE
+> Task :kizzy:preReleaseBuild UP-TO-DATE
+> Task :innertube:copyReleaseJniLibsProjectOnly
+> Task :kugou:preBuild UP-TO-DATE
+> Task :kugou:preReleaseBuild UP-TO-DATE
+> Task :jiosaavn:mergeReleaseJniLibFolders
+> Task :jiosaavn:mergeReleaseNativeLibs NO-SOURCE
+> Task :kizzy:mergeReleaseJniLibFolders
+> Task :kizzy:mergeReleaseNativeLibs NO-SOURCE
+> Task :kugou:mergeReleaseJniLibFolders
+> Task :jiosaavn:copyReleaseJniLibsProjectOnly
+> Task :lastfm:preBuild UP-TO-DATE
+> Task :lastfm:preReleaseBuild UP-TO-DATE
+> Task :kizzy:copyReleaseJniLibsProjectOnly
+> Task :lrclib:preBuild UP-TO-DATE
+> Task :kugou:mergeReleaseNativeLibs NO-SOURCE
+> Task :lrclib:preReleaseBuild UP-TO-DATE
+> Task :lastfm:mergeReleaseJniLibFolders
+> Task :kugou:copyReleaseJniLibsProjectOnly
+> Task :musixmatchlyrics:preBuild UP-TO-DATE
+> Task :musixmatchlyrics:preReleaseBuild UP-TO-DATE
+> Task :lastfm:mergeReleaseNativeLibs NO-SOURCE
+> Task :lrclib:mergeReleaseJniLibFolders
+> Task :lrclib:mergeReleaseNativeLibs NO-SOURCE
+> Task :lastfm:copyReleaseJniLibsProjectOnly
+> Task :paxsenixlyrics:preBuild UP-TO-DATE
+> Task :paxsenixlyrics:preReleaseBuild UP-TO-DATE
+> Task :musixmatchlyrics:mergeReleaseJniLibFolders
+> Task :lrclib:copyReleaseJniLibsProjectOnly
+> Task :shazamkit:preBuild UP-TO-DATE
+> Task :shazamkit:preReleaseBuild UP-TO-DATE
+> Task :musixmatchlyrics:mergeReleaseNativeLibs NO-SOURCE
+> Task :paxsenixlyrics:mergeReleaseJniLibFolders
+> Task :musixmatchlyrics:copyReleaseJniLibsProjectOnly
+> Task :shazamkit:mergeReleaseJniLibFolders
+> Task :paxsenixlyrics:mergeReleaseNativeLibs NO-SOURCE
+> Task :simpmusic:preBuild UP-TO-DATE
+> Task :simpmusic:preReleaseBuild UP-TO-DATE
+> Task :shazamkit:mergeReleaseNativeLibs NO-SOURCE
+> Task :paxsenixlyrics:copyReleaseJniLibsProjectOnly
+> Task :spine:preBuild UP-TO-DATE
+> Task :spine:preReleaseBuild UP-TO-DATE
+> Task :shazamkit:copyReleaseJniLibsProjectOnly
+> Task :spotify:preBuild UP-TO-DATE
+> Task :spotify:preReleaseBuild UP-TO-DATE
+> Task :simpmusic:mergeReleaseJniLibFolders
+> Task :simpmusic:mergeReleaseNativeLibs NO-SOURCE
+> Task :spine:mergeReleaseJniLibFolders
+> Task :spotify:mergeReleaseJniLibFolders
+> Task :simpmusic:copyReleaseJniLibsProjectOnly
+> Task :youlyplus:preBuild UP-TO-DATE
+> Task :youlyplus:preReleaseBuild UP-TO-DATE
+> Task :spine:mergeReleaseNativeLibs NO-SOURCE
+> Task :spotify:mergeReleaseNativeLibs NO-SOURCE
+> Task :spine:copyReleaseJniLibsProjectOnly
+> Task :spotify:copyReleaseJniLibsProjectOnly
+> Task :youlyplus:mergeReleaseJniLibFolders
+> Task :artistvideo:prepareReleaseArtProfile
+> Task :betterlyrics:prepareReleaseArtProfile
+> Task :youlyplus:mergeReleaseNativeLibs NO-SOURCE
+> Task :innertube:prepareReleaseArtProfile
+> Task :jiosaavn:prepareReleaseArtProfile
+> Task :kizzy:prepareReleaseArtProfile
+> Task :youlyplus:copyReleaseJniLibsProjectOnly
+> Task :kugou:prepareReleaseArtProfile
+> Task :lrclib:prepareReleaseArtProfile
+> Task :lastfm:prepareReleaseArtProfile
+> Task :musixmatchlyrics:prepareReleaseArtProfile
+> Task :paxsenixlyrics:prepareReleaseArtProfile
+> Task :simpmusic:prepareReleaseArtProfile
+> Task :shazamkit:prepareReleaseArtProfile
+> Task :spine:prepareReleaseArtProfile
+> Task :spotify:prepareReleaseArtProfile
+> Task :youlyplus:prepareReleaseArtProfile
+> Task :innertube:generateReleaseResources
+> Task :innertube:processReleaseNavigationResources
+> Task :innertube:javaPreCompileRelease
+> Task :kugou:generateReleaseResources
+> Task :innertube:packageReleaseResources
+> Task :kugou:packageReleaseResources
+> Task :kugou:processReleaseNavigationResources
+> Task :kugou:parseReleaseLocalResources
+> Task :innertube:parseReleaseLocalResources
+> Task :kugou:generateReleaseRFile
+> Task :innertube:generateReleaseRFile
+> Task :app:mergeUniversalGmsReleaseArtProfile
+> Task :app:expandUniversalGmsReleaseL8ArtProfileWildcards
+> Task :kugou:javaPreCompileRelease
+> Task :lrclib:generateReleaseResources
+> Task :lrclib:packageReleaseResources
+> Task :lrclib:processReleaseNavigationResources
+> Task :lrclib:parseReleaseLocalResources
+> Task :lrclib:generateReleaseRFile
+> Task :lrclib:compileReleaseKotlin
+> Task :lrclib:javaPreCompileRelease
+> Task :lrclib:compileReleaseJavaWithJavac NO-SOURCE
+> Task :lrclib:mergeReleaseGeneratedProguardFiles
+> Task :kugou:compileReleaseKotlin
+> Task :kugou:compileReleaseJavaWithJavac NO-SOURCE
+> Task :kugou:mergeReleaseGeneratedProguardFiles
+> Task :kugou:exportReleaseConsumerProguardFiles
+> Task :lrclib:exportReleaseConsumerProguardFiles
+
+> Task :canvas:compileKotlin
+w: file:///home/runner/work/Averon/Averon/canvas/src/main/kotlin/com/beatwave/music/canvas/TidalCanvasProvider.kt:175:72 Unnecessary safe call on a non-null receiver of type 'JsonObject'.
+
+> Task :canvas:compileJava NO-SOURCE
+> Task :canvas:classes UP-TO-DATE
+> Task :kizzy:processReleaseNavigationResources
+> Task :kizzy:generateReleaseResources
+> Task :kizzy:javaPreCompileRelease
+> Task :lastfm:generateReleaseResources
+> Task :kizzy:packageReleaseResources
+> Task :lastfm:packageReleaseResources
+> Task :lastfm:processReleaseNavigationResources
+> Task :kizzy:parseReleaseLocalResources
+> Task :lastfm:parseReleaseLocalResources
+> Task :kizzy:generateReleaseRFile
+> Task :canvas:jar
+> Task :lastfm:generateReleaseRFile
+> Task :vivimusiccanvas:compileKotlin
+> Task :vivimusiccanvas:compileJava NO-SOURCE
+> Task :vivimusiccanvas:classes UP-TO-DATE
+> Task :vivimusiccanvas:jar
+> Task :applecanvas:compileKotlin
+> Task :applecanvas:compileJava NO-SOURCE
+> Task :applecanvas:classes UP-TO-DATE
+> Task :applecanvas:jar
+> Task :lastfm:compileReleaseKotlin
+> Task :lastfm:javaPreCompileRelease
+> Task :lastfm:compileReleaseJavaWithJavac NO-SOURCE
+> Task :lastfm:mergeReleaseGeneratedProguardFiles
+> Task :lastfm:exportReleaseConsumerProguardFiles
+> Task :betterlyrics:generateReleaseResources
+> Task :betterlyrics:packageReleaseResources
+> Task :app:mergeUniversalGmsReleaseNativeLibs
+> Task :betterlyrics:processReleaseNavigationResources
+> Task :betterlyrics:parseReleaseLocalResources
+
+> Task :app:stripUniversalGmsReleaseDebugSymbols
+Unable to strip the following libraries, packaging them as they are: libquickjs.so. Run with --info option to learn more.
+
+> Task :betterlyrics:generateReleaseRFile
+> Task :app:extractUniversalGmsReleaseNativeSymbolTables
+> Task :app:mergeUniversalGmsReleaseNativeDebugMetadata NO-SOURCE
+> Task :betterlyrics:javaPreCompileRelease
+> Task :paxsenixlyrics:generateReleaseResources
+> Task :paxsenixlyrics:packageReleaseResources
+> Task :paxsenixlyrics:processReleaseNavigationResources
+> Task :paxsenixlyrics:parseReleaseLocalResources
+> Task :paxsenixlyrics:generateReleaseRFile
+> Task :paxsenixlyrics:javaPreCompileRelease
+> Task :simpmusic:generateReleaseResources
+> Task :simpmusic:packageReleaseResources
+> Task :simpmusic:processReleaseNavigationResources
+> Task :simpmusic:parseReleaseLocalResources
+> Task :simpmusic:generateReleaseRFile
+> Task :kizzy:compileReleaseKotlin
+> Task :kizzy:compileReleaseJavaWithJavac NO-SOURCE
+> Task :kizzy:mergeReleaseGeneratedProguardFiles
+> Task :kizzy:exportReleaseConsumerProguardFiles
+> Task :simpmusic:javaPreCompileRelease
+> Task :youlyplus:generateReleaseResources
+> Task :youlyplus:packageReleaseResources
+> Task :youlyplus:processReleaseNavigationResources
+> Task :youlyplus:parseReleaseLocalResources
+> Task :youlyplus:generateReleaseRFile
+> Task :simpmusic:compileReleaseKotlin
+> Task :simpmusic:compileReleaseJavaWithJavac NO-SOURCE
+> Task :simpmusic:mergeReleaseGeneratedProguardFiles
+> Task :simpmusic:exportReleaseConsumerProguardFiles
+> Task :youlyplus:javaPreCompileRelease
+> Task :shazamkit:generateReleaseResources
+> Task :shazamkit:packageReleaseResources
+> Task :shazamkit:processReleaseNavigationResources
+> Task :shazamkit:parseReleaseLocalResources
+> Task :shazamkit:generateReleaseRFile
+> Task :betterlyrics:compileReleaseKotlin
+> Task :betterlyrics:compileReleaseJavaWithJavac NO-SOURCE
+> Task :betterlyrics:bundleLibCompileToJarRelease
+> Task :youlyplus:compileReleaseKotlin
+> Task :betterlyrics:mergeReleaseGeneratedProguardFiles
+> Task :betterlyrics:exportReleaseConsumerProguardFiles
+> Task :youlyplus:compileReleaseJavaWithJavac NO-SOURCE
+> Task :youlyplus:mergeReleaseGeneratedProguardFiles
+> Task :youlyplus:exportReleaseConsumerProguardFiles
+> Task :shazamkit:javaPreCompileRelease
+> Task :artistvideo:generateReleaseResources
+> Task :artistvideo:packageReleaseResources
+> Task :artistvideo:processReleaseNavigationResources
+> Task :artistvideo:parseReleaseLocalResources
+> Task :artistvideo:generateReleaseRFile
+> Task :innertube:compileReleaseKotlin
+> Task :shazamkit:compileReleaseKotlin
+> Task :shazamkit:compileReleaseJavaWithJavac NO-SOURCE
+> Task :shazamkit:mergeReleaseGeneratedProguardFiles
+> Task :shazamkit:exportReleaseConsumerProguardFiles
+> Task :artistvideo:javaPreCompileRelease
+> Task :musixmatchlyrics:generateReleaseResources
+> Task :musixmatchlyrics:packageReleaseResources
+> Task :musixmatchlyrics:processReleaseNavigationResources
+> Task :musixmatchlyrics:parseReleaseLocalResources
+> Task :musixmatchlyrics:generateReleaseRFile
+> Task :paxsenixlyrics:compileReleaseKotlin
+> Task :paxsenixlyrics:compileReleaseJavaWithJavac NO-SOURCE
+> Task :paxsenixlyrics:mergeReleaseGeneratedProguardFiles
+> Task :paxsenixlyrics:exportReleaseConsumerProguardFiles
+> Task :musixmatchlyrics:javaPreCompileRelease
+> Task :jiosaavn:generateReleaseResources
+> Task :jiosaavn:packageReleaseResources
+> Task :jiosaavn:processReleaseNavigationResources
+> Task :jiosaavn:parseReleaseLocalResources
+> Task :jiosaavn:generateReleaseRFile
+> Task :jiosaavn:compileReleaseKotlin
+> Task :jiosaavn:javaPreCompileRelease
+> Task :jiosaavn:compileReleaseJavaWithJavac NO-SOURCE
+> Task :jiosaavn:mergeReleaseGeneratedProguardFiles
+> Task :jiosaavn:exportReleaseConsumerProguardFiles
+> Task :spotify:generateReleaseResources
+> Task :spotify:packageReleaseResources
+> Task :spotify:processReleaseNavigationResources
+> Task :spotify:parseReleaseLocalResources
+> Task :spotify:generateReleaseRFile
+> Task :musixmatchlyrics:compileReleaseKotlin
+> Task :musixmatchlyrics:compileReleaseJavaWithJavac NO-SOURCE
+> Task :musixmatchlyrics:mergeReleaseGeneratedProguardFiles
+> Task :musixmatchlyrics:exportReleaseConsumerProguardFiles
+> Task :spotify:javaPreCompileRelease
+> Task :spine:generateReleaseResources
+> Task :spine:packageReleaseResources
+> Task :spine:processReleaseNavigationResources
+> Task :spine:parseReleaseLocalResources
+> Task :spine:generateReleaseRFile
+> Task :artistvideo:compileReleaseKotlin
+> Task :artistvideo:compileReleaseJavaWithJavac NO-SOURCE
+> Task :artistvideo:mergeReleaseGeneratedProguardFiles
+> Task :artistvideo:exportReleaseConsumerProguardFiles
+> Task :spine:javaPreCompileRelease
+
+> Task :spine:compileReleaseKotlin
+w: file:///home/runner/work/Averon/Averon/spine/src/main/kotlin/com/music/spine/ModuleManager.kt:168:62 Unnecessary safe call on a non-null receiver of type 'String'.
+w: file:///home/runner/work/Averon/Averon/spine/src/main/kotlin/com/music/spine/QuickJsExecutor.kt:366:49 Unnecessary safe call on a non-null receiver of type 'ResponseBody'.
+
+> Task :spine:compileReleaseJavaWithJavac NO-SOURCE
+> Task :spine:mergeReleaseGeneratedProguardFiles
+> Task :spine:exportReleaseConsumerProguardFiles
+> Task :app:generateUniversalGmsReleaseBuildConfig
+> Task :app:protobufDummy UP-TO-DATE
+> Task :spotify:compileReleaseKotlin
+> Task :spotify:compileReleaseJavaWithJavac NO-SOURCE
+> Task :spotify:mergeReleaseGeneratedProguardFiles
+> Task :app:extractGmsProto
+> Task :spotify:exportReleaseConsumerProguardFiles
+> Task :artistvideo:bundleLibRuntimeToJarRelease
+> Task :artistvideo:processReleaseJavaRes
+> Task :artistvideo:createFullJarRelease
+> Task :betterlyrics:bundleLibRuntimeToJarRelease
+> Task :betterlyrics:processReleaseJavaRes
+> Task :jiosaavn:bundleLibRuntimeToJarRelease
+> Task :betterlyrics:createFullJarRelease
+> Task :jiosaavn:processReleaseJavaRes
+> Task :jiosaavn:createFullJarRelease
+> Task :kizzy:bundleLibRuntimeToJarRelease
+> Task :kugou:bundleLibRuntimeToJarRelease
+> Task :kizzy:processReleaseJavaRes
+> Task :kizzy:createFullJarRelease
+> Task :kugou:processReleaseJavaRes
+> Task :kugou:createFullJarRelease
+> Task :lastfm:bundleLibRuntimeToJarRelease
+> Task :lrclib:bundleLibRuntimeToJarRelease
+> Task :lastfm:processReleaseJavaRes
+> Task :lastfm:createFullJarRelease
+> Task :lrclib:processReleaseJavaRes
+> Task :lrclib:createFullJarRelease
+> Task :musixmatchlyrics:bundleLibRuntimeToJarRelease
+> Task :musixmatchlyrics:processReleaseJavaRes
+> Task :musixmatchlyrics:createFullJarRelease
+> Task :paxsenixlyrics:processReleaseJavaRes
+> Task :paxsenixlyrics:bundleLibRuntimeToJarRelease
+> Task :paxsenixlyrics:createFullJarRelease
+> Task :shazamkit:bundleLibRuntimeToJarRelease
+> Task :simpmusic:bundleLibRuntimeToJarRelease
+> Task :shazamkit:processReleaseJavaRes
+> Task :app:checkUniversalGmsReleaseDuplicateClasses
+> Task :simpmusic:processReleaseJavaRes
+> Task :shazamkit:createFullJarRelease
+> Task :simpmusic:createFullJarRelease
+> Task :spine:processReleaseJavaRes
+> Task :spine:bundleLibRuntimeToJarRelease
+> Task :spine:createFullJarRelease
+> Task :spotify:bundleLibRuntimeToJarRelease
+> Task :spotify:processReleaseJavaRes
+> Task :youlyplus:bundleLibRuntimeToJarRelease
+> Task :app:extractProto
+> Task :youlyplus:processReleaseJavaRes
+> Task :app:extractReleaseProto
+> Task :youlyplus:createFullJarRelease
+> Task :app:extractUniversalGmsReleaseProto
+> Task :app:extractUniversalGmsProto
+> Task :spotify:createFullJarRelease
+> Task :app:extractUniversalProto
+> Task :artistvideo:extractReleaseSupportedLocales
+> Task :betterlyrics:extractReleaseSupportedLocales
+> Task :innertube:extractReleaseSupportedLocales
+> Task :jiosaavn:extractReleaseSupportedLocales
+> Task :kizzy:extractReleaseSupportedLocales
+> Task :kugou:extractReleaseSupportedLocales
+> Task :lastfm:extractReleaseSupportedLocales
+> Task :lrclib:extractReleaseSupportedLocales
+> Task :musixmatchlyrics:extractReleaseSupportedLocales
+> Task :paxsenixlyrics:extractReleaseSupportedLocales
+> Task :shazamkit:extractReleaseSupportedLocales
+> Task :app:mapUniversalGmsReleaseSourceSetPaths
+> Task :spine:extractReleaseSupportedLocales
+> Task :simpmusic:extractReleaseSupportedLocales
+> Task :app:extractUniversalGmsReleaseSupportedLocales
+> Task :youlyplus:extractReleaseSupportedLocales
+> Task :spotify:extractReleaseSupportedLocales
+> Task :app:generateUniversalGmsReleaseResources
+> Task :artistvideo:bundleLibCompileToJarRelease
+> Task :app:generateUniversalGmsReleaseLocaleConfig
+> Task :jiosaavn:bundleLibCompileToJarRelease
+> Task :app:processUniversalGmsReleaseNavigationResources
+> Task :kugou:bundleLibCompileToJarRelease
+> Task :kizzy:bundleLibCompileToJarRelease
+> Task :lastfm:bundleLibCompileToJarRelease
+> Task :lrclib:bundleLibCompileToJarRelease
+> Task :musixmatchlyrics:bundleLibCompileToJarRelease
+> Task :paxsenixlyrics:bundleLibCompileToJarRelease
+> Task :simpmusic:bundleLibCompileToJarRelease
+> Task :shazamkit:bundleLibCompileToJarRelease
+> Task :spine:bundleLibCompileToJarRelease
+> Task :youlyplus:bundleLibCompileToJarRelease
+> Task :spotify:bundleLibCompileToJarRelease
+> Task :artistvideo:writeReleaseAarMetadata
+> Task :betterlyrics:writeReleaseAarMetadata
+> Task :innertube:writeReleaseAarMetadata
+> Task :jiosaavn:writeReleaseAarMetadata
+> Task :kizzy:writeReleaseAarMetadata
+> Task :kugou:writeReleaseAarMetadata
+> Task :lastfm:writeReleaseAarMetadata
+> Task :lrclib:writeReleaseAarMetadata
+> Task :musixmatchlyrics:writeReleaseAarMetadata
+> Task :paxsenixlyrics:writeReleaseAarMetadata
+> Task :shazamkit:writeReleaseAarMetadata
+> Task :simpmusic:writeReleaseAarMetadata
+> Task :spine:writeReleaseAarMetadata
+> Task :spotify:writeReleaseAarMetadata
+> Task :youlyplus:writeReleaseAarMetadata
+> Task :app:javaPreCompileUniversalGmsRelease
+> Task :app:compileUniversalGmsReleaseNavigationResources
+> Task :app:checkUniversalGmsReleaseAarMetadata
+> Task :app:createUniversalGmsReleaseCompatibleScreenManifests
+> Task :app:extractDeepLinksUniversalGmsRelease
+> Task :artistvideo:extractDeepLinksRelease
+> Task :artistvideo:processReleaseManifest
+> Task :betterlyrics:extractDeepLinksRelease
+> Task :betterlyrics:processReleaseManifest
+> Task :innertube:extractDeepLinksRelease
+> Task :innertube:processReleaseManifest
+> Task :jiosaavn:extractDeepLinksRelease
+> Task :app:packageUniversalGmsReleaseResources
+> Task :jiosaavn:processReleaseManifest
+> Task :kizzy:extractDeepLinksRelease
+> Task :kizzy:processReleaseManifest
+> Task :kugou:extractDeepLinksRelease
+> Task :kugou:processReleaseManifest
+> Task :lastfm:extractDeepLinksRelease
+> Task :lastfm:processReleaseManifest
+> Task :lrclib:extractDeepLinksRelease
+> Task :lrclib:processReleaseManifest
+> Task :musixmatchlyrics:extractDeepLinksRelease
+> Task :musixmatchlyrics:processReleaseManifest
+> Task :paxsenixlyrics:extractDeepLinksRelease
+> Task :paxsenixlyrics:processReleaseManifest
+> Task :app:parseUniversalGmsReleaseLocalResources
+> Task :shazamkit:extractDeepLinksRelease
+> Task :shazamkit:processReleaseManifest
+> Task :simpmusic:extractDeepLinksRelease
+> Task :simpmusic:processReleaseManifest
+> Task :spine:extractDeepLinksRelease
+> Task :spine:processReleaseManifest
+> Task :spotify:extractDeepLinksRelease
+
+> Task :spotify:processReleaseManifest
+package="com.music.spotify" found in source AndroidManifest.xml: /home/runner/work/Averon/Averon/spotify/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.music.spotify" from the source AndroidManifest.xml: /home/runner/work/Averon/Averon/spotify/src/main/AndroidManifest.xml.
+
+> Task :youlyplus:extractDeepLinksRelease
+
+> Task :youlyplus:processReleaseManifest
+package="com.music.youlyplus" found in source AndroidManifest.xml: /home/runner/work/Averon/Averon/youlyplus/src/main/AndroidManifest.xml.
+Setting the namespace via the package attribute in the source AndroidManifest.xml is no longer supported, and the value is ignored.
+Recommendation: remove package="com.music.youlyplus" from the source AndroidManifest.xml: /home/runner/work/Averon/Averon/youlyplus/src/main/AndroidManifest.xml.
+
+> Task :app:generateUniversalGmsReleaseRFile
+> Task :artistvideo:mapReleaseSourceSetPaths
+> Task :artistvideo:compileReleaseLibraryResources
+> Task :betterlyrics:mapReleaseSourceSetPaths
+> Task :betterlyrics:compileReleaseLibraryResources
+> Task :innertube:mapReleaseSourceSetPaths
+> Task :innertube:compileReleaseLibraryResources
+> Task :jiosaavn:mapReleaseSourceSetPaths
+> Task :jiosaavn:compileReleaseLibraryResources
+> Task :kizzy:mapReleaseSourceSetPaths
+> Task :kizzy:compileReleaseLibraryResources
+> Task :kugou:mapReleaseSourceSetPaths
+> Task :kugou:compileReleaseLibraryResources
+> Task :lastfm:mapReleaseSourceSetPaths
+> Task :lastfm:compileReleaseLibraryResources
+> Task :lrclib:mapReleaseSourceSetPaths
+> Task :lrclib:compileReleaseLibraryResources
+> Task :musixmatchlyrics:mapReleaseSourceSetPaths
+> Task :musixmatchlyrics:compileReleaseLibraryResources
+> Task :paxsenixlyrics:mapReleaseSourceSetPaths
+> Task :paxsenixlyrics:compileReleaseLibraryResources
+> Task :shazamkit:mapReleaseSourceSetPaths
+> Task :shazamkit:compileReleaseLibraryResources
+> Task :simpmusic:mapReleaseSourceSetPaths
+> Task :simpmusic:compileReleaseLibraryResources
+> Task :spine:mapReleaseSourceSetPaths
+> Task :spine:compileReleaseLibraryResources
+> Task :spotify:mapReleaseSourceSetPaths
+> Task :spotify:compileReleaseLibraryResources
+> Task :youlyplus:mapReleaseSourceSetPaths
+> Task :youlyplus:compileReleaseLibraryResources
+> Task :app:extractProguardFiles
+> Task :app:processUniversalGmsReleaseMainManifest
+> Task :app:mergeUniversalGmsReleaseStartupProfile
+> Task :app:generateUniversalGmsReleaseAssets UP-TO-DATE
+> Task :artistvideo:generateReleaseAssets UP-TO-DATE
+> Task :artistvideo:mergeReleaseAssets
+> Task :betterlyrics:generateReleaseAssets UP-TO-DATE
+> Task :betterlyrics:mergeReleaseAssets
+> Task :innertube:generateReleaseAssets UP-TO-DATE
+> Task :innertube:mergeReleaseAssets
+> Task :jiosaavn:generateReleaseAssets UP-TO-DATE
+> Task :jiosaavn:mergeReleaseAssets
+> Task :kizzy:generateReleaseAssets UP-TO-DATE
+> Task :kizzy:mergeReleaseAssets
+> Task :kugou:generateReleaseAssets UP-TO-DATE
+> Task :kugou:mergeReleaseAssets
+> Task :lastfm:generateReleaseAssets UP-TO-DATE
+> Task :lastfm:mergeReleaseAssets
+> Task :lrclib:generateReleaseAssets UP-TO-DATE
+> Task :lrclib:mergeReleaseAssets
+> Task :musixmatchlyrics:generateReleaseAssets UP-TO-DATE
+> Task :musixmatchlyrics:mergeReleaseAssets
+> Task :paxsenixlyrics:generateReleaseAssets UP-TO-DATE
+> Task :paxsenixlyrics:mergeReleaseAssets
+> Task :shazamkit:generateReleaseAssets UP-TO-DATE
+> Task :shazamkit:mergeReleaseAssets
+> Task :simpmusic:generateReleaseAssets UP-TO-DATE
+> Task :simpmusic:mergeReleaseAssets
+> Task :spine:generateReleaseAssets UP-TO-DATE
+> Task :spine:mergeReleaseAssets
+> Task :spotify:generateReleaseAssets UP-TO-DATE
+> Task :spotify:mergeReleaseAssets
+> Task :youlyplus:generateReleaseAssets UP-TO-DATE
+> Task :youlyplus:mergeReleaseAssets
+> Task :app:processUniversalGmsReleaseManifest
+> Task :app:processUniversalGmsReleaseManifestForPackage
+> Task :app:mergeUniversalGmsReleaseAssets
+> Task :app:compressUniversalGmsReleaseAssets
+> Task :artistvideo:extractProguardFiles
+> Task :app:extractUniversalGmsReleaseVersionControlInfo
+> Task :artistvideo:prepareLintJarForPublish
+> Task :betterlyrics:extractProguardFiles
+> Task :app:mergeUniversalGmsReleaseResources
+> Task :betterlyrics:generateReleaseLintModel
+> Task :betterlyrics:prepareLintJarForPublish
+> Task :innertube:extractProguardFiles
+> Task :innertube:prepareLintJarForPublish
+> Task :jiosaavn:extractProguardFiles
+> Task :jiosaavn:generateReleaseLintModel
+> Task :jiosaavn:prepareLintJarForPublish
+> Task :kizzy:extractProguardFiles
+> Task :kizzy:generateReleaseLintModel
+> Task :kizzy:prepareLintJarForPublish
+> Task :kugou:extractProguardFiles
+> Task :kugou:generateReleaseLintModel
+
+> Task :innertube:compileReleaseKotlin
+w: file:///home/runner/work/Averon/Averon/innertube/src/main/kotlin/com/music/innertube/YouTube.kt:268:32 Unnecessary safe call on a non-null receiver of type 'Tabs.Tab.TabRenderer'.
+w: file:///home/runner/work/Averon/Averon/innertube/src/main/kotlin/com/music/innertube/YouTube.kt:285:32 Unnecessary safe call on a non-null receiver of type 'Tabs.Tab.TabRenderer'.
+w: file:///home/runner/work/Averon/Averon/innertube/src/main/kotlin/com/music/innertube/pages/RelatedPage.kt:119:58 Unnecessary safe call on a non-null receiver of type 'Runs'.
+w: file:///home/runner/work/Averon/Averon/innertube/src/main/kotlin/com/music/innertube/pages/VideoSearch.kt:183:36 'var relatedStreams: (Mutable)List<InfoItem!>!' is deprecated. Deprecated in Java.
+w: file:///home/runner/work/Averon/Averon/innertube/src/main/kotlin/com/music/innertube/pages/VideoSearch.kt:231:45 Unnecessary safe call on a non-null receiver of type 'Description'.
+
+> Task :kugou:prepareLintJarForPublish
+> Task :lastfm:extractProguardFiles
+> Task :lastfm:generateReleaseLintModel
+> Task :lastfm:prepareLintJarForPublish
+> Task :lrclib:extractProguardFiles
+> Task :lrclib:generateReleaseLintModel
+> Task :lrclib:prepareLintJarForPublish
+> Task :musixmatchlyrics:extractProguardFiles
+> Task :musixmatchlyrics:generateReleaseLintModel
+> Task :musixmatchlyrics:prepareLintJarForPublish
+> Task :paxsenixlyrics:extractProguardFiles
+> Task :paxsenixlyrics:generateReleaseLintModel
+> Task :paxsenixlyrics:prepareLintJarForPublish
+> Task :shazamkit:extractProguardFiles
+> Task :shazamkit:generateReleaseLintModel
+> Task :shazamkit:prepareLintJarForPublish
+> Task :simpmusic:extractProguardFiles
+> Task :simpmusic:generateReleaseLintModel
+> Task :simpmusic:prepareLintJarForPublish
+> Task :spine:extractProguardFiles
+> Task :innertube:compileReleaseJavaWithJavac NO-SOURCE
+> Task :innertube:mergeReleaseGeneratedProguardFiles
+> Task :innertube:exportReleaseConsumerProguardFiles
+> Task :spine:generateReleaseLintModel
+> Task :innertube:processReleaseJavaRes
+> Task :innertube:bundleLibRuntimeToJarRelease
+> Task :innertube:createFullJarRelease
+> Task :innertube:bundleLibCompileToJarRelease
+> Task :innertube:generateReleaseLintModel
+> Task :spine:prepareLintJarForPublish
+> Task :spotify:extractProguardFiles
+> Task :artistvideo:generateReleaseLintModel
+> Task :spotify:prepareLintJarForPublish
+> Task :youlyplus:extractProguardFiles
+> Task :spotify:generateReleaseLintModel
+> Task :youlyplus:prepareLintJarForPublish
+> Task :youlyplus:generateReleaseLintModel
+> Task :innertube:stripReleaseDebugSymbols NO-SOURCE
+> Task :innertube:copyReleaseJniLibsProjectAndLocalJars
+> Task :innertube:checkReleaseAarMetadata
+> Task :innertube:extractDeepLinksForAarRelease
+> Task :innertube:mergeReleaseConsumerProguardFiles
+> Task :innertube:mergeReleaseJavaResource
+> Task :kugou:checkReleaseAarMetadata
+> Task :kugou:stripReleaseDebugSymbols NO-SOURCE
+> Task :kugou:copyReleaseJniLibsProjectAndLocalJars
+> Task :kugou:extractDeepLinksForAarRelease
+> Task :app:extractIncludeUniversalGmsReleaseProto
+> Task :app:generateUniversalGmsReleaseProto
+> Task :app:processUniversalGmsReleaseResources
+> Task :kugou:mergeReleaseConsumerProguardFiles
+> Task :kugou:mergeReleaseJavaResource
+> Task :lrclib:checkReleaseAarMetadata
+> Task :lrclib:stripReleaseDebugSymbols NO-SOURCE
+> Task :lrclib:copyReleaseJniLibsProjectAndLocalJars
+> Task :lrclib:extractDeepLinksForAarRelease
+> Task :kugou:extractReleaseAnnotations
+> Task :lrclib:extractReleaseAnnotations
+> Task :lrclib:mergeReleaseConsumerProguardFiles
+> Task :innertube:extractReleaseAnnotations
+> Task :kugou:syncReleaseLibJars
+> Task :kugou:bundleReleaseLocalLintAar
+> Task :lrclib:mergeReleaseJavaResource
+> Task :lrclib:syncReleaseLibJars
+> Task :lrclib:bundleReleaseLocalLintAar
+> Task :kizzy:stripReleaseDebugSymbols NO-SOURCE
+> Task :kizzy:checkReleaseAarMetadata
+> Task :kizzy:extractDeepLinksForAarRelease
+> Task :kizzy:copyReleaseJniLibsProjectAndLocalJars
+> Task :kizzy:mergeReleaseConsumerProguardFiles
+> Task :kizzy:extractReleaseAnnotations
+> Task :kizzy:mergeReleaseJavaResource
+> Task :lastfm:checkReleaseAarMetadata
+> Task :lastfm:stripReleaseDebugSymbols NO-SOURCE
+> Task :lastfm:copyReleaseJniLibsProjectAndLocalJars
+> Task :lastfm:extractDeepLinksForAarRelease
+> Task :lastfm:extractReleaseAnnotations
+> Task :lastfm:mergeReleaseConsumerProguardFiles
+> Task :kizzy:syncReleaseLibJars
+> Task :lastfm:mergeReleaseJavaResource
+> Task :kizzy:bundleReleaseLocalLintAar
+> Task :lastfm:syncReleaseLibJars
+> Task :lastfm:bundleReleaseLocalLintAar
+> Task :paxsenixlyrics:stripReleaseDebugSymbols NO-SOURCE
+> Task :paxsenixlyrics:checkReleaseAarMetadata
+> Task :paxsenixlyrics:copyReleaseJniLibsProjectAndLocalJars
+> Task :paxsenixlyrics:extractDeepLinksForAarRelease
+> Task :paxsenixlyrics:mergeReleaseConsumerProguardFiles
+> Task :innertube:syncReleaseLibJars
+> Task :paxsenixlyrics:extractReleaseAnnotations
+> Task :betterlyrics:checkReleaseAarMetadata
+> Task :paxsenixlyrics:mergeReleaseJavaResource
+> Task :betterlyrics:stripReleaseDebugSymbols NO-SOURCE
+> Task :betterlyrics:copyReleaseJniLibsProjectAndLocalJars
+> Task :betterlyrics:extractDeepLinksForAarRelease
+> Task :innertube:bundleReleaseLocalLintAar
+> Task :betterlyrics:extractReleaseAnnotations
+> Task :betterlyrics:mergeReleaseConsumerProguardFiles
+> Task :betterlyrics:mergeReleaseJavaResource
+> Task :paxsenixlyrics:syncReleaseLibJars
+> Task :paxsenixlyrics:bundleReleaseLocalLintAar
+> Task :betterlyrics:syncReleaseLibJars
+> Task :betterlyrics:bundleReleaseLocalLintAar
+> Task :simpmusic:stripReleaseDebugSymbols NO-SOURCE
+> Task :simpmusic:extractDeepLinksForAarRelease
+> Task :simpmusic:extractReleaseAnnotations
+> Task :simpmusic:mergeReleaseConsumerProguardFiles
+> Task :simpmusic:mergeReleaseJavaResource
+> Task :simpmusic:syncReleaseLibJars
+> Task :simpmusic:copyReleaseJniLibsProjectAndLocalJars
+> Task :youlyplus:stripReleaseDebugSymbols NO-SOURCE
+> Task :youlyplus:checkReleaseAarMetadata
+> Task :youlyplus:extractDeepLinksForAarRelease
+> Task :simpmusic:checkReleaseAarMetadata
+> Task :youlyplus:copyReleaseJniLibsProjectAndLocalJars
+> Task :youlyplus:mergeReleaseConsumerProguardFiles
+> Task :simpmusic:bundleReleaseLocalLintAar
+> Task :youlyplus:extractReleaseAnnotations
+> Task :shazamkit:checkReleaseAarMetadata
+> Task :shazamkit:stripReleaseDebugSymbols NO-SOURCE
+> Task :shazamkit:copyReleaseJniLibsProjectAndLocalJars
+> Task :shazamkit:extractDeepLinksForAarRelease
+> Task :youlyplus:mergeReleaseJavaResource
+> Task :shazamkit:mergeReleaseConsumerProguardFiles
+> Task :youlyplus:syncReleaseLibJars
+> Task :shazamkit:extractReleaseAnnotations
+> Task :shazamkit:mergeReleaseJavaResource
+> Task :youlyplus:bundleReleaseLocalLintAar
+> Task :artistvideo:stripReleaseDebugSymbols NO-SOURCE
+> Task :shazamkit:syncReleaseLibJars
+> Task :artistvideo:copyReleaseJniLibsProjectAndLocalJars
+> Task :artistvideo:extractDeepLinksForAarRelease
+> Task :shazamkit:bundleReleaseLocalLintAar
+> Task :artistvideo:checkReleaseAarMetadata
+> Task :artistvideo:mergeReleaseConsumerProguardFiles
+> Task :musixmatchlyrics:checkReleaseAarMetadata
+> Task :artistvideo:mergeReleaseJavaResource
+> Task :musixmatchlyrics:stripReleaseDebugSymbols NO-SOURCE
+> Task :musixmatchlyrics:extractDeepLinksForAarRelease
+> Task :musixmatchlyrics:copyReleaseJniLibsProjectAndLocalJars
+> Task :musixmatchlyrics:mergeReleaseConsumerProguardFiles
+> Task :musixmatchlyrics:extractReleaseAnnotations
+> Task :musixmatchlyrics:mergeReleaseJavaResource
+> Task :jiosaavn:checkReleaseAarMetadata
+> Task :jiosaavn:stripReleaseDebugSymbols NO-SOURCE
+> Task :jiosaavn:copyReleaseJniLibsProjectAndLocalJars
+> Task :jiosaavn:extractDeepLinksForAarRelease
+> Task :jiosaavn:extractReleaseAnnotations
+> Task :musixmatchlyrics:syncReleaseLibJars
+> Task :jiosaavn:mergeReleaseConsumerProguardFiles
+> Task :musixmatchlyrics:bundleReleaseLocalLintAar
+> Task :jiosaavn:mergeReleaseJavaResource
+> Task :spotify:checkReleaseAarMetadata
+> Task :spotify:stripReleaseDebugSymbols NO-SOURCE
+> Task :spotify:copyReleaseJniLibsProjectAndLocalJars
+> Task :spotify:extractDeepLinksForAarRelease
+> Task :jiosaavn:syncReleaseLibJars
+> Task :jiosaavn:bundleReleaseLocalLintAar
+> Task :spotify:extractReleaseAnnotations
+> Task :spotify:mergeReleaseConsumerProguardFiles
+> Task :spotify:mergeReleaseJavaResource
+> Task :spine:checkReleaseAarMetadata
+> Task :spine:stripReleaseDebugSymbols NO-SOURCE
+> Task :spine:copyReleaseJniLibsProjectAndLocalJars
+> Task :spine:extractDeepLinksForAarRelease
+> Task :spotify:syncReleaseLibJars
+> Task :spotify:bundleReleaseLocalLintAar
+> Task :spine:mergeReleaseConsumerProguardFiles
+> Task :spine:mergeReleaseJavaResource
+> Task :spine:extractReleaseAnnotations
+> Task :spine:syncReleaseLibJars
+> Task :spine:bundleReleaseLocalLintAar
+> Task :artistvideo:writeReleaseLintModelMetadata
+> Task :artistvideo:extractReleaseAnnotations
+> Task :artistvideo:syncReleaseLibJars
+> Task :artistvideo:bundleReleaseLocalLintAar
+> Task :betterlyrics:writeReleaseLintModelMetadata
+> Task :betterlyrics:lintVitalAnalyzeRelease
+> Task :artistvideo:lintVitalAnalyzeRelease
+> Task :innertube:writeReleaseLintModelMetadata
+> Task :jiosaavn:writeReleaseLintModelMetadata
+> Task :jiosaavn:lintVitalAnalyzeRelease
+> Task :kizzy:writeReleaseLintModelMetadata
+> Task :kugou:lintVitalAnalyzeRelease
+> Task :kugou:writeReleaseLintModelMetadata
+> Task :kizzy:lintVitalAnalyzeRelease
+> Task :lastfm:writeReleaseLintModelMetadata
+> Task :lastfm:lintVitalAnalyzeRelease
+> Task :lrclib:writeReleaseLintModelMetadata
+> Task :musixmatchlyrics:lintVitalAnalyzeRelease
+> Task :musixmatchlyrics:writeReleaseLintModelMetadata
+> Task :lrclib:lintVitalAnalyzeRelease
+> Task :paxsenixlyrics:writeReleaseLintModelMetadata
+> Task :app:kspUniversalGmsReleaseKotlin
+> Task :paxsenixlyrics:lintVitalAnalyzeRelease
+> Task :shazamkit:writeReleaseLintModelMetadata
+> Task :shazamkit:lintVitalAnalyzeRelease
+> Task :simpmusic:writeReleaseLintModelMetadata
+> Task :simpmusic:lintVitalAnalyzeRelease
+> Task :spine:writeReleaseLintModelMetadata
+> Task :innertube:lintVitalAnalyzeRelease
+> Task :spine:lintVitalAnalyzeRelease
+> Task :spotify:writeReleaseLintModelMetadata
+> Task :spotify:lintVitalAnalyzeRelease
+> Task :youlyplus:writeReleaseLintModelMetadata
+> Task :artistvideo:generateReleaseLintVitalModel
+> Task :betterlyrics:generateReleaseLintVitalModel
+> Task :innertube:generateReleaseLintVitalModel
+> Task :jiosaavn:generateReleaseLintVitalModel
+> Task :kizzy:generateReleaseLintVitalModel
+> Task :kugou:generateReleaseLintVitalModel
+> Task :lastfm:generateReleaseLintVitalModel
+> Task :lrclib:generateReleaseLintVitalModel
+> Task :youlyplus:lintVitalAnalyzeRelease
+> Task :musixmatchlyrics:generateReleaseLintVitalModel
+> Task :paxsenixlyrics:generateReleaseLintVitalModel
+> Task :simpmusic:generateReleaseLintVitalModel
+> Task :shazamkit:generateReleaseLintVitalModel
+> Task :spine:generateReleaseLintVitalModel
+> Task :spotify:generateReleaseLintVitalModel
+> Task :app:validateSigningUniversalGmsRelease
+> Task :app:writeUniversalGmsReleaseAppMetadata
+> Task :youlyplus:generateReleaseLintVitalModel
+> Task :app:writeUniversalGmsReleaseSigningConfigVersions
+> Task :app:compileUniversalGmsReleaseKotlin
+e: org.jetbrains.kotlin.codegen.CompilationException: Back-end (JVM) Internal error: Couldn't transform method node:
+DiscordSettings$lambda$73$1 (ZLandroidx/compose/runtime/MutableState;Landroidx/compose/runtime/MutableState;Landroidx/compose/runtime/MutableState;Landroidx/compose/runtime/MutableState;Landroidx/compose/runtime/MutableState;Landroidx/navigation/NavController;Landroidx/compose/runtime/MutableState;Landroidx/compose/foundation/layout/ColumnScope;Landroidx/compose/runtime/Composer;I)Lkotlin/Unit;:
+  @Landroidx/compose/runtime/Composable;() // invisible
+  @Landroidx/compose/runtime/ComposableTarget;(applier="androidx.compose.ui.UiComposable") // invisible
+  @Landroidx/compose/runtime/internal/FunctionKeyMeta;(key=125072505, startOffset=22709, endOffset=27726) // invisible
+    // annotable parameter count: 11 (visible)
+    // annotable parameter count: 11 (invisible)
+   L0
+    ALOAD 8
+    LDC "$this$Card"
+    INVOKESTATIC kotlin/jvm/internal/Intrinsics.checkNotNullParameter (Ljava/lang/Object;Ljava/lang/String;)V
+    ALOAD 9
+    LDC "C515@22723L3863:DiscordSettings.kt#a3p3to"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformation (Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
+    ALOAD 9
+    ILOAD 10
+    BIPUSH 17
+    IAND
+    BIPUSH 16
+    IF_ICMPEQ L1
+    ICONST_1
+    GOTO L2
+   L1
+    ICONST_0
+   L2
+    ILOAD 10
+    ICONST_1
+    IAND
+    INVOKEINTERFACE androidx/compose/runtime/Composer.shouldExecute (ZI)Z (itf)
+    IFEQ L3
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.isTraceInProgress ()Z
+    IFEQ L4
+    LDC 125072505
+    ILOAD 10
+    ICONST_M1
+    LDC "com.beatwave.music.ui.screens.settings.integrations.DiscordSettings.<anonymous>.<anonymous> (DiscordSettings.kt:515)"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.traceEventStart (IIILjava/lang/String;)V
+   L4
+    LINENUMBER 517 L4
+    GETSTATIC androidx/compose/ui/Modifier.Companion : Landroidx/compose/ui/Modifier$Companion;
+    ASTORE 11
+   L5
+    LINENUMBER 518 L5
+    BIPUSH 20
+    ISTORE 13
+   L6
+    ICONST_0
+    ISTORE 14
+   L7
+    LINENUMBER 1477 L7
+    ILOAD 13
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L8
+   L8
+    LINENUMBER 518 L8
+    FSTORE 12
+    BIPUSH 20
+    ISTORE 14
+   L9
+    ICONST_0
+    ISTORE 15
+   L10
+    LINENUMBER 1477 L10
+    ILOAD 14
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L11
+   L11
+    LINENUMBER 518 L11
+    FSTORE 13
+    BIPUSH 20
+    ISTORE 15
+   L12
+    ICONST_0
+    ISTORE 16
+   L13
+    LINENUMBER 1477 L13
+    ILOAD 15
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L14
+   L14
+    LINENUMBER 518 L14
+    FSTORE 14
+   L15
+    LINENUMBER 519 L15
+    ILOAD 0
+    IFEQ L16
+    BIPUSH 20
+    ISTORE 16
+   L17
+    ICONST_0
+    ISTORE 17
+   L18
+    LINENUMBER 1478 L18
+    ILOAD 16
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L19
+   L19
+    GOTO L20
+   L16
+    LINENUMBER 519 L16
+    BIPUSH 8
+    ISTORE 16
+   L21
+    ICONST_0
+    ISTORE 17
+   L22
+    LINENUMBER 1478 L22
+    ILOAD 16
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L20
+   L20
+    LINENUMBER 519 L20
+    FSTORE 15
+   L23
+    LINENUMBER 517 L23
+    ALOAD 11
+    CHECKCAST androidx/compose/ui/Modifier
+   L24
+    LINENUMBER 518 L24
+    FLOAD 12
+    FLOAD 14
+    FLOAD 13
+   L25
+    LINENUMBER 519 L25
+    FLOAD 15
+   L26
+    LINENUMBER 518 L26
+    INVOKESTATIC androidx/compose/foundation/layout/PaddingKt.padding-qDBjuR0 (Landroidx/compose/ui/Modifier;FFFF)Landroidx/compose/ui/Modifier;
+   L27
+    LINENUMBER 520 L27
+    FCONST_0
+    ICONST_1
+    ACONST_NULL
+    INVOKESTATIC androidx/compose/foundation/layout/SizeKt.fillMaxWidth$default (Landroidx/compose/ui/Modifier;FILjava/lang/Object;)Landroidx/compose/ui/Modifier;
+    ASTORE 11
+   L28
+    LINENUMBER 521 L28
+    GETSTATIC androidx/compose/ui/Alignment.Companion : Landroidx/compose/ui/Alignment$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/Alignment$Companion.getCenterVertically ()Landroidx/compose/ui/Alignment$Vertical;
+    ASTORE 13
+    ALOAD 9
+    ASTORE 14
+    SIPUSH 384
+    ISTORE 15
+   L29
+    LINENUMBER 516 L29
+    NOP
+   L30
+    ICONST_0
+    ISTORE 16
+   L31
+    ALOAD 14
+    LDC 844473419
+    LDC "CC(Row)N(modifier,horizontalArrangement,verticalAlignment,content)99@5125L58,100@5188L131:Row.kt#2w3rfo"
+   L32
+    LINENUMBER 1479 L32
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L33
+    LINENUMBER 1480 L33
+    GETSTATIC androidx/compose/foundation/layout/Arrangement.INSTANCE : Landroidx/compose/foundation/layout/Arrangement;
+    INVOKEVIRTUAL androidx/compose/foundation/layout/Arrangement.getStart ()Landroidx/compose/foundation/layout/Arrangement$Horizontal;
+    ASTORE 12
+   L34
+    LINENUMBER 1484 L34
+    ALOAD 12
+    ALOAD 13
+    ALOAD 14
+    BIPUSH 14
+    ILOAD 15
+    ICONST_3
+    ISHR
+    IAND
+    BIPUSH 112
+    ILOAD 15
+    ICONST_3
+    ISHR
+    IAND
+    IOR
+    INVOKESTATIC androidx/compose/foundation/layout/RowKt.rowMeasurePolicy (Landroidx/compose/foundation/layout/Arrangement$Horizontal;Landroidx/compose/ui/Alignment$Vertical;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/layout/MeasurePolicy;
+    ASTORE 17
+   L35
+    LINENUMBER 1488 L35
+    ALOAD 11
+    ASTORE 18
+   L36
+    LINENUMBER 1487 L36
+    ALOAD 17
+    ASTORE 19
+    ALOAD 14
+    ASTORE 20
+    BIPUSH 112
+    ILOAD 15
+    ICONST_3
+    ISHL
+    IAND
+    ISTORE 21
+   L37
+    LINENUMBER 1485 L37
+    NOP
+   L38
+    ICONST_0
+    ISTORE 22
+   L39
+    ALOAD 20
+    LDC -1159599143
+    LDC "CC(Layout)N(content,modifier,measurePolicy)81@3355L27,84@3521L415:Layout.kt#80mrfh"
+   L40
+    LINENUMBER 1489 L40
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L41
+    LINENUMBER 1490 L41
+    ALOAD 20
+    ICONST_0
+    INVOKESTATIC androidx/compose/runtime/ComposablesKt.getCurrentCompositeKeyHashCode (Landroidx/compose/runtime/Composer;I)J
+    INVOKESTATIC java/lang/Long.hashCode (J)I
+    ISTORE 23
+   L42
+    ALOAD 20
+   L43
+    LINENUMBER 1491 L43
+    INVOKEINTERFACE androidx/compose/runtime/Composer.getCurrentCompositionLocalMap ()Landroidx/compose/runtime/CompositionLocalMap; (itf)
+    ASTORE 24
+   L44
+    ALOAD 20
+   L45
+    LINENUMBER 1492 L45
+    ALOAD 18
+    INVOKESTATIC androidx/compose/ui/ComposedModifierKt.materializeModifier (Landroidx/compose/runtime/Composer;Landroidx/compose/ui/Modifier;)Landroidx/compose/ui/Modifier;
+    ASTORE 25
+   L46
+    LINENUMBER 1494 L46
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getConstructor ()Lkotlin/jvm/functions/Function0;
+    ASTORE 26
+    ALOAD 20
+    ASTORE 27
+    BIPUSH 6
+    SIPUSH 896
+    ILOAD 21
+    BIPUSH 6
+    ISHL
+    IAND
+    IOR
+    ISTORE 28
+   L47
+    LINENUMBER 1493 L47
+    NOP
+   L48
+    ICONST_0
+    ISTORE 29
+   L49
+    ALOAD 27
+    LDC -553112988
+    LDC "CC(ReusableComposeNode)N(factory,update,content)410@16187L9:Composables.kt#9igjgp"
+   L50
+    LINENUMBER 1495 L50
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L51
+    LINENUMBER 1496 L51
+    ALOAD 27
+    INVOKEINTERFACE androidx/compose/runtime/Composer.getApplier ()Landroidx/compose/runtime/Applier; (itf)
+    INSTANCEOF androidx/compose/runtime/Applier
+    IFNE L52
+    INVOKESTATIC androidx/compose/runtime/ComposablesKt.invalidApplier ()V
+   L52
+    ALOAD 27
+   L53
+    LINENUMBER 1497 L53
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReusableNode ()V (itf)
+   L54
+    LINENUMBER 1498 L54
+    ALOAD 27
+    INVOKEINTERFACE androidx/compose/runtime/Composer.getInserting ()Z (itf)
+    IFEQ L55
+    ALOAD 27
+   L56
+    LINENUMBER 1499 L56
+    ALOAD 26
+    INVOKEINTERFACE androidx/compose/runtime/Composer.createNode (Lkotlin/jvm/functions/Function0;)V (itf)
+    GOTO L57
+   L55
+    ALOAD 27
+   L58
+    LINENUMBER 1501 L58
+    INVOKEINTERFACE androidx/compose/runtime/Composer.useNode ()V (itf)
+   L57
+    LINENUMBER 1503 L57
+    ALOAD 27
+    INVOKESTATIC androidx/compose/runtime/Updater.constructor-impl (Landroidx/compose/runtime/Composer;)Landroidx/compose/runtime/Composer;
+    ASTORE 30
+   L59
+    ICONST_0
+    ISTORE 31
+   L60
+    LINENUMBER 1504 L60
+    ALOAD 30
+    ALOAD 19
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetMeasurePolicy ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L61
+    LINENUMBER 1505 L61
+    ALOAD 30
+    ALOAD 24
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetResolvedCompositionLocals ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L62
+    LINENUMBER 1506 L62
+    ALOAD 30
+    ILOAD 23
+    INVOKESTATIC java/lang/Integer.valueOf (I)Ljava/lang/Integer;
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetCompositeKeyHash ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L63
+    LINENUMBER 1507 L63
+    ALOAD 30
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getApplyOnDeactivatedNodeAssertion ()Lkotlin/jvm/functions/Function1;
+    INVOKESTATIC androidx/compose/runtime/Updater.reconcile-impl (Landroidx/compose/runtime/Composer;Lkotlin/jvm/functions/Function1;)V
+   L64
+    LINENUMBER 1508 L64
+    ALOAD 30
+    ALOAD 25
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetModifier ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L65
+    LINENUMBER 1509 L65
+    NOP
+   L66
+    LINENUMBER 1503 L66
+    NOP
+   L67
+    LINENUMBER 1510 L67
+    ALOAD 27
+    BIPUSH 14
+    ILOAD 28
+    BIPUSH 6
+    ISHR
+    IAND
+    ISTORE 32
+    ASTORE 33
+   L68
+    ICONST_0
+    ISTORE 34
+   L69
+    ALOAD 33
+    LDC 1456264949
+    LDC "C101@5233L9:Row.kt#2w3rfo"
+   L70
+    LINENUMBER 1486 L70
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+    GETSTATIC androidx/compose/foundation/layout/RowScopeInstance.INSTANCE : Landroidx/compose/foundation/layout/RowScopeInstance;
+    ALOAD 33
+    BIPUSH 6
+    BIPUSH 112
+    ILOAD 15
+    BIPUSH 6
+    ISHR
+    IAND
+    IOR
+    ISTORE 35
+    ASTORE 36
+    CHECKCAST androidx/compose/foundation/layout/RowScope
+    ASTORE 37
+   L71
+    ICONST_0
+    ISTORE 38
+   L72
+    ALOAD 36
+    LDC 1853918378
+    LDC "C523@23080L1835,564@24933L29,566@24980L1147:DiscordSettings.kt#a3p3to"
+   L73
+    LINENUMBER 524 L73
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+    GETSTATIC androidx/compose/ui/Modifier.Companion : Landroidx/compose/ui/Modifier$Companion;
+    CHECKCAST androidx/compose/ui/Modifier
+    BIPUSH 56
+    ISTORE 39
+   L74
+    ICONST_0
+    ISTORE 40
+   L75
+    LINENUMBER 1511 L75
+    ILOAD 39
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L76
+   L76
+    LINENUMBER 524 L76
+    INVOKESTATIC androidx/compose/foundation/layout/SizeKt.size-3ABfNKs (Landroidx/compose/ui/Modifier;F)Landroidx/compose/ui/Modifier;
+    ASTORE 39
+    ALOAD 36
+    ASTORE 41
+    BIPUSH 6
+    ISTORE 42
+   L77
+    ICONST_0
+    ISTORE 43
+   L78
+    ALOAD 41
+    LDC 1042775818
+    LDC "CC(Box)N(modifier,contentAlignment,propagateMinConstraints,content)71@3424L131:Box.kt#2w3rfo"
+   L79
+    LINENUMBER 1512 L79
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L80
+    LINENUMBER 1513 L80
+    GETSTATIC androidx/compose/ui/Alignment.Companion : Landroidx/compose/ui/Alignment$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/Alignment$Companion.getTopStart ()Landroidx/compose/ui/Alignment;
+    ASTORE 40
+   L81
+    LINENUMBER 1514 L81
+    ICONST_0
+    ISTORE 44
+   L82
+    LINENUMBER 1517 L82
+    ALOAD 40
+    ILOAD 44
+    INVOKESTATIC androidx/compose/foundation/layout/BoxKt.maybeCachedBoxMeasurePolicy (Landroidx/compose/ui/Alignment;Z)Landroidx/compose/ui/layout/MeasurePolicy;
+    ASTORE 45
+   L83
+    LINENUMBER 1521 L83
+    ALOAD 39
+    ASTORE 46
+   L84
+    LINENUMBER 1520 L84
+    ALOAD 45
+    ASTORE 47
+    ALOAD 41
+    ASTORE 48
+    BIPUSH 112
+    ILOAD 42
+    ICONST_3
+    ISHL
+    IAND
+    ISTORE 49
+   L85
+    LINENUMBER 1518 L85
+    NOP
+   L86
+    ICONST_0
+    ISTORE 50
+   L87
+    ALOAD 48
+    LDC -1159599143
+    LDC "CC(Layout)N(content,modifier,measurePolicy)81@3355L27,84@3521L415:Layout.kt#80mrfh"
+   L88
+    LINENUMBER 1522 L88
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L89
+    LINENUMBER 1523 L89
+    ALOAD 48
+    ICONST_0
+    INVOKESTATIC androidx/compose/runtime/ComposablesKt.getCurrentCompositeKeyHashCode (Landroidx/compose/runtime/Composer;I)J
+    INVOKESTATIC java/lang/Long.hashCode (J)I
+    ISTORE 51
+   L90
+    ALOAD 48
+   L91
+    LINENUMBER 1524 L91
+    INVOKEINTERFACE androidx/compose/runtime/Composer.getCurrentCompositionLocalMap ()Landroidx/compose/runtime/CompositionLocalMap; (itf)
+    ASTORE 52
+   L92
+    ALOAD 48
+   L93
+    LINENUMBER 1525 L93
+    ALOAD 46
+    INVOKESTATIC androidx/compose/ui/ComposedModifierKt.materializeModifier (Landroidx/compose/runtime/Composer;Landroidx/compose/ui/Modifier;)Landroidx/compose/ui/Modifier;
+    ASTORE 53
+   L94
+    LINENUMBER 1527 L94
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getConstructor ()Lkotlin/jvm/functions/Function0;
+    ASTORE 54
+    ALOAD 48
+    ASTORE 55
+    BIPUSH 6
+    SIPUSH 896
+    ILOAD 49
+    BIPUSH 6
+    ISHL
+    IAND
+    IOR
+    ISTORE 56
+   L95
+    LINENUMBER 1526 L95
+    NOP
+   L96
+    ICONST_0
+    ISTORE 57
+   L97
+    ALOAD 55
+    LDC -553112988
+    LDC "CC(ReusableComposeNode)N(factory,update,content)410@16187L9:Composables.kt#9igjgp"
+   L98
+    LINENUMBER 1528 L98
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L99
+    LINENUMBER 1529 L99
+    ALOAD 55
+    INVOKEINTERFACE androidx/compose/runtime/Composer.getApplier ()Landroidx/compose/runtime/Applier; (itf)
+    INSTANCEOF androidx/compose/runtime/Applier
+    IFNE L100
+    INVOKESTATIC androidx/compose/runtime/ComposablesKt.invalidApplier ()V
+   L100
+    ALOAD 55
+   L101
+    LINENUMBER 1530 L101
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReusableNode ()V (itf)
+   L102
+    LINENUMBER 1531 L102
+    ALOAD 55
+    INVOKEINTERFACE androidx/compose/runtime/Composer.getInserting ()Z (itf)
+    IFEQ L103
+    ALOAD 55
+   L104
+    LINENUMBER 1532 L104
+    ALOAD 54
+    INVOKEINTERFACE androidx/compose/runtime/Composer.createNode (Lkotlin/jvm/functions/Function0;)V (itf)
+    GOTO L105
+   L103
+    ALOAD 55
+   L106
+    LINENUMBER 1534 L106
+    INVOKEINTERFACE androidx/compose/runtime/Composer.useNode ()V (itf)
+   L105
+    LINENUMBER 1536 L105
+    ALOAD 55
+    INVOKESTATIC androidx/compose/runtime/Updater.constructor-impl (Landroidx/compose/runtime/Composer;)Landroidx/compose/runtime/Composer;
+    ASTORE 58
+   L107
+    ICONST_0
+    ISTORE 59
+   L108
+    LINENUMBER 1537 L108
+    ALOAD 58
+    ALOAD 47
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetMeasurePolicy ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L109
+    LINENUMBER 1538 L109
+    ALOAD 58
+    ALOAD 52
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetResolvedCompositionLocals ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L110
+    LINENUMBER 1539 L110
+    ALOAD 58
+    ILOAD 51
+    INVOKESTATIC java/lang/Integer.valueOf (I)Ljava/lang/Integer;
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetCompositeKeyHash ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L111
+    LINENUMBER 1540 L111
+    ALOAD 58
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getApplyOnDeactivatedNodeAssertion ()Lkotlin/jvm/functions/Function1;
+    INVOKESTATIC androidx/compose/runtime/Updater.reconcile-impl (Landroidx/compose/runtime/Composer;Lkotlin/jvm/functions/Function1;)V
+   L112
+    LINENUMBER 1541 L112
+    ALOAD 58
+    ALOAD 53
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetModifier ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L113
+    LINENUMBER 1542 L113
+    NOP
+   L114
+    LINENUMBER 1536 L114
+    NOP
+   L115
+    LINENUMBER 1543 L115
+    ALOAD 55
+    BIPUSH 14
+    ILOAD 56
+    BIPUSH 6
+    ISHR
+    IAND
+    ISTORE 60
+    ASTORE 61
+   L116
+    ICONST_0
+    ISTORE 62
+   L117
+    ALOAD 61
+    LDC 1833054614
+    LDC "C72@3469L9:Box.kt#2w3rfo"
+   L118
+    LINENUMBER 1519 L118
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+    GETSTATIC androidx/compose/foundation/layout/BoxScopeInstance.INSTANCE : Landroidx/compose/foundation/layout/BoxScopeInstance;
+    ALOAD 61
+    BIPUSH 6
+    BIPUSH 112
+    ILOAD 42
+    BIPUSH 6
+    ISHR
+    IAND
+    IOR
+    ISTORE 63
+    ASTORE 64
+    CHECKCAST androidx/compose/foundation/layout/BoxScope
+    ASTORE 65
+   L119
+    ICONST_0
+    ISTORE 66
+   L120
+    ALOAD 64
+    LDC -613153290
+    LDC "C:DiscordSettings.kt#a3p3to"
+   L121
+    LINENUMBER 525 L121
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+    ILOAD 0
+    IFEQ L122
+    ALOAD 4
+    INVOKESTATIC com/beatwave/music/ui/screens/settings/integrations/DiscordSettingsKt.DiscordSettings$lambda$12 (Landroidx/compose/runtime/MutableState;)Ljava/lang/String;
+    CHECKCAST java/lang/CharSequence
+    INVOKEINTERFACE java/lang/CharSequence.length ()I (itf)
+    IFLE L123
+    ICONST_1
+    GOTO L124
+   L123
+    ICONST_0
+   L124
+    GOTO L125
+   L125
+    LINENUMBER 525 L125
+    IFEQ L122
+    ALOAD 64
+    LDC -613151741
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    LDC "525@23211L288"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformation (Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
+   L126
+    LINENUMBER 527 L126
+    ALOAD 4
+    INVOKESTATIC com/beatwave/music/ui/screens/settings/integrations/DiscordSettingsKt.DiscordSettings$lambda$12 (Landroidx/compose/runtime/MutableState;)Ljava/lang/String;
+   L127
+    LINENUMBER 528 L127
+    ACONST_NULL
+   L128
+    LINENUMBER 529 L128
+    GETSTATIC androidx/compose/ui/Modifier.Companion : Landroidx/compose/ui/Modifier$Companion;
+    CHECKCAST androidx/compose/ui/Modifier
+   L129
+    LINENUMBER 530 L129
+    BIPUSH 56
+    ISTORE 67
+   L130
+    ICONST_0
+    ISTORE 68
+   L131
+    LINENUMBER 1544 L131
+    ILOAD 67
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L132
+   L132
+    LINENUMBER 530 L132
+    INVOKESTATIC androidx/compose/foundation/layout/SizeKt.size-3ABfNKs (Landroidx/compose/ui/Modifier;F)Landroidx/compose/ui/Modifier;
+   L133
+    LINENUMBER 531 L133
+    INVOKESTATIC androidx/compose/foundation/shape/RoundedCornerShapeKt.getCircleShape ()Landroidx/compose/foundation/shape/RoundedCornerShape;
+    CHECKCAST androidx/compose/ui/graphics/Shape
+    INVOKESTATIC androidx/compose/ui/draw/ClipKt.clip (Landroidx/compose/ui/Modifier;Landroidx/compose/ui/graphics/Shape;)Landroidx/compose/ui/Modifier;
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    FCONST_0
+    ACONST_NULL
+    ICONST_0
+    ICONST_0
+    ALOAD 64
+    BIPUSH 48
+    ICONST_0
+    SIPUSH 2040
+   L134
+    LINENUMBER 526 L134
+    INVOKESTATIC coil3/compose/SingletonAsyncImageKt.AsyncImage-10Xjiaw (Ljava/lang/Object;Ljava/lang/String;Landroidx/compose/ui/Modifier;Lkotlin/jvm/functions/Function1;Lkotlin/jvm/functions/Function1;Landroidx/compose/ui/Alignment;Landroidx/compose/ui/layout/ContentScale;FLandroidx/compose/ui/graphics/ColorFilter;IZLandroidx/compose/runtime/Composer;III)V
+   L135
+    LINENUMBER 525 L135
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+    GOTO L136
+   L122
+    LINENUMBER 533 L122
+    ALOAD 64
+    LDC -612810338
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    LDC "534@23597L35,533@23553L357"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformation (Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
+   L137
+    LINENUMBER 535 L137
+    GETSTATIC com/beatwave/music/R$drawable.discord : I
+    ALOAD 64
+    ICONST_0
+    INVOKESTATIC androidx/compose/ui/res/PainterResources_androidKt.painterResource (ILandroidx/compose/runtime/Composer;I)Landroidx/compose/ui/graphics/painter/Painter;
+   L138
+    LINENUMBER 536 L138
+    ACONST_NULL
+   L139
+    LINENUMBER 537 L139
+    ALOAD 65
+    GETSTATIC androidx/compose/ui/Modifier.Companion : Landroidx/compose/ui/Modifier$Companion;
+    CHECKCAST androidx/compose/ui/Modifier
+   L140
+    LINENUMBER 538 L140
+    BIPUSH 36
+    ISTORE 67
+   L141
+    ICONST_0
+    ISTORE 68
+   L142
+    LINENUMBER 1545 L142
+    ILOAD 67
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L143
+   L143
+    LINENUMBER 538 L143
+    INVOKESTATIC androidx/compose/foundation/layout/SizeKt.size-3ABfNKs (Landroidx/compose/ui/Modifier;F)Landroidx/compose/ui/Modifier;
+   L144
+    LINENUMBER 539 L144
+    GETSTATIC androidx/compose/ui/Alignment.Companion : Landroidx/compose/ui/Alignment$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/Alignment$Companion.getCenter ()Landroidx/compose/ui/Alignment;
+    INVOKEINTERFACE androidx/compose/foundation/layout/BoxScope.align (Landroidx/compose/ui/Modifier;Landroidx/compose/ui/Alignment;)Landroidx/compose/ui/Modifier; (itf)
+   L145
+    LINENUMBER 540 L145
+    LDC 0.4
+    INVOKESTATIC androidx/compose/ui/draw/AlphaKt.alpha (Landroidx/compose/ui/Modifier;F)Landroidx/compose/ui/Modifier;
+    LCONST_0
+    ALOAD 64
+    BIPUSH 48
+    GETSTATIC androidx/compose/ui/graphics/painter/Painter.$stable : I
+    IOR
+    BIPUSH 8
+   L146
+    LINENUMBER 534 L146
+    INVOKESTATIC androidx/compose/material3/IconKt.Icon-ww6aTOc (Landroidx/compose/ui/graphics/painter/Painter;Ljava/lang/String;Landroidx/compose/ui/Modifier;JLandroidx/compose/runtime/Composer;II)V
+   L147
+    LINENUMBER 533 L147
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+   L136
+    LINENUMBER 543 L136
+    ILOAD 0
+    IFEQ L148
+    ALOAD 64
+    LDC -612355661
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    LDC "556@24691L11,548@24298L577"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformation (Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
+   L149
+    LINENUMBER 544 L149
+    ALOAD 5
+    INVOKESTATIC com/beatwave/music/ui/screens/settings/integrations/DiscordSettingsKt.DiscordSettings$lambda$16 (Landroidx/compose/runtime/MutableState;)Ljava/lang/String;
+    ASTORE 69
+   L150
+    LINENUMBER 545 L150
+    ALOAD 69
+    LDC "idle"
+    INVOKESTATIC kotlin/jvm/internal/Intrinsics.areEqual (Ljava/lang/Object;Ljava/lang/Object;)Z
+    IFEQ L151
+    ALOAD 64
+    LDC -573939465
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    LDC "544@24088L11"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformation (Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
+    GETSTATIC androidx/compose/material3/MaterialTheme.INSTANCE : Landroidx/compose/material3/MaterialTheme;
+    ALOAD 64
+    GETSTATIC androidx/compose/material3/MaterialTheme.$stable : I
+    INVOKEVIRTUAL androidx/compose/material3/MaterialTheme.getColorScheme (Landroidx/compose/runtime/Composer;I)Landroidx/compose/material3/ColorScheme;
+    INVOKEVIRTUAL androidx/compose/material3/ColorScheme.getTertiary-0d7_KjU ()J
+    LSTORE 70
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+    LLOAD 70
+    GOTO L152
+   L151
+    LINENUMBER 546 L151
+    ALOAD 69
+    LDC "dnd"
+    INVOKESTATIC kotlin/jvm/internal/Intrinsics.areEqual (Ljava/lang/Object;Ljava/lang/Object;)Z
+    IFEQ L153
+    ALOAD 64
+    LDC -573937164
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    LDC "545@24160L11"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformation (Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
+    GETSTATIC androidx/compose/material3/MaterialTheme.INSTANCE : Landroidx/compose/material3/MaterialTheme;
+    ALOAD 64
+    GETSTATIC androidx/compose/material3/MaterialTheme.$stable : I
+    INVOKEVIRTUAL androidx/compose/material3/MaterialTheme.getColorScheme (Landroidx/compose/runtime/Composer;I)Landroidx/compose/material3/ColorScheme;
+    INVOKEVIRTUAL androidx/compose/material3/ColorScheme.getError-0d7_KjU ()J
+    LSTORE 70
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+    LLOAD 70
+    GOTO L152
+   L153
+    LINENUMBER 547 L153
+    ALOAD 64
+    LDC -573934986
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    LDC "546@24228L11"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformation (Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
+    GETSTATIC androidx/compose/material3/MaterialTheme.INSTANCE : Landroidx/compose/material3/MaterialTheme;
+    ALOAD 64
+    GETSTATIC androidx/compose/material3/MaterialTheme.$stable : I
+    INVOKEVIRTUAL androidx/compose/material3/MaterialTheme.getColorScheme (Landroidx/compose/runtime/Composer;I)Landroidx/compose/material3/ColorScheme;
+    INVOKEVIRTUAL androidx/compose/material3/ColorScheme.getPrimary-0d7_KjU ()J
+    LSTORE 70
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+    LLOAD 70
+   L152
+    LINENUMBER 544 L152
+    LSTORE 72
+   L154
+    LINENUMBER 551 L154
+    INVOKESTATIC androidx/compose/foundation/shape/RoundedCornerShapeKt.getCircleShape ()Landroidx/compose/foundation/shape/RoundedCornerShape;
+    ASTORE 69
+   L155
+    LINENUMBER 552 L155
+    ALOAD 65
+    GETSTATIC androidx/compose/ui/Modifier.Companion : Landroidx/compose/ui/Modifier$Companion;
+    CHECKCAST androidx/compose/ui/Modifier
+   L156
+    LINENUMBER 553 L156
+    BIPUSH 16
+    ISTORE 74
+   L157
+    ICONST_0
+    ISTORE 75
+   L158
+    LINENUMBER 1546 L158
+    ILOAD 74
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L159
+   L159
+    LINENUMBER 553 L159
+    INVOKESTATIC androidx/compose/foundation/layout/SizeKt.size-3ABfNKs (Landroidx/compose/ui/Modifier;F)Landroidx/compose/ui/Modifier;
+   L160
+    LINENUMBER 554 L160
+    GETSTATIC androidx/compose/ui/Alignment.Companion : Landroidx/compose/ui/Alignment$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/Alignment$Companion.getBottomEnd ()Landroidx/compose/ui/Alignment;
+    INVOKEINTERFACE androidx/compose/foundation/layout/BoxScope.align (Landroidx/compose/ui/Modifier;Landroidx/compose/ui/Alignment;)Landroidx/compose/ui/Modifier; (itf)
+   L161
+    LINENUMBER 556 L161
+    ICONST_2
+    ISTORE 74
+   L162
+    ICONST_0
+    ISTORE 75
+   L163
+    LINENUMBER 1547 L163
+    ILOAD 74
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L164
+   L164
+    LINENUMBER 557 L164
+    GETSTATIC androidx/compose/material3/MaterialTheme.INSTANCE : Landroidx/compose/material3/MaterialTheme;
+    ALOAD 64
+    GETSTATIC androidx/compose/material3/MaterialTheme.$stable : I
+    INVOKEVIRTUAL androidx/compose/material3/MaterialTheme.getColorScheme (Landroidx/compose/runtime/Composer;I)Landroidx/compose/material3/ColorScheme;
+    INVOKEVIRTUAL androidx/compose/material3/ColorScheme.getSurfaceContainerHigh-0d7_KjU ()J
+   L165
+    LINENUMBER 558 L165
+    INVOKESTATIC androidx/compose/foundation/shape/RoundedCornerShapeKt.getCircleShape ()Landroidx/compose/foundation/shape/RoundedCornerShape;
+    CHECKCAST androidx/compose/ui/graphics/Shape
+   L166
+    LINENUMBER 555 L166
+    INVOKESTATIC androidx/compose/foundation/BorderKt.border-xT4_qwU (Landroidx/compose/ui/Modifier;FJLandroidx/compose/ui/graphics/Shape;)Landroidx/compose/ui/Modifier;
+   L167
+    LINENUMBER 551 L167
+    ALOAD 69
+    CHECKCAST androidx/compose/ui/graphics/Shape
+   L168
+    LINENUMBER 550 L168
+    LLOAD 72
+    LCONST_0
+    FCONST_0
+    FCONST_0
+    ACONST_NULL
+    GETSTATIC com/beatwave/music/ui/screens/settings/integrations/ComposableSingletons$DiscordSettingsKt.INSTANCE : Lcom/beatwave/music/ui/screens/settings/integrations/ComposableSingletons$DiscordSettingsKt;
+    INVOKEVIRTUAL com/beatwave/music/ui/screens/settings/integrations/ComposableSingletons$DiscordSettingsKt.getLambda$1216422658$app ()Lkotlin/jvm/functions/Function2;
+    ALOAD 64
+    LDC 12582912
+    BIPUSH 120
+   L169
+    LINENUMBER 549 L169
+    INVOKESTATIC androidx/compose/material3/SurfaceKt.Surface-T9BRK9s (Landroidx/compose/ui/Modifier;Landroidx/compose/ui/graphics/Shape;JJFFLandroidx/compose/foundation/BorderStroke;Lkotlin/jvm/functions/Function2;Landroidx/compose/runtime/Composer;II)V
+   L170
+    LINENUMBER 543 L170
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+    GOTO L171
+   L148
+    LINENUMBER 562 L148
+    ALOAD 64
+    LDC -611463853
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+   L171
+    ALOAD 64
+   L172
+    LINENUMBER 525 L172
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L173
+    LINENUMBER 563 L173
+    GOTO L174
+   L174
+    GETSTATIC kotlin/Unit.INSTANCE : Lkotlin/Unit;
+   L175
+    LINENUMBER 1519 L175
+    POP
+    ALOAD 61
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L176
+    LINENUMBER 1543 L176
+    ALOAD 55
+   L177
+    LINENUMBER 1548 L177
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endNode ()V (itf)
+    ALOAD 55
+   L178
+    LINENUMBER 1528 L178
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L179
+    LINENUMBER 1549 L179
+    NOP
+   L180
+    ALOAD 48
+   L181
+    LINENUMBER 1522 L181
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L182
+    LINENUMBER 1550 L182
+    NOP
+   L183
+    ALOAD 41
+   L184
+    LINENUMBER 1512 L184
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L185
+    LINENUMBER 1551 L185
+    GOTO L186
+   L186
+    LINENUMBER 565 L186
+    GETSTATIC androidx/compose/ui/Modifier.Companion : Landroidx/compose/ui/Modifier$Companion;
+    CHECKCAST androidx/compose/ui/Modifier
+    BIPUSH 16
+    ISTORE 39
+   L187
+    ICONST_0
+    ISTORE 40
+   L188
+    LINENUMBER 1552 L188
+    ILOAD 39
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L189
+   L189
+    LINENUMBER 565 L189
+    INVOKESTATIC androidx/compose/foundation/layout/SizeKt.width-3ABfNKs (Landroidx/compose/ui/Modifier;F)Landroidx/compose/ui/Modifier;
+    ALOAD 36
+    BIPUSH 6
+    INVOKESTATIC androidx/compose/foundation/layout/SpacerKt.Spacer (Landroidx/compose/ui/Modifier;Landroidx/compose/runtime/Composer;I)V
+   L190
+    LINENUMBER 567 L190
+    ALOAD 37
+    GETSTATIC androidx/compose/ui/Modifier.Companion : Landroidx/compose/ui/Modifier$Companion;
+    CHECKCAST androidx/compose/ui/Modifier
+    FCONST_1
+    ICONST_0
+    ICONST_2
+    ACONST_NULL
+    INVOKESTATIC androidx/compose/foundation/layout/RowScope.weight$default (Landroidx/compose/foundation/layout/RowScope;Landroidx/compose/ui/Modifier;FZILjava/lang/Object;)Landroidx/compose/ui/Modifier; (itf)
+    ASTORE 39
+    ALOAD 36
+    ASTORE 41
+    ICONST_0
+    ISTORE 42
+   L191
+    ICONST_0
+    ISTORE 43
+   L192
+    ALOAD 41
+    LDC 1341605231
+    LDC "CC(Column)N(modifier,verticalArrangement,horizontalAlignment,content)87@4443L61,88@4509L134:Column.kt#2w3rfo"
+   L193
+    LINENUMBER 1553 L193
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L194
+    LINENUMBER 1554 L194
+    GETSTATIC androidx/compose/foundation/layout/Arrangement.INSTANCE : Landroidx/compose/foundation/layout/Arrangement;
+    INVOKEVIRTUAL androidx/compose/foundation/layout/Arrangement.getTop ()Landroidx/compose/foundation/layout/Arrangement$Vertical;
+    ASTORE 40
+   L195
+    LINENUMBER 1555 L195
+    GETSTATIC androidx/compose/ui/Alignment.Companion : Landroidx/compose/ui/Alignment$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/Alignment$Companion.getStart ()Landroidx/compose/ui/Alignment$Horizontal;
+    ASTORE 44
+   L196
+    LINENUMBER 1558 L196
+    ALOAD 40
+    ALOAD 44
+    ALOAD 41
+    BIPUSH 14
+    ILOAD 42
+    ICONST_3
+    ISHR
+    IAND
+    BIPUSH 112
+    ILOAD 42
+    ICONST_3
+    ISHR
+    IAND
+    IOR
+    INVOKESTATIC androidx/compose/foundation/layout/ColumnKt.columnMeasurePolicy (Landroidx/compose/foundation/layout/Arrangement$Vertical;Landroidx/compose/ui/Alignment$Horizontal;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/layout/MeasurePolicy;
+    ASTORE 45
+   L197
+    LINENUMBER 1562 L197
+    ALOAD 39
+    ASTORE 46
+   L198
+    LINENUMBER 1561 L198
+    ALOAD 45
+    ASTORE 47
+    ALOAD 41
+    ASTORE 48
+    BIPUSH 112
+    ILOAD 42
+    ICONST_3
+    ISHL
+    IAND
+    ISTORE 49
+   L199
+    LINENUMBER 1559 L199
+    NOP
+   L200
+    ICONST_0
+    ISTORE 50
+   L201
+    ALOAD 48
+    LDC -1159599143
+    LDC "CC(Layout)N(content,modifier,measurePolicy)81@3355L27,84@3521L415:Layout.kt#80mrfh"
+   L202
+    LINENUMBER 1563 L202
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L203
+    LINENUMBER 1564 L203
+    ALOAD 48
+    ICONST_0
+    INVOKESTATIC androidx/compose/runtime/ComposablesKt.getCurrentCompositeKeyHashCode (Landroidx/compose/runtime/Composer;I)J
+    INVOKESTATIC java/lang/Long.hashCode (J)I
+    ISTORE 51
+   L204
+    ALOAD 48
+   L205
+    LINENUMBER 1565 L205
+    INVOKEINTERFACE androidx/compose/runtime/Composer.getCurrentCompositionLocalMap ()Landroidx/compose/runtime/CompositionLocalMap; (itf)
+    ASTORE 52
+   L206
+    ALOAD 48
+   L207
+    LINENUMBER 1566 L207
+    ALOAD 46
+    INVOKESTATIC androidx/compose/ui/ComposedModifierKt.materializeModifier (Landroidx/compose/runtime/Composer;Landroidx/compose/ui/Modifier;)Landroidx/compose/ui/Modifier;
+    ASTORE 53
+   L208
+    LINENUMBER 1568 L208
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getConstructor ()Lkotlin/jvm/functions/Function0;
+    ASTORE 54
+    ALOAD 48
+    ASTORE 55
+    BIPUSH 6
+    SIPUSH 896
+    ILOAD 49
+    BIPUSH 6
+    ISHL
+    IAND
+    IOR
+    ISTORE 56
+   L209
+    LINENUMBER 1567 L209
+    NOP
+   L210
+    ICONST_0
+    ISTORE 57
+   L211
+    ALOAD 55
+    LDC -553112988
+    LDC "CC(ReusableComposeNode)N(factory,update,content)410@16187L9:Composables.kt#9igjgp"
+   L212
+    LINENUMBER 1569 L212
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L213
+    LINENUMBER 1570 L213
+    ALOAD 55
+    INVOKEINTERFACE androidx/compose/runtime/Composer.getApplier ()Landroidx/compose/runtime/Applier; (itf)
+    INSTANCEOF androidx/compose/runtime/Applier
+    IFNE L214
+    INVOKESTATIC androidx/compose/runtime/ComposablesKt.invalidApplier ()V
+   L214
+    ALOAD 55
+   L215
+    LINENUMBER 1571 L215
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReusableNode ()V (itf)
+   L216
+    LINENUMBER 1572 L216
+    ALOAD 55
+    INVOKEINTERFACE androidx/compose/runtime/Composer.getInserting ()Z (itf)
+    IFEQ L217
+    ALOAD 55
+   L218
+    LINENUMBER 1573 L218
+    ALOAD 54
+    INVOKEINTERFACE androidx/compose/runtime/Composer.createNode (Lkotlin/jvm/functions/Function0;)V (itf)
+    GOTO L219
+   L217
+    ALOAD 55
+   L220
+    LINENUMBER 1575 L220
+    INVOKEINTERFACE androidx/compose/runtime/Composer.useNode ()V (itf)
+   L219
+    LINENUMBER 1577 L219
+    ALOAD 55
+    INVOKESTATIC androidx/compose/runtime/Updater.constructor-impl (Landroidx/compose/runtime/Composer;)Landroidx/compose/runtime/Composer;
+    ASTORE 58
+   L221
+    ICONST_0
+    ISTORE 59
+   L222
+    LINENUMBER 1578 L222
+    ALOAD 58
+    ALOAD 47
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetMeasurePolicy ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L223
+    LINENUMBER 1579 L223
+    ALOAD 58
+    ALOAD 52
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetResolvedCompositionLocals ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L224
+    LINENUMBER 1580 L224
+    ALOAD 58
+    ILOAD 51
+    INVOKESTATIC java/lang/Integer.valueOf (I)Ljava/lang/Integer;
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetCompositeKeyHash ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L225
+    LINENUMBER 1581 L225
+    ALOAD 58
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getApplyOnDeactivatedNodeAssertion ()Lkotlin/jvm/functions/Function1;
+    INVOKESTATIC androidx/compose/runtime/Updater.reconcile-impl (Landroidx/compose/runtime/Composer;Lkotlin/jvm/functions/Function1;)V
+   L226
+    LINENUMBER 1582 L226
+    ALOAD 58
+    ALOAD 53
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetModifier ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L227
+    LINENUMBER 1583 L227
+    NOP
+   L228
+    LINENUMBER 1577 L228
+    NOP
+   L229
+    LINENUMBER 1584 L229
+    ALOAD 55
+    BIPUSH 14
+    ILOAD 56
+    BIPUSH 6
+    ISHR
+    IAND
+    ISTORE 60
+    ASTORE 61
+   L230
+    ICONST_0
+    ISTORE 62
+   L231
+    ALOAD 61
+    LDC 2093002350
+    LDC "C89@4557L9:Column.kt#2w3rfo"
+   L232
+    LINENUMBER 1560 L232
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+    GETSTATIC androidx/compose/foundation/layout/ColumnScopeInstance.INSTANCE : Landroidx/compose/foundation/layout/ColumnScopeInstance;
+    ALOAD 61
+    BIPUSH 6
+    BIPUSH 112
+    ILOAD 42
+    BIPUSH 6
+    ISHR
+    IAND
+    IOR
+    ISTORE 63
+    ASTORE 64
+    CHECKCAST androidx/compose/foundation/layout/ColumnScope
+    ASTORE 65
+   L233
+    ICONST_0
+    ISTORE 66
+   L234
+    ALOAD 64
+    LDC -1232413992
+    LDC "C570@25228L10,567@25041L367:DiscordSettings.kt#a3p3to"
+   L235
+    LINENUMBER 568 L235
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L236
+    LINENUMBER 569 L236
+    ILOAD 0
+    IFEQ L237
+    ALOAD 64
+    LDC 1207171338
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+    ALOAD 1
+    INVOKESTATIC com/beatwave/music/ui/screens/settings/integrations/DiscordSettingsKt.DiscordSettings$lambda$10 (Landroidx/compose/runtime/MutableState;)Ljava/lang/String;
+    GOTO L238
+   L237
+    LINENUMBER 570 L237
+    ALOAD 64
+    LDC 1207172901
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    LDC "569@25142L38"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformation (Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
+    GETSTATIC com/beatwave/music/R$string.not_logged_in : I
+    ALOAD 64
+    ICONST_0
+    INVOKESTATIC androidx/compose/ui/res/StringResources_androidKt.stringResource (ILandroidx/compose/runtime/Composer;I)Ljava/lang/String;
+    ASTORE 67
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+    ALOAD 67
+   L238
+    LINENUMBER 569 L238
+    ASTORE 68
+   L239
+    LINENUMBER 571 L239
+    GETSTATIC androidx/compose/material3/MaterialTheme.INSTANCE : Landroidx/compose/material3/MaterialTheme;
+    ALOAD 64
+    GETSTATIC androidx/compose/material3/MaterialTheme.$stable : I
+    INVOKEVIRTUAL androidx/compose/material3/MaterialTheme.getTypography (Landroidx/compose/runtime/Composer;I)Landroidx/compose/material3/Typography;
+    INVOKEVIRTUAL androidx/compose/material3/Typography.getTitleMedium ()Landroidx/compose/ui/text/TextStyle;
+    ASTORE 67
+   L240
+    LINENUMBER 572 L240
+    GETSTATIC androidx/compose/ui/text/font/FontWeight.Companion : Landroidx/compose/ui/text/font/FontWeight$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/text/font/FontWeight$Companion.getBold ()Landroidx/compose/ui/text/font/FontWeight;
+    ASTORE 69
+   L241
+    LINENUMBER 573 L241
+    GETSTATIC androidx/compose/ui/Modifier.Companion : Landroidx/compose/ui/Modifier$Companion;
+    CHECKCAST androidx/compose/ui/Modifier
+    ILOAD 0
+    IFEQ L242
+    FCONST_1
+    GOTO L243
+   L242
+    LDC 0.5
+   L243
+    INVOKESTATIC androidx/compose/ui/draw/AlphaKt.alpha (Landroidx/compose/ui/Modifier;F)Landroidx/compose/ui/Modifier;
+    ASTORE 76
+   L244
+    LINENUMBER 569 L244
+    ALOAD 68
+   L245
+    LINENUMBER 573 L245
+    ALOAD 76
+    LCONST_0
+    ACONST_NULL
+    LCONST_0
+    ACONST_NULL
+   L246
+    LINENUMBER 572 L246
+    ALOAD 69
+    ACONST_NULL
+    LCONST_0
+    ACONST_NULL
+    ACONST_NULL
+    LCONST_0
+    ICONST_0
+    ICONST_0
+    ICONST_0
+    ICONST_0
+    ACONST_NULL
+   L247
+    LINENUMBER 571 L247
+    ALOAD 67
+    ALOAD 64
+    LDC 1572864
+    ICONST_0
+    LDC 131004
+   L248
+    LINENUMBER 568 L248
+    INVOKESTATIC androidx/compose/material3/TextKt.Text-Nvy7gAk (Ljava/lang/String;Landroidx/compose/ui/Modifier;JLandroidx/compose/foundation/text/TextAutoSize;JLandroidx/compose/ui/text/font/FontStyle;Landroidx/compose/ui/text/font/FontWeight;Landroidx/compose/ui/text/font/FontFamily;JLandroidx/compose/ui/text/style/TextDecoration;Landroidx/compose/ui/text/style/TextAlign;JIZIILkotlin/jvm/functions/Function1;Landroidx/compose/ui/text/TextStyle;Landroidx/compose/runtime/Composer;III)V
+   L249
+    LINENUMBER 575 L249
+    ALOAD 3
+    INVOKESTATIC com/beatwave/music/ui/screens/settings/integrations/DiscordSettingsKt.DiscordSettings$lambda$8 (Landroidx/compose/runtime/MutableState;)Ljava/lang/String;
+    CHECKCAST java/lang/CharSequence
+    INVOKEINTERFACE java/lang/CharSequence.length ()I (itf)
+    IFLE L250
+    ICONST_1
+    GOTO L251
+   L250
+    ICONST_0
+   L251
+    GOTO L252
+   L252
+    LINENUMBER 575 L252
+    IFEQ L253
+   L254
+    LINENUMBER 576 L254
+    ALOAD 64
+    LDC -1231995245
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    LDC "577@25601L10,578@25674L11,575@25489L240"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformation (Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
+   L255
+    LINENUMBER 577 L255
+    ALOAD 3
+    INVOKESTATIC com/beatwave/music/ui/screens/settings/integrations/DiscordSettingsKt.DiscordSettings$lambda$8 (Landroidx/compose/runtime/MutableState;)Ljava/lang/String;
+    INVOKEDYNAMIC makeConcatWithConstants(Ljava/lang/String;)Ljava/lang/String; [
+      // handle kind 0x6 : INVOKESTATIC
+      java/lang/invoke/StringConcatFactory.makeConcatWithConstants(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/String;[Ljava/lang/Object;)Ljava/lang/invoke/CallSite;
+      // arguments:
+      "@\u0001"
+    ]
+    ASTORE 68
+   L256
+    LINENUMBER 578 L256
+    GETSTATIC androidx/compose/material3/MaterialTheme.INSTANCE : Landroidx/compose/material3/MaterialTheme;
+    ALOAD 64
+    GETSTATIC androidx/compose/material3/MaterialTheme.$stable : I
+    INVOKEVIRTUAL androidx/compose/material3/MaterialTheme.getTypography (Landroidx/compose/runtime/Composer;I)Landroidx/compose/material3/Typography;
+    INVOKEVIRTUAL androidx/compose/material3/Typography.getBodyMedium ()Landroidx/compose/ui/text/TextStyle;
+    ASTORE 67
+   L257
+    LINENUMBER 579 L257
+    GETSTATIC androidx/compose/material3/MaterialTheme.INSTANCE : Landroidx/compose/material3/MaterialTheme;
+    ALOAD 64
+    GETSTATIC androidx/compose/material3/MaterialTheme.$stable : I
+    INVOKEVIRTUAL androidx/compose/material3/MaterialTheme.getColorScheme (Landroidx/compose/runtime/Composer;I)Landroidx/compose/material3/ColorScheme;
+    INVOKEVIRTUAL androidx/compose/material3/ColorScheme.getOnSurfaceVariant-0d7_KjU ()J
+    LSTORE 77
+   L258
+    LINENUMBER 577 L258
+    ALOAD 68
+    ACONST_NULL
+   L259
+    LINENUMBER 579 L259
+    LLOAD 77
+    ACONST_NULL
+    LCONST_0
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    LCONST_0
+    ACONST_NULL
+    ACONST_NULL
+    LCONST_0
+    ICONST_0
+    ICONST_0
+    ICONST_0
+    ICONST_0
+    ACONST_NULL
+   L260
+    LINENUMBER 578 L260
+    ALOAD 67
+    ALOAD 64
+    ICONST_0
+    ICONST_0
+    LDC 131066
+   L261
+    LINENUMBER 576 L261
+    INVOKESTATIC androidx/compose/material3/TextKt.Text-Nvy7gAk (Ljava/lang/String;Landroidx/compose/ui/Modifier;JLandroidx/compose/foundation/text/TextAutoSize;JLandroidx/compose/ui/text/font/FontStyle;Landroidx/compose/ui/text/font/FontWeight;Landroidx/compose/ui/text/font/FontFamily;JLandroidx/compose/ui/text/style/TextDecoration;Landroidx/compose/ui/text/style/TextAlign;JIZIILkotlin/jvm/functions/Function1;Landroidx/compose/ui/text/TextStyle;Landroidx/compose/runtime/Composer;III)V
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+    GOTO L262
+   L253
+    LINENUMBER 581 L253
+    ALOAD 64
+    LDC -1231742781
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+   L262
+    LINENUMBER 582 L262
+    ILOAD 0
+    IFNE L263
+   L264
+    LINENUMBER 583 L264
+    ALOAD 64
+    LDC -1231670861
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    LDC "583@25856L52,584@25960L10,585@26032L11,582@25815L272"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformation (Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
+   L265
+    LINENUMBER 584 L265
+    GETSTATIC com/beatwave/music/R$string.discord_connect_description : I
+    ALOAD 64
+    ICONST_0
+    INVOKESTATIC androidx/compose/ui/res/StringResources_androidKt.stringResource (ILandroidx/compose/runtime/Composer;I)Ljava/lang/String;
+    ASTORE 68
+   L266
+    LINENUMBER 585 L266
+    GETSTATIC androidx/compose/material3/MaterialTheme.INSTANCE : Landroidx/compose/material3/MaterialTheme;
+    ALOAD 64
+    GETSTATIC androidx/compose/material3/MaterialTheme.$stable : I
+    INVOKEVIRTUAL androidx/compose/material3/MaterialTheme.getTypography (Landroidx/compose/runtime/Composer;I)Landroidx/compose/material3/Typography;
+    INVOKEVIRTUAL androidx/compose/material3/Typography.getBodySmall ()Landroidx/compose/ui/text/TextStyle;
+    ASTORE 67
+   L267
+    LINENUMBER 586 L267
+    GETSTATIC androidx/compose/material3/MaterialTheme.INSTANCE : Landroidx/compose/material3/MaterialTheme;
+    ALOAD 64
+    GETSTATIC androidx/compose/material3/MaterialTheme.$stable : I
+    INVOKEVIRTUAL androidx/compose/material3/MaterialTheme.getColorScheme (Landroidx/compose/runtime/Composer;I)Landroidx/compose/material3/ColorScheme;
+    INVOKEVIRTUAL androidx/compose/material3/ColorScheme.getOnSurfaceVariant-0d7_KjU ()J
+    LSTORE 77
+   L268
+    LINENUMBER 584 L268
+    ALOAD 68
+    ACONST_NULL
+   L269
+    LINENUMBER 586 L269
+    LLOAD 77
+    ACONST_NULL
+    LCONST_0
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    LCONST_0
+    ACONST_NULL
+    ACONST_NULL
+    LCONST_0
+    ICONST_0
+    ICONST_0
+    ICONST_0
+    ICONST_0
+    ACONST_NULL
+   L270
+    LINENUMBER 585 L270
+    ALOAD 67
+    ALOAD 64
+    ICONST_0
+    ICONST_0
+    LDC 131066
+   L271
+    LINENUMBER 583 L271
+    INVOKESTATIC androidx/compose/material3/TextKt.Text-Nvy7gAk (Ljava/lang/String;Landroidx/compose/ui/Modifier;JLandroidx/compose/foundation/text/TextAutoSize;JLandroidx/compose/ui/text/font/FontStyle;Landroidx/compose/ui/text/font/FontWeight;Landroidx/compose/ui/text/font/FontFamily;JLandroidx/compose/ui/text/style/TextDecoration;Landroidx/compose/ui/text/style/TextAlign;JIZIILkotlin/jvm/functions/Function1;Landroidx/compose/ui/text/TextStyle;Landroidx/compose/runtime/Composer;III)V
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+    GOTO L272
+   L263
+    LINENUMBER 588 L263
+    ALOAD 64
+    LDC -1231387645
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 64
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+   L272
+    ALOAD 64
+   L273
+    LINENUMBER 568 L273
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L274
+    LINENUMBER 589 L274
+    GOTO L275
+   L275
+    GETSTATIC kotlin/Unit.INSTANCE : Lkotlin/Unit;
+   L276
+    LINENUMBER 1560 L276
+    POP
+    ALOAD 61
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L277
+    LINENUMBER 1584 L277
+    ALOAD 55
+   L278
+    LINENUMBER 1585 L278
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endNode ()V (itf)
+    ALOAD 55
+   L279
+    LINENUMBER 1569 L279
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L280
+    LINENUMBER 1586 L280
+    NOP
+   L281
+    ALOAD 48
+   L282
+    LINENUMBER 1563 L282
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L283
+    LINENUMBER 1587 L283
+    NOP
+   L284
+    ALOAD 41
+   L285
+    LINENUMBER 1553 L285
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L286
+    LINENUMBER 1588 L286
+    GOTO L287
+   L287
+    LINENUMBER 592 L287
+    ILOAD 0
+    IFEQ L288
+    ALOAD 36
+    LDC 1856934956
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 36
+    LDC "592@26266L194,592@26241L313"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformation (Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
+    ALOAD 36
+    LDC -1602665513
+    LDC "CC(remember):DiscordSettings.kt#9igjgp"
+   L289
+    LINENUMBER 593 L289
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+    ALOAD 36
+    ASTORE 40
+    ALOAD 36
+    ALOAD 1
+    INVOKEINTERFACE androidx/compose/runtime/Composer.changed (Ljava/lang/Object;)Z (itf)
+    ALOAD 36
+    ALOAD 2
+    INVOKEINTERFACE androidx/compose/runtime/Composer.changed (Ljava/lang/Object;)Z (itf)
+    IOR
+    ALOAD 36
+    ALOAD 3
+    INVOKEINTERFACE androidx/compose/runtime/Composer.changed (Ljava/lang/Object;)Z (itf)
+    IOR
+    ALOAD 36
+    ALOAD 4
+    INVOKEINTERFACE androidx/compose/runtime/Composer.changed (Ljava/lang/Object;)Z (itf)
+    IOR
+    ISTORE 44
+   L290
+    ICONST_0
+    ISTORE 41
+   L291
+    LINENUMBER 1589 L291
+    ALOAD 40
+    INVOKEINTERFACE androidx/compose/runtime/Composer.rememberedValue ()Ljava/lang/Object; (itf)
+    ASTORE 42
+   L292
+    ICONST_0
+    ISTORE 43
+   L293
+    LINENUMBER 1590 L293
+    ILOAD 44
+    IFNE L294
+    ALOAD 42
+    GETSTATIC androidx/compose/runtime/Composer.Companion : Landroidx/compose/runtime/Composer$Companion;
+    INVOKEVIRTUAL androidx/compose/runtime/Composer$Companion.getEmpty ()Ljava/lang/Object;
+    IF_ACMPNE L295
+   L294
+    LINENUMBER 1591 L294
+    ICONST_0
+    ISTORE 45
+   L296
+    LINENUMBER 593 L296
+    ALOAD 1
+    ALOAD 2
+    ALOAD 3
+    ALOAD 4
+    INVOKEDYNAMIC invoke(Landroidx/compose/runtime/MutableState;Landroidx/compose/runtime/MutableState;Landroidx/compose/runtime/MutableState;Landroidx/compose/runtime/MutableState;)Lkotlin/jvm/functions/Function0; [
+      // handle kind 0x6 : INVOKESTATIC
+      java/lang/invoke/LambdaMetafactory.metafactory(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+      // arguments:
+      ()Ljava/lang/Object;, 
+      // handle kind 0x6 : INVOKESTATIC
+      com/beatwave/music/ui/screens/settings/integrations/DiscordSettingsKt.DiscordSettings$lambda$73$1$0$2$0(Landroidx/compose/runtime/MutableState;Landroidx/compose/runtime/MutableState;Landroidx/compose/runtime/MutableState;Landroidx/compose/runtime/MutableState;)Lkotlin/Unit;, 
+      ()Lkotlin/Unit;
+    ]
+    GOTO L297
+   L297
+    LINENUMBER 1591 L297
+    ASTORE 46
+   L298
+    LINENUMBER 1592 L298
+    ALOAD 40
+    ALOAD 46
+    INVOKEINTERFACE androidx/compose/runtime/Composer.updateRememberedValue (Ljava/lang/Object;)V (itf)
+   L299
+    LINENUMBER 1593 L299
+    ALOAD 46
+   L300
+    GOTO L301
+   L295
+    LINENUMBER 1594 L295
+    ALOAD 42
+   L301
+    LINENUMBER 1589 L301
+    NOP
+   L302
+    LINENUMBER 1589 L302
+    GOTO L303
+   L303
+    LINENUMBER 593 L303
+    CHECKCAST kotlin/jvm/functions/Function0
+    ASTORE 39
+    ALOAD 36
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+    ALOAD 39
+    ACONST_NULL
+    ICONST_0
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    GETSTATIC com/beatwave/music/ui/screens/settings/integrations/ComposableSingletons$DiscordSettingsKt.INSTANCE : Lcom/beatwave/music/ui/screens/settings/integrations/ComposableSingletons$DiscordSettingsKt;
+    INVOKEVIRTUAL com/beatwave/music/ui/screens/settings/integrations/ComposableSingletons$DiscordSettingsKt.getLambda$-99375448$app ()Lkotlin/jvm/functions/Function3;
+    ALOAD 36
+    LDC 805306368
+    SIPUSH 510
+    INVOKESTATIC androidx/compose/material3/ButtonKt.OutlinedButton (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;ZLandroidx/compose/ui/graphics/Shape;Landroidx/compose/material3/ButtonColors;Landroidx/compose/material3/ButtonElevation;Landroidx/compose/foundation/BorderStroke;Landroidx/compose/foundation/layout/PaddingValues;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+   L304
+    LINENUMBER 592 L304
+    ALOAD 36
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+    GOTO L305
+   L288
+    LINENUMBER 601 L288
+    ALOAD 36
+    LDC 1857274189
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 36
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+   L305
+    ALOAD 36
+   L306
+    LINENUMBER 524 L306
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L307
+    LINENUMBER 602 L307
+    GOTO L308
+   L308
+    GETSTATIC kotlin/Unit.INSTANCE : Lkotlin/Unit;
+   L309
+    LINENUMBER 1486 L309
+    POP
+    ALOAD 33
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L310
+    LINENUMBER 1510 L310
+    ALOAD 27
+   L311
+    LINENUMBER 1595 L311
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endNode ()V (itf)
+    ALOAD 27
+   L312
+    LINENUMBER 1495 L312
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L313
+    LINENUMBER 1596 L313
+    NOP
+   L314
+    ALOAD 20
+   L315
+    LINENUMBER 1489 L315
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L316
+    LINENUMBER 1597 L316
+    NOP
+   L317
+    ALOAD 14
+   L318
+    LINENUMBER 1479 L318
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L319
+    LINENUMBER 1598 L319
+    GOTO L320
+   L320
+    LINENUMBER 605 L320
+    ILOAD 0
+    IFNE L321
+    ALOAD 9
+    LDC -1992653772
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 9
+    LDC "605@26689L1013"
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformation (Landroidx/compose/runtime/Composer;Ljava/lang/String;)V
+   L322
+    LINENUMBER 607 L322
+    GETSTATIC androidx/compose/ui/Modifier.Companion : Landroidx/compose/ui/Modifier$Companion;
+    CHECKCAST androidx/compose/ui/Modifier
+   L323
+    LINENUMBER 608 L323
+    FCONST_0
+    ICONST_1
+    ACONST_NULL
+    INVOKESTATIC androidx/compose/foundation/layout/SizeKt.fillMaxWidth$default (Landroidx/compose/ui/Modifier;FILjava/lang/Object;)Landroidx/compose/ui/Modifier;
+   L324
+    LINENUMBER 609 L324
+    BIPUSH 20
+    ISTORE 11
+   L325
+    ICONST_0
+    ISTORE 12
+   L326
+    LINENUMBER 1599 L326
+    ILOAD 11
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L327
+   L327
+    LINENUMBER 609 L327
+    FCONST_0
+    BIPUSH 20
+    ISTORE 11
+   L328
+    ICONST_0
+    ISTORE 12
+   L329
+    LINENUMBER 1599 L329
+    ILOAD 11
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L330
+   L330
+    LINENUMBER 609 L330
+    BIPUSH 16
+    ISTORE 11
+   L331
+    ICONST_0
+    ISTORE 12
+   L332
+    LINENUMBER 1599 L332
+    ILOAD 11
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L333
+   L333
+    LINENUMBER 609 L333
+    ICONST_2
+    ACONST_NULL
+    INVOKESTATIC androidx/compose/foundation/layout/PaddingKt.padding-qDBjuR0$default (Landroidx/compose/ui/Modifier;FFFFILjava/lang/Object;)Landroidx/compose/ui/Modifier;
+    ASTORE 11
+   L334
+    LINENUMBER 610 L334
+    GETSTATIC androidx/compose/foundation/layout/Arrangement.INSTANCE : Landroidx/compose/foundation/layout/Arrangement;
+    BIPUSH 12
+    ISTORE 12
+   L335
+    ICONST_0
+    ISTORE 13
+   L336
+    LINENUMBER 1600 L336
+    ILOAD 12
+    I2F
+    INVOKESTATIC androidx/compose/ui/unit/Dp.constructor-impl (F)F
+    GOTO L337
+   L337
+    LINENUMBER 610 L337
+    INVOKEVIRTUAL androidx/compose/foundation/layout/Arrangement.spacedBy-0680j_4 (F)Landroidx/compose/foundation/layout/Arrangement$HorizontalOrVertical;
+    CHECKCAST androidx/compose/foundation/layout/Arrangement$Horizontal
+    ASTORE 12
+    ALOAD 9
+    ASTORE 14
+    BIPUSH 54
+    ISTORE 15
+   L338
+    LINENUMBER 606 L338
+    NOP
+   L339
+    ICONST_0
+    ISTORE 16
+   L340
+    ALOAD 14
+    LDC 844473419
+    LDC "CC(Row)N(modifier,horizontalArrangement,verticalAlignment,content)99@5125L58,100@5188L131:Row.kt#2w3rfo"
+   L341
+    LINENUMBER 1601 L341
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L342
+    LINENUMBER 1602 L342
+    GETSTATIC androidx/compose/ui/Alignment.Companion : Landroidx/compose/ui/Alignment$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/Alignment$Companion.getTop ()Landroidx/compose/ui/Alignment$Vertical;
+    ASTORE 13
+   L343
+    LINENUMBER 1605 L343
+    ALOAD 12
+    ALOAD 13
+    ALOAD 14
+    BIPUSH 14
+    ILOAD 15
+    ICONST_3
+    ISHR
+    IAND
+    BIPUSH 112
+    ILOAD 15
+    ICONST_3
+    ISHR
+    IAND
+    IOR
+    INVOKESTATIC androidx/compose/foundation/layout/RowKt.rowMeasurePolicy (Landroidx/compose/foundation/layout/Arrangement$Horizontal;Landroidx/compose/ui/Alignment$Vertical;Landroidx/compose/runtime/Composer;I)Landroidx/compose/ui/layout/MeasurePolicy;
+    ASTORE 17
+   L344
+    LINENUMBER 1609 L344
+    ALOAD 11
+    ASTORE 18
+   L345
+    LINENUMBER 1608 L345
+    ALOAD 17
+    ASTORE 19
+    ALOAD 14
+    ASTORE 20
+    BIPUSH 112
+    ILOAD 15
+    ICONST_3
+    ISHL
+    IAND
+    ISTORE 21
+   L346
+    LINENUMBER 1606 L346
+    NOP
+   L347
+    ICONST_0
+    ISTORE 22
+   L348
+    ALOAD 20
+    LDC -1159599143
+    LDC "CC(Layout)N(content,modifier,measurePolicy)81@3355L27,84@3521L415:Layout.kt#80mrfh"
+   L349
+    LINENUMBER 1610 L349
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L350
+    LINENUMBER 1611 L350
+    ALOAD 20
+    ICONST_0
+    INVOKESTATIC androidx/compose/runtime/ComposablesKt.getCurrentCompositeKeyHashCode (Landroidx/compose/runtime/Composer;I)J
+    INVOKESTATIC java/lang/Long.hashCode (J)I
+    ISTORE 23
+   L351
+    ALOAD 20
+   L352
+    LINENUMBER 1612 L352
+    INVOKEINTERFACE androidx/compose/runtime/Composer.getCurrentCompositionLocalMap ()Landroidx/compose/runtime/CompositionLocalMap; (itf)
+    ASTORE 24
+   L353
+    ALOAD 20
+   L354
+    LINENUMBER 1613 L354
+    ALOAD 18
+    INVOKESTATIC androidx/compose/ui/ComposedModifierKt.materializeModifier (Landroidx/compose/runtime/Composer;Landroidx/compose/ui/Modifier;)Landroidx/compose/ui/Modifier;
+    ASTORE 25
+   L355
+    LINENUMBER 1615 L355
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getConstructor ()Lkotlin/jvm/functions/Function0;
+    ASTORE 26
+    ALOAD 20
+    ASTORE 27
+    BIPUSH 6
+    SIPUSH 896
+    ILOAD 21
+    BIPUSH 6
+    ISHL
+    IAND
+    IOR
+    ISTORE 28
+   L356
+    LINENUMBER 1614 L356
+    NOP
+   L357
+    ICONST_0
+    ISTORE 29
+   L358
+    ALOAD 27
+    LDC -553112988
+    LDC "CC(ReusableComposeNode)N(factory,update,content)410@16187L9:Composables.kt#9igjgp"
+   L359
+    LINENUMBER 1616 L359
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+   L360
+    LINENUMBER 1617 L360
+    ALOAD 27
+    INVOKEINTERFACE androidx/compose/runtime/Composer.getApplier ()Landroidx/compose/runtime/Applier; (itf)
+    INSTANCEOF androidx/compose/runtime/Applier
+    IFNE L361
+    INVOKESTATIC androidx/compose/runtime/ComposablesKt.invalidApplier ()V
+   L361
+    ALOAD 27
+   L362
+    LINENUMBER 1618 L362
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReusableNode ()V (itf)
+   L363
+    LINENUMBER 1619 L363
+    ALOAD 27
+    INVOKEINTERFACE androidx/compose/runtime/Composer.getInserting ()Z (itf)
+    IFEQ L364
+    ALOAD 27
+   L365
+    LINENUMBER 1620 L365
+    ALOAD 26
+    INVOKEINTERFACE androidx/compose/runtime/Composer.createNode (Lkotlin/jvm/functions/Function0;)V (itf)
+    GOTO L366
+   L364
+    ALOAD 27
+   L367
+    LINENUMBER 1622 L367
+    INVOKEINTERFACE androidx/compose/runtime/Composer.useNode ()V (itf)
+   L366
+    LINENUMBER 1624 L366
+    ALOAD 27
+    INVOKESTATIC androidx/compose/runtime/Updater.constructor-impl (Landroidx/compose/runtime/Composer;)Landroidx/compose/runtime/Composer;
+    ASTORE 30
+   L368
+    ICONST_0
+    ISTORE 31
+   L369
+    LINENUMBER 1625 L369
+    ALOAD 30
+    ALOAD 19
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetMeasurePolicy ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L370
+    LINENUMBER 1626 L370
+    ALOAD 30
+    ALOAD 24
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetResolvedCompositionLocals ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L371
+    LINENUMBER 1627 L371
+    ALOAD 30
+    ILOAD 23
+    INVOKESTATIC java/lang/Integer.valueOf (I)Ljava/lang/Integer;
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetCompositeKeyHash ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L372
+    LINENUMBER 1628 L372
+    ALOAD 30
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getApplyOnDeactivatedNodeAssertion ()Lkotlin/jvm/functions/Function1;
+    INVOKESTATIC androidx/compose/runtime/Updater.reconcile-impl (Landroidx/compose/runtime/Composer;Lkotlin/jvm/functions/Function1;)V
+   L373
+    LINENUMBER 1629 L373
+    ALOAD 30
+    ALOAD 25
+    GETSTATIC androidx/compose/ui/node/ComposeUiNode.Companion : Landroidx/compose/ui/node/ComposeUiNode$Companion;
+    INVOKEVIRTUAL androidx/compose/ui/node/ComposeUiNode$Companion.getSetModifier ()Lkotlin/jvm/functions/Function2;
+    INVOKESTATIC androidx/compose/runtime/Updater.set-impl (Landroidx/compose/runtime/Composer;Ljava/lang/Object;Lkotlin/jvm/functions/Function2;)V
+   L374
+    LINENUMBER 1630 L374
+    NOP
+   L375
+    LINENUMBER 1624 L375
+    NOP
+   L376
+    LINENUMBER 1631 L376
+    ALOAD 27
+    BIPUSH 14
+    ILOAD 28
+    BIPUSH 6
+    ISHR
+    IAND
+    ISTORE 32
+    ASTORE 33
+   L377
+    ICONST_0
+    ISTORE 34
+   L378
+    ALOAD 33
+    LDC 1456264949
+    LDC "C101@5233L9:Row.kt#2w3rfo"
+   L379
+    LINENUMBER 1607 L379
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+    GETSTATIC androidx/compose/foundation/layout/RowScopeInstance.INSTANCE : Landroidx/compose/foundation/layout/RowScopeInstance;
+    ALOAD 33
+    BIPUSH 6
+    BIPUSH 112
+    ILOAD 15
+    BIPUSH 6
+    ISHR
+    IAND
+    IOR
+    ISTORE 35
+    ASTORE 36
+    CHECKCAST androidx/compose/foundation/layout/RowScope
+    ASTORE 37
+   L380
+    ICONST_0
+    ISTORE 38
+   L381
+    ALOAD 36
+    LDC -141840006
+    LDC "C612@27015L52,611@26965L217,617@27253L26,616@27203L481:DiscordSettings.kt#a3p3to"
+   L382
+    LINENUMBER 612 L382
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+    ALOAD 36
+    LDC 1242351438
+    LDC "CC(remember):DiscordSettings.kt#9igjgp"
+   L383
+    LINENUMBER 613 L383
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+    ALOAD 36
+    ASTORE 39
+    ALOAD 36
+    ALOAD 6
+    INVOKEINTERFACE androidx/compose/runtime/Composer.changedInstance (Ljava/lang/Object;)Z (itf)
+    ISTORE 40
+   L384
+    ICONST_0
+    ISTORE 41
+   L385
+    LINENUMBER 1632 L385
+    ALOAD 39
+    INVOKEINTERFACE androidx/compose/runtime/Composer.rememberedValue ()Ljava/lang/Object; (itf)
+    ASTORE 42
+   L386
+    ICONST_0
+    ISTORE 43
+   L387
+    LINENUMBER 1633 L387
+    ILOAD 40
+    IFNE L388
+    ALOAD 42
+    GETSTATIC androidx/compose/runtime/Composer.Companion : Landroidx/compose/runtime/Composer$Companion;
+    INVOKEVIRTUAL androidx/compose/runtime/Composer$Companion.getEmpty ()Ljava/lang/Object;
+    IF_ACMPNE L389
+   L388
+    LINENUMBER 1634 L388
+    ICONST_0
+    ISTORE 44
+   L390
+    LINENUMBER 613 L390
+    ALOAD 6
+    INVOKEDYNAMIC invoke(Landroidx/navigation/NavController;)Lkotlin/jvm/functions/Function0; [
+      // handle kind 0x6 : INVOKESTATIC
+      java/lang/invoke/LambdaMetafactory.metafactory(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+      // arguments:
+      ()Ljava/lang/Object;, 
+      // handle kind 0x6 : INVOKESTATIC
+      com/beatwave/music/ui/screens/settings/integrations/DiscordSettingsKt.DiscordSettings$lambda$73$1$1$0$0(Landroidx/navigation/NavController;)Lkotlin/Unit;, 
+      ()Lkotlin/Unit;
+    ]
+    GOTO L391
+   L391
+    LINENUMBER 1634 L391
+    ASTORE 45
+   L392
+    LINENUMBER 1635 L392
+    ALOAD 39
+    ALOAD 45
+    INVOKEINTERFACE androidx/compose/runtime/Composer.updateRememberedValue (Ljava/lang/Object;)V (itf)
+   L393
+    LINENUMBER 1636 L393
+    ALOAD 45
+   L394
+    GOTO L395
+   L389
+    LINENUMBER 1637 L389
+    ALOAD 42
+   L395
+    LINENUMBER 1632 L395
+    NOP
+   L396
+    LINENUMBER 1632 L396
+    GOTO L397
+   L397
+    LINENUMBER 613 L397
+    CHECKCAST kotlin/jvm/functions/Function0
+    ASTORE 46
+    ALOAD 36
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+    ALOAD 46
+    ACONST_NULL
+    ICONST_0
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    GETSTATIC com/beatwave/music/ui/screens/settings/integrations/ComposableSingletons$DiscordSettingsKt.INSTANCE : Lcom/beatwave/music/ui/screens/settings/integrations/ComposableSingletons$DiscordSettingsKt;
+    INVOKEVIRTUAL com/beatwave/music/ui/screens/settings/integrations/ComposableSingletons$DiscordSettingsKt.getLambda$-168971160$app ()Lkotlin/jvm/functions/Function3;
+    ALOAD 36
+    LDC 805306368
+    SIPUSH 510
+   L398
+    LINENUMBER 612 L398
+    INVOKESTATIC androidx/compose/material3/ButtonKt.OutlinedButton (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;ZLandroidx/compose/ui/graphics/Shape;Landroidx/compose/material3/ButtonColors;Landroidx/compose/material3/ButtonElevation;Landroidx/compose/foundation/BorderStroke;Landroidx/compose/foundation/layout/PaddingValues;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+    ALOAD 36
+    LDC 1242359028
+    LDC "CC(remember):DiscordSettings.kt#9igjgp"
+   L399
+    LINENUMBER 618 L399
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerStart (Landroidx/compose/runtime/Composer;ILjava/lang/String;)V
+    ALOAD 36
+    ASTORE 39
+    ALOAD 36
+    ALOAD 7
+    INVOKEINTERFACE androidx/compose/runtime/Composer.changed (Ljava/lang/Object;)Z (itf)
+    ISTORE 40
+   L400
+    ICONST_0
+    ISTORE 41
+   L401
+    LINENUMBER 1638 L401
+    ALOAD 39
+    INVOKEINTERFACE androidx/compose/runtime/Composer.rememberedValue ()Ljava/lang/Object; (itf)
+    ASTORE 42
+   L402
+    ICONST_0
+    ISTORE 43
+   L403
+    LINENUMBER 1639 L403
+    ILOAD 40
+    IFNE L404
+    ALOAD 42
+    GETSTATIC androidx/compose/runtime/Composer.Companion : Landroidx/compose/runtime/Composer$Companion;
+    INVOKEVIRTUAL androidx/compose/runtime/Composer$Companion.getEmpty ()Ljava/lang/Object;
+    IF_ACMPNE L405
+   L404
+    LINENUMBER 1640 L404
+    ICONST_0
+    ISTORE 44
+   L406
+    LINENUMBER 618 L406
+    ALOAD 7
+    INVOKEDYNAMIC invoke(Landroidx/compose/runtime/MutableState;)Lkotlin/jvm/functions/Function0; [
+      // handle kind 0x6 : INVOKESTATIC
+      java/lang/invoke/LambdaMetafactory.metafactory(Ljava/lang/invoke/MethodHandles$Lookup;Ljava/lang/String;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/MethodType;)Ljava/lang/invoke/CallSite;
+      // arguments:
+      ()Ljava/lang/Object;, 
+      // handle kind 0x6 : INVOKESTATIC
+      com/beatwave/music/ui/screens/settings/integrations/DiscordSettingsKt.DiscordSettings$lambda$73$1$1$1$0(Landroidx/compose/runtime/MutableState;)Lkotlin/Unit;, 
+      ()Lkotlin/Unit;
+    ]
+    GOTO L407
+   L407
+    LINENUMBER 1640 L407
+    ASTORE 45
+   L408
+    LINENUMBER 1641 L408
+    ALOAD 39
+    ALOAD 45
+    INVOKEINTERFACE androidx/compose/runtime/Composer.updateRememberedValue (Ljava/lang/Object;)V (itf)
+   L409
+    LINENUMBER 1642 L409
+    ALOAD 45
+   L410
+    GOTO L411
+   L405
+    LINENUMBER 1643 L405
+    ALOAD 42
+   L411
+    LINENUMBER 1638 L411
+    NOP
+   L412
+    LINENUMBER 1638 L412
+    GOTO L413
+   L413
+    LINENUMBER 618 L413
+    CHECKCAST kotlin/jvm/functions/Function0
+    ASTORE 46
+    ALOAD 36
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+    ALOAD 46
+    ACONST_NULL
+    ICONST_0
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    ACONST_NULL
+    GETSTATIC com/beatwave/music/ui/screens/settings/integrations/ComposableSingletons$DiscordSettingsKt.INSTANCE : Lcom/beatwave/music/ui/screens/settings/integrations/ComposableSingletons$DiscordSettingsKt;
+    INVOKEVIRTUAL com/beatwave/music/ui/screens/settings/integrations/ComposableSingletons$DiscordSettingsKt.getLambda$610076305$app ()Lkotlin/jvm/functions/Function3;
+    ALOAD 36
+    LDC 805306368
+    SIPUSH 510
+   L414
+    LINENUMBER 617 L414
+    INVOKESTATIC androidx/compose/material3/ButtonKt.OutlinedButton (Lkotlin/jvm/functions/Function0;Landroidx/compose/ui/Modifier;ZLandroidx/compose/ui/graphics/Shape;Landroidx/compose/material3/ButtonColors;Landroidx/compose/material3/ButtonElevation;Landroidx/compose/foundation/BorderStroke;Landroidx/compose/foundation/layout/PaddingValues;Landroidx/compose/foundation/interaction/MutableInteractionSource;Lkotlin/jvm/functions/Function3;Landroidx/compose/runtime/Composer;II)V
+    ALOAD 36
+   L415
+    LINENUMBER 612 L415
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L416
+    LINENUMBER 628 L416
+    GOTO L417
+   L417
+    GETSTATIC kotlin/Unit.INSTANCE : Lkotlin/Unit;
+   L418
+    LINENUMBER 1607 L418
+    POP
+    ALOAD 33
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L419
+    LINENUMBER 1631 L419
+    ALOAD 27
+   L420
+    LINENUMBER 1644 L420
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endNode ()V (itf)
+    ALOAD 27
+   L421
+    LINENUMBER 1616 L421
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L422
+    LINENUMBER 1645 L422
+    NOP
+   L423
+    ALOAD 20
+   L424
+    LINENUMBER 1610 L424
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L425
+    LINENUMBER 1646 L425
+    NOP
+   L426
+    ALOAD 14
+   L427
+    LINENUMBER 1601 L427
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.sourceInformationMarkerEnd (Landroidx/compose/runtime/Composer;)V
+   L428
+    LINENUMBER 1647 L428
+    GOTO L429
+   L429
+    LINENUMBER 605 L429
+    ALOAD 9
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+    GOTO L430
+   L321
+    LINENUMBER 629 L321
+    ALOAD 9
+    LDC -1991649527
+    INVOKEINTERFACE androidx/compose/runtime/Composer.startReplaceGroup (I)V (itf)
+    ALOAD 9
+    INVOKEINTERFACE androidx/compose/runtime/Composer.endReplaceGroup ()V (itf)
+   L430
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.isTraceInProgress ()Z
+    IFEQ L431
+    INVOKESTATIC androidx/compose/runtime/ComposerKt.traceEventEnd ()V
+   L431
+    GOTO L432
+   L3
+    LINENUMBER 515 L3
+    ALOAD 9
+    INVOKEINTERFACE androidx/compose/runtime/Composer.skipToGroupEnd ()V (itf)
+   L432
+    LINENUMBER 630 L432
+    GETSTATIC kotlin/Unit.INSTANCE : Lkotlin/Unit;
+    ARETURN
+   L433
+    LOCALVARIABLE $i$f$getDp I L7 L8 14
+    LOCALVARIABLE $this$dp$iv I L6 L8 13
+    LOCALVARIABLE $i$f$getDp I L10 L11 15
+    LOCALVARIABLE $this$dp$iv I L9 L11 14
+    LOCALVARIABLE $i$f$getDp I L13 L14 16
+    LOCALVARIABLE $this$dp$iv I L12 L14 15
+    LOCALVARIABLE $i$f$getDp I L18 L19 17
+    LOCALVARIABLE $this$dp$iv I L17 L19 16
+    LOCALVARIABLE $i$f$getDp I L22 L20 17
+    LOCALVARIABLE $this$dp$iv I L21 L20 16
+    LOCALVARIABLE $i$f$getDp I L75 L76 40
+    LOCALVARIABLE $this$dp$iv I L74 L76 39
+    LOCALVARIABLE $i$f$getDp I L131 L132 68
+    LOCALVARIABLE $this$dp$iv I L130 L132 67
+    LOCALVARIABLE $i$f$getDp I L142 L143 68
+    LOCALVARIABLE $this$dp$iv I L141 L143 67
+    LOCALVARIABLE $i$f$getDp I L158 L159 75
+    LOCALVARIABLE $this$dp$iv I L157 L159 74
+    LOCALVARIABLE $i$f$getDp I L163 L164 75
+    LOCALVARIABLE $this$dp$iv I L162 L164 74
+    LOCALVARIABLE statusColor J L154 L170 72
+    LOCALVARIABLE $i$a$-Box-DiscordSettingsKt$DiscordSettings$19$2$1$1 I L120 L174 66
+    LOCALVARIABLE $this$DiscordSettings_u24lambda_u2473_u241_u240_u240 Landroidx/compose/foundation/layout/BoxScope; L119 L174 65
+    LOCALVARIABLE $composer Landroidx/compose/runtime/Composer; L119 L174 64
+    LOCALVARIABLE $changed I L119 L174 63
+    LOCALVARIABLE $i$a$-Layout-BoxKt$Box$1$iv I L117 L176 62
+    LOCALVARIABLE $composer$iv Landroidx/compose/runtime/Composer; L116 L176 61
+    LOCALVARIABLE $changed$iv I L116 L176 60
+    LOCALVARIABLE $i$a$-ReusableComposeNode-LayoutKt$Layout$1$iv$iv I L108 L114 59
+    LOCALVARIABLE $this$Layout_u24lambda_u240$iv$iv Landroidx/compose/runtime/Composer; L107 L114 58
+    LOCALVARIABLE $i$f$ReusableComposeNode I L97 L180 57
+    LOCALVARIABLE factory$iv$iv$iv Lkotlin/jvm/functions/Function0; L96 L180 54
+    LOCALVARIABLE $composer$iv$iv$iv Landroidx/compose/runtime/Composer; L96 L180 55
+    LOCALVARIABLE $changed$iv$iv$iv I L96 L180 56
+    LOCALVARIABLE $i$f$Layout I L87 L183 50
+    LOCALVARIABLE compositeKeyHash$iv$iv I L90 L183 51
+    LOCALVARIABLE localMap$iv$iv Landroidx/compose/runtime/CompositionLocalMap; L92 L183 52
+    LOCALVARIABLE materialized$iv$iv Landroidx/compose/ui/Modifier; L94 L183 53
+    LOCALVARIABLE modifier$iv$iv Landroidx/compose/ui/Modifier; L86 L183 46
+    LOCALVARIABLE measurePolicy$iv$iv Landroidx/compose/ui/layout/MeasurePolicy; L86 L183 47
+    LOCALVARIABLE $composer$iv$iv Landroidx/compose/runtime/Composer; L86 L183 48
+    LOCALVARIABLE $changed$iv$iv I L86 L183 49
+    LOCALVARIABLE $i$f$Box I L78 L186 43
+    LOCALVARIABLE measurePolicy$iv Landroidx/compose/ui/layout/MeasurePolicy; L83 L186 45
+    LOCALVARIABLE modifier$iv Landroidx/compose/ui/Modifier; L77 L186 39
+    LOCALVARIABLE contentAlignment$iv Landroidx/compose/ui/Alignment; L81 L186 40
+    LOCALVARIABLE propagateMinConstraints$iv Z L82 L186 44
+    LOCALVARIABLE $composer$iv Landroidx/compose/runtime/Composer; L77 L186 41
+    LOCALVARIABLE $changed$iv I L77 L186 42
+    LOCALVARIABLE $i$f$getDp I L188 L189 40
+    LOCALVARIABLE $this$dp$iv I L187 L189 39
+    LOCALVARIABLE $i$a$-Column-DiscordSettingsKt$DiscordSettings$19$2$1$2 I L234 L275 66
+    LOCALVARIABLE $this$DiscordSettings_u24lambda_u2473_u241_u240_u241 Landroidx/compose/foundation/layout/ColumnScope; L233 L275 65
+    LOCALVARIABLE $composer Landroidx/compose/runtime/Composer; L233 L275 64
+    LOCALVARIABLE $changed I L233 L275 63
+    LOCALVARIABLE $i$a$-Layout-ColumnKt$Column$1$iv I L231 L277 62
+    LOCALVARIABLE $composer$iv Landroidx/compose/runtime/Composer; L230 L277 61
+    LOCALVARIABLE $changed$iv I L230 L277 60
+    LOCALVARIABLE $i$a$-ReusableComposeNode-LayoutKt$Layout$1$iv$iv I L222 L228 59
+    LOCALVARIABLE $this$Layout_u24lambda_u240$iv$iv Landroidx/compose/runtime/Composer; L221 L228 58
+    LOCALVARIABLE $i$f$ReusableComposeNode I L211 L281 57
+    LOCALVARIABLE factory$iv$iv$iv Lkotlin/jvm/functions/Function0; L210 L281 54
+    LOCALVARIABLE $composer$iv$iv$iv Landroidx/compose/runtime/Composer; L210 L281 55
+    LOCALVARIABLE $changed$iv$iv$iv I L210 L281 56
+    LOCALVARIABLE $i$f$Layout I L201 L284 50
+    LOCALVARIABLE compositeKeyHash$iv$iv I L204 L284 51
+    LOCALVARIABLE localMap$iv$iv Landroidx/compose/runtime/CompositionLocalMap; L206 L284 52
+    LOCALVARIABLE materialized$iv$iv Landroidx/compose/ui/Modifier; L208 L284 53
+    LOCALVARIABLE modifier$iv$iv Landroidx/compose/ui/Modifier; L200 L284 46
+    LOCALVARIABLE measurePolicy$iv$iv Landroidx/compose/ui/layout/MeasurePolicy; L200 L284 47
+    LOCALVARIABLE $composer$iv$iv Landroidx/compose/runtime/Composer; L200 L284 48
+    LOCALVARIABLE $changed$iv$iv I L200 L284 49
+    LOCALVARIABLE $i$f$Column I L192 L287 43
+    LOCALVARIABLE measurePolicy$iv Landroidx/compose/ui/layout/MeasurePolicy; L197 L287 45
+    LOCALVARIABLE modifier$iv Landroidx/compose/ui/Modifier; L191 L287 39
+    LOCALVARIABLE verticalArrangement$iv Landroidx/compose/foundation/layout/Arrangement$Vertical; L195 L287 40
+    LOCALVARIABLE horizontalAlignment$iv Landroidx/compose/ui/Alignment$Horizontal; L196 L287 44
+    LOCALVARIABLE $composer$iv Landroidx/compose/runtime/Composer; L191 L287 41
+    LOCALVARIABLE $changed$iv I L191 L287 42
+    LOCALVARIABLE $i$a$-cache-DiscordSettingsKt$DiscordSettings$19$2$1$3 I L296 L297 45
+    LOCALVARIABLE value$iv Ljava/lang/Object; L298 L300 46
+    LOCALVARIABLE $i$a$-let-ComposerKt$cache$1$iv I L293 L301 43
+    LOCALVARIABLE it$iv Ljava/lang/Object; L292 L301 42
+    LOCALVARIABLE $i$f$cache I L291 L303 41
+    LOCALVARIABLE $this$cache$iv Landroidx/compose/runtime/Composer; L290 L303 40
+    LOCALVARIABLE invalid$iv Z L290 L303 44
+    LOCALVARIABLE $i$a$-Row-DiscordSettingsKt$DiscordSettings$19$2$1 I L72 L308 38
+    LOCALVARIABLE $this$DiscordSettings_u24lambda_u2473_u241_u240 Landroidx/compose/foundation/layout/RowScope; L71 L308 37
+    LOCALVARIABLE $composer Landroidx/compose/runtime/Composer; L71 L308 36
+    LOCALVARIABLE $changed I L71 L308 35
+    LOCALVARIABLE $i$a$-Layout-RowKt$Row$1$iv I L69 L310 34
+    LOCALVARIABLE $composer$iv Landroidx/compose/runtime/Composer; L68 L310 33
+    LOCALVARIABLE $changed$iv I L68 L310 32
+    LOCALVARIABLE $i$a$-ReusableComposeNode-LayoutKt$Layout$1$iv$iv I L60 L66 31
+    LOCALVARIABLE $this$Layout_u24lambda_u240$iv$iv Landroidx/compose/runtime/Composer; L59 L66 30
+    LOCALVARIABLE $i$f$ReusableComposeNode I L49 L314 29
+    LOCALVARIABLE factory$iv$iv$iv Lkotlin/jvm/functions/Function0; L48 L314 26
+    LOCALVARIABLE $composer$iv$iv$iv Landroidx/compose/runtime/Composer; L48 L314 27
+    LOCALVARIABLE $changed$iv$iv$iv I L48 L314 28
+    LOCALVARIABLE $i$f$Layout I L39 L317 22
+    LOCALVARIABLE compositeKeyHash$iv$iv I L42 L317 23
+    LOCALVARIABLE localMap$iv$iv Landroidx/compose/runtime/CompositionLocalMap; L44 L317 24
+    LOCALVARIABLE materialized$iv$iv Landroidx/compose/ui/Modifier; L46 L317 25
+    LOCALVARIABLE modifier$iv$iv Landroidx/compose/ui/Modifier; L38 L317 18
+    LOCALVARIABLE measurePolicy$iv$iv Landroidx/compose/ui/layout/MeasurePolicy; L38 L317 19
+    LOCALVARIABLE $composer$iv$iv Landroidx/compose/runtime/Composer; L38 L317 20
+    LOCALVARIABLE $changed$iv$iv I L38 L317 21
+    LOCALVARIABLE $i$f$Row I L31 L320 16
+    LOCALVARIABLE measurePolicy$iv Landroidx/compose/ui/layout/MeasurePolicy; L35 L320 17
+    LOCALVARIABLE modifier$iv Landroidx/compose/ui/Modifier; L30 L320 11
+    LOCALVARIABLE horizontalArrangement$iv Landroidx/compose/foundation/layout/Arrangement$Horizontal; L34 L320 12
+    LOCALVARIABLE verticalAlignment$iv Landroidx/compose/ui/Alignment$Vertical; L30 L320 13
+    LOCALVARIABLE $composer$iv Landroidx/compose/runtime/Composer; L30 L320 14
+    LOCALVARIABLE $changed$iv I L30 L320 15
+    LOCALVARIABLE $i$f$getDp I L326 L327 12
+    LOCALVARIABLE $this$dp$iv I L325 L327 11
+    LOCALVARIABLE $i$f$getDp I L329 L330 12
+    LOCALVARIABLE $this$dp$iv I L328 L330 11
+    LOCALVARIABLE $i$f$getDp I L332 L333 12
+    LOCALVARIABLE $this$dp$iv I L331 L333 11
+    LOCALVARIABLE $i$f$getDp I L336 L337 13
+    LOCALVARIABLE $this$dp$iv I L335 L337 12
+    LOCALVARIABLE $i$a$-cache-DiscordSettingsKt$DiscordSettings$19$2$2$1 I L390 L391 44
+    LOCALVARIABLE value$iv Ljava/lang/Object; L392 L394 45
+    LOCALVARIABLE $i$a$-let-ComposerKt$cache$1$iv I L387 L395 43
+    LOCALVARIABLE it$iv Ljava/lang/Object; L386 L395 42
+    LOCALVARIABLE $i$f$cache I L385 L397 41
+    LOCALVARIABLE $this$cache$iv Landroidx/compose/runtime/Composer; L384 L397 39
+    LOCALVARIABLE invalid$iv Z L384 L397 40
+    LOCALVARIABLE $i$a$-cache-DiscordSettingsKt$DiscordSettings$19$2$2$2 I L406 L407 44
+    LOCALVARIABLE value$iv Ljava/lang/Object; L408 L410 45
+    LOCALVARIABLE $i$a$-let-ComposerKt$cache$1$iv I L403 L411 43
+    LOCALVARIABLE it$iv Ljava/lang/Object; L402 L411 42
+    LOCALVARIABLE $i$f$cache I L401 L413 41
+    LOCALVARIABLE $this$cache$iv Landroidx/compose/runtime/Composer; L400 L413 39
+    LOCALVARIABLE invalid$iv Z L400 L413 40
+    LOCALVARIABLE $i$a$-Row-DiscordSettingsKt$DiscordSettings$19$2$2 I L381 L417 38
+    LOCALVARIABLE $this$DiscordSettings_u24lambda_u2473_u241_u241 Landroidx/compose/foundation/layout/RowScope; L380 L417 37
+    LOCALVARIABLE $composer Landroidx/compose/runtime/Composer; L380 L417 36
+    LOCALVARIABLE $changed I L380 L417 35
+    LOCALVARIABLE $i$a$-Layout-RowKt$Row$1$iv I L378 L419 34
+    LOCALVARIABLE $composer$iv Landroidx/compose/runtime/Composer; L377 L419 33
+    LOCALVARIABLE $changed$iv I L377 L419 32
+    LOCALVARIABLE $i$a$-ReusableComposeNode-LayoutKt$Layout$1$iv$iv I L369 L375 31
+    LOCALVARIABLE $this$Layout_u24lambda_u240$iv$iv Landroidx/compose/runtime/Composer; L368 L375 30
+    LOCALVARIABLE $i$f$ReusableComposeNode I L358 L423 29
+    LOCALVARIABLE factory$iv$iv$iv Lkotlin/jvm/functions/Function0; L357 L423 26
+    LOCALVARIABLE $composer$iv$iv$iv Landroidx/compose/runtime/Composer; L357 L423 27
+    LOCALVARIABLE $changed$iv$iv$iv I L357 L423 28
+    LOCALVARIABLE $i$f$Layout I L348 L426 22
+    LOCALVARIABLE compositeKeyHash$iv$iv I L351 L426 23
+    LOCALVARIABLE localMap$iv$iv Landroidx/compose/runtime/CompositionLocalMap; L353 L426 24
+    LOCALVARIABLE materialized$iv$iv Landroidx/compose/ui/Modifier; L355 L426 25
+    LOCALVARIABLE modifier$iv$iv Landroidx/compose/ui/Modifier; L347 L426 18
+    LOCALVARIABLE measurePolicy$iv$iv Landroidx/compose/ui/layout/MeasurePolicy; L347 L426 19
+    LOCALVARIABLE $composer$iv$iv Landroidx/compose/runtime/Composer; L347 L426 20
+    LOCALVARIABLE $changed$iv$iv I L347 L426 21
+    LOCALVARIABLE $i$f$Row I L340 L429 16
+    LOCALVARIABLE measurePolicy$iv Landroidx/compose/ui/layout/MeasurePolicy; L344 L429 17
+    LOCALVARIABLE modifier$iv Landroidx/compose/ui/Modifier; L339 L429 11
+    LOCALVARIABLE horizontalArrangement$iv Landroidx/compose/foundation/layout/Arrangement$Horizontal; L339 L429 12
+    LOCALVARIABLE verticalAlignment$iv Landroidx/compose/ui/Alignment$Vertical; L343 L429 13
+    LOCALVARIABLE $composer$iv Landroidx/compose/runtime/Composer; L339 L429 14
+    LOCALVARIABLE $changed$iv I L339 L429 15
+    LOCALVARIABLE $isLoggedIn Z L0 L433 0
+    LOCALVARIABLE $discordName$delegate Landroidx/compose/runtime/MutableState; L0 L433 1
+    LOCALVARIABLE $discordToken$delegate Landroidx/compose/runtime/MutableState; L0 L433 2
+    LOCALVARIABLE $discordUsername$delegate Landroidx/compose/runtime/MutableState; L0 L433 3
+    LOCALVARIABLE $discordAvatar$delegate Landroidx/compose/runtime/MutableState; L0 L433 4
+    LOCALVARIABLE $discordStatus$delegate Landroidx/compose/runtime/MutableState; L0 L433 5
+    LOCALVARIABLE $navController Landroidx/navigation/NavController; L0 L433 6
+    LOCALVARIABLE $showTokenDialog$delegate Landroidx/compose/runtime/MutableState; L0 L433 7
+    LOCALVARIABLE $this$Card Landroidx/compose/foundation/layout/ColumnScope; L0 L433 8
+    LOCALVARIABLE $composer Landroidx/compose/runtime/Composer; L0 L433 9
+    LOCALVARIABLE $changed I L0 L433 10
+    MAXSTACK = 26
+    MAXLOCALS = 79
+
+File is unknown
+The root cause java.lang.OutOfMemoryError was thrown at: org.jetbrains.kotlin.utils.SmartSet.iterator(SmartSet.kt:46)
+	at org.jetbrains.kotlin.codegen.TransformationMethodVisitor.visitEnd(TransformationMethodVisitor.kt:89)
+	at org.jetbrains.org.objectweb.asm.MethodVisitor.visitEnd(MethodVisitor.java:796)
+	at org.jetbrains.org.objectweb.asm.tree.MethodNode.accept(MethodNode.java:770)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generateMethod(ClassCodegen.kt:476)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generate(ClassCodegen.kt:168)
+	at org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory.generateFile(JvmIrCodegenFactory.kt:467)
+	at org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory.invokeCodegen(JvmIrCodegenFactory.kt:433)
+	at org.jetbrains.kotlin.cli.jvm.compiler.KotlinToJVMBytecodeCompiler.runCodegen$cli(KotlinToJVMBytecodeCompiler.kt:409)
+	at org.jetbrains.kotlin.cli.pipeline.jvm.JvmBackendPipelinePhase.executePhase(JvmBackendPipelinePhase.kt:89)
+	at org.jetbrains.kotlin.cli.pipeline.jvm.JvmBackendPipelinePhase.executePhase(JvmBackendPipelinePhase.kt:27)
+	at org.jetbrains.kotlin.cli.pipeline.PipelinePhase.phaseBody(PipelinePhase.kt:68)
+	at org.jetbrains.kotlin.cli.pipeline.PipelinePhase.phaseBody(PipelinePhase.kt:58)
+	at org.jetbrains.kotlin.config.phaser.NamedCompilerPhase.invoke(CompilerPhase.kt:102)
+	at org.jetbrains.kotlin.backend.common.phaser.CompositePhase.invoke(PhaseBuilders.kt:22)
+	at org.jetbrains.kotlin.config.phaser.CompilerPhaseKt.invokeToplevel(CompilerPhase.kt:53)
+	at org.jetbrains.kotlin.cli.pipeline.AbstractCliPipeline.runPhasedPipeline(AbstractCliPipeline.kt:109)
+	at org.jetbrains.kotlin.cli.pipeline.AbstractCliPipeline.execute(AbstractCliPipeline.kt:68)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecutePhased(K2JVMCompiler.kt:51)
+	at org.jetbrains.kotlin.cli.jvm.K2JVMCompiler.doExecutePhased(K2JVMCompiler.kt:42)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.execImpl(CLICompiler.kt:89)
+	at org.jetbrains.kotlin.cli.common.CLICompiler.exec(CLICompiler.kt:359)
+	at org.jetbrains.kotlin.incremental.IncrementalJvmCompilerRunnerBase.runCompiler(IncrementalJvmCompilerRunnerBase.kt:178)
+	at org.jetbrains.kotlin.incremental.IncrementalJvmCompilerRunnerBase.runCompiler(IncrementalJvmCompilerRunnerBase.kt:40)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.doCompile(IncrementalCompilerRunner.kt:504)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compileImpl(IncrementalCompilerRunner.kt:418)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compileNonIncrementally(IncrementalCompilerRunner.kt:301)
+	at org.jetbrains.kotlin.incremental.IncrementalCompilerRunner.compile(IncrementalCompilerRunner.kt:128)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.execIncrementalCompiler(CompileServiceImpl.kt:684)
+	at org.jetbrains.kotlin.daemon.CompileServiceImplBase.access$execIncrementalCompiler(CompileServiceImpl.kt:94)
+	at org.jetbrains.kotlin.daemon.CompileServiceImpl.compile(CompileServiceImpl.kt:1810)
+	at java.base/jdk.internal.reflect.DirectMethodHandleAccessor.invoke(DirectMethodHandleAccessor.java:103)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.rmi/sun.rmi.server.UnicastServerRef.dispatch(UnicastServerRef.java:360)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:200)
+	at java.rmi/sun.rmi.transport.Transport$1.run(Transport.java:197)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:714)
+	at java.rmi/sun.rmi.transport.Transport.serviceCall(Transport.java:196)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport.handleMessages(TCPTransport.java:598)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run0(TCPTransport.java:844)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.lambda$run$0(TCPTransport.java:721)
+	at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
+	at java.rmi/sun.rmi.transport.tcp.TCPTransport$ConnectionHandler.run(TCPTransport.java:720)
+	at java.base/java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1144)
+	at java.base/java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:642)
+	at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: java.lang.OutOfMemoryError: GC overhead limit exceeded
+	at org.jetbrains.kotlin.utils.SmartSet.iterator(SmartSet.kt:46)
+	at java.base/java.util.AbstractCollection.containsAll(AbstractCollection.java:310)
+	at java.base/java.util.AbstractSet.equals(AbstractSet.java:95)
+	at kotlin.jvm.internal.Intrinsics.areEqual(Intrinsics.java:169)
+	at org.jetbrains.kotlin.codegen.optimization.temporaryVals.TemporaryValsAnalyzer$StoredValue$DirtyStore.equals(TemporaryVals.kt:156)
+	at org.jetbrains.org.objectweb.asm.tree.analysis.Frame.merge(Frame.java:705)
+	at org.jetbrains.kotlin.codegen.optimization.common.FastAnalyzer.fullMergeControlFlowEdge(FastAnalyzer.kt:241)
+	at org.jetbrains.kotlin.codegen.optimization.common.FastAnalyzer.mergeControlFlowEdge(FastAnalyzer.kt:216)
+	at org.jetbrains.kotlin.codegen.optimization.common.FastAnalyzer.processControlFlowEdge(FastAnalyzer.kt:208)
+	at org.jetbrains.kotlin.codegen.optimization.common.FastAnalyzer.processControlFlowEdge$default(FastAnalyzer.kt:206)
+	at org.jetbrains.kotlin.codegen.optimization.common.FastAnalyzer.visitJumpInsnNode(FastAnalyzer.kt:318)
+	at org.jetbrains.kotlin.codegen.optimization.common.FastAnalyzer.visitMeaningfulInstruction(FastAnalyzer.kt:275)
+	at org.jetbrains.kotlin.codegen.optimization.common.FastAnalyzer.analyzeInstruction(FastAnalyzer.kt:113)
+	at org.jetbrains.kotlin.codegen.optimization.common.FastAnalyzer.analyzeMainLoop(FastAnalyzer.kt:74)
+	at org.jetbrains.kotlin.codegen.optimization.common.FastAnalyzer.analyze(FastAnalyzer.kt:53)
+	at org.jetbrains.kotlin.codegen.optimization.temporaryVals.TemporaryValsAnalyzer.analyze(TemporaryVals.kt:111)
+	at org.jetbrains.kotlin.codegen.optimization.temporaryVals.TemporaryVariablesEliminationTransformer.transform(TemporaryVariablesEliminationTransformer.kt:36)
+	at org.jetbrains.kotlin.codegen.optimization.transformer.CompositeMethodTransformer.transform(CompositeMethodTransformer.kt:25)
+	at org.jetbrains.kotlin.codegen.optimization.OptimizationMethodVisitor.performTransformations(OptimizationMethodVisitor.kt:74)
+	at org.jetbrains.kotlin.codegen.TransformationMethodVisitor.visitEnd(TransformationMethodVisitor.kt:67)
+	at org.jetbrains.org.objectweb.asm.MethodVisitor.visitEnd(MethodVisitor.java:796)
+	at org.jetbrains.org.objectweb.asm.tree.MethodNode.accept(MethodNode.java:770)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generateMethod(ClassCodegen.kt:476)
+	at org.jetbrains.kotlin.backend.jvm.codegen.ClassCodegen.generate(ClassCodegen.kt:168)
+	at org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory.generateFile(JvmIrCodegenFactory.kt:467)
+	at org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory.invokeCodegen(JvmIrCodegenFactory.kt:433)
+	at org.jetbrains.kotlin.cli.jvm.compiler.KotlinToJVMBytecodeCompiler.runCodegen$cli(KotlinToJVMBytecodeCompiler.kt:409)
+	at org.jetbrains.kotlin.cli.pipeline.jvm.JvmBackendPipelinePhase.executePhase(JvmBackendPipelinePhase.kt:89)
+	at org.jetbrains.kotlin.cli.pipeline.jvm.JvmBackendPipelinePhase.executePhase(JvmBackendPipelinePhase.kt:27)
+	at org.jetbrains.kotlin.cli.pipeline.PipelinePhase.phaseBody(PipelinePhase.kt:68)
+	at org.jetbrains.kotlin.cli.pipeline.PipelinePhase.phaseBody(PipelinePhase.kt:58)
+	at org.jetbrains.kotlin.config.phaser.NamedCompilerPhase.invoke(CompilerPhase.kt:102)
+
+
+> Task :app:compileUniversalGmsReleaseKotlin FAILED
+gradle/actions: Writing build results to /home/runner/work/_temp/.gradle-actions/build-results/__run_3-1793207516771.json
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':app:compileUniversalGmsReleaseKotlin'.
+> A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+   > Not enough memory to run compilation. Try to increase it via 'gradle.properties':
+     kotlin.daemon.jvmargs=-Xmx<size>
+
+* Try:
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+* Exception is:
+org.gradle.api.tasks.TaskExecutionException: Execution failed for task ':app:compileUniversalGmsReleaseKotlin'.
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.lambda$executeIfValid$1(ExecuteActionsTaskExecuter.java:135)
+	at org.gradle.internal.Try$Failure.ifSuccessfulOrElse(Try.java:288)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:133)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.execute(ExecuteActionsTaskExecuter.java:121)
+	at org.gradle.api.internal.tasks.execution.ProblemsTaskPathTrackingTaskExecuter.execute(ProblemsTaskPathTrackingTaskExecuter.java:41)
+	at org.gradle.api.internal.tasks.execution.ResolveTaskExecutionModeExecuter.execute(ResolveTaskExecutionModeExecuter.java:51)
+	at org.gradle.api.internal.tasks.execution.FinalizePropertiesTaskExecuter.execute(FinalizePropertiesTaskExecuter.java:46)
+	at org.gradle.api.internal.tasks.execution.SkipTaskWithNoActionsExecuter.execute(SkipTaskWithNoActionsExecuter.java:57)
+	at org.gradle.api.internal.tasks.execution.SkipOnlyIfTaskExecuter.execute(SkipOnlyIfTaskExecuter.java:74)
+	at org.gradle.api.internal.tasks.execution.CatchExceptionTaskExecuter.execute(CatchExceptionTaskExecuter.java:36)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.executeTask(EventFiringTaskExecuter.java:77)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:55)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter$1.call(EventFiringTaskExecuter.java:52)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.api.internal.tasks.execution.EventFiringTaskExecuter.execute(EventFiringTaskExecuter.java:52)
+	at org.gradle.execution.plan.DefaultNodeExecutor.executeLocalTaskNode(DefaultNodeExecutor.java:55)
+	at org.gradle.execution.plan.DefaultNodeExecutor.execute(DefaultNodeExecutor.java:34)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:355)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$InvokeNodeExecutorsAction.execute(DefaultTaskExecutionGraph.java:343)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.lambda$execute$0(DefaultTaskExecutionGraph.java:339)
+	at org.gradle.internal.operations.CurrentBuildOperationRef.with(CurrentBuildOperationRef.java:84)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:339)
+	at org.gradle.execution.taskgraph.DefaultTaskExecutionGraph$BuildOperationAwareExecutionAction.execute(DefaultTaskExecutionGraph.java:328)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.execute(DefaultPlanExecutor.java:459)
+	at org.gradle.execution.plan.DefaultPlanExecutor$ExecutorWorker.run(DefaultPlanExecutor.java:376)
+	at org.gradle.internal.concurrent.ExecutorPolicy$CatchAndRecordFailures.onExecute(ExecutorPolicy.java:64)
+	at org.gradle.internal.concurrent.AbstractManagedExecutor$1.run(AbstractManagedExecutor.java:47)
+Caused by: org.gradle.workers.internal.DefaultWorkerExecutor$WorkExecutionException: A failure occurred while executing org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction
+	at org.gradle.workers.internal.DefaultWorkerExecutor$WorkItemExecution.waitForCompletion(DefaultWorkerExecutor.java:289)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.lambda$waitForItemsAndGatherFailures$2(DefaultAsyncWorkTracker.java:130)
+	at org.gradle.internal.Factories$1.create(Factories.java:30)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.lambda$withoutLocks$2(DefaultWorkerLeaseService.java:350)
+	at org.gradle.internal.work.ResourceLockStatistics$1.measure(ResourceLockStatistics.java:43)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLocks(DefaultWorkerLeaseService.java:348)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLocks(DefaultWorkerLeaseService.java:332)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withoutLock(DefaultWorkerLeaseService.java:337)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForItemsAndGatherFailures(DefaultAsyncWorkTracker.java:126)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForItemsAndGatherFailures(DefaultAsyncWorkTracker.java:92)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForAll(DefaultAsyncWorkTracker.java:78)
+	at org.gradle.internal.work.DefaultAsyncWorkTracker.waitForCompletion(DefaultAsyncWorkTracker.java:66)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$3.run(TaskExecution.java:267)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:30)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$1.execute(DefaultBuildOperationRunner.java:27)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.run(DefaultBuildOperationRunner.java:48)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeAction(TaskExecution.java:244)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeActions(TaskExecution.java:227)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.executeWithPreviousOutputFiles(TaskExecution.java:210)
+	at org.gradle.api.internal.tasks.execution.TaskExecution.execute(TaskExecution.java:176)
+	at org.gradle.internal.execution.steps.ExecuteStep.executeInternal(ExecuteStep.java:167)
+	at org.gradle.internal.execution.steps.ExecuteStep.access$000(ExecuteStep.java:47)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:137)
+	at org.gradle.internal.execution.steps.ExecuteStep$1.call(ExecuteStep.java:134)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.internal.execution.steps.ExecuteStep.execute(ExecuteStep.java:134)
+	at org.gradle.internal.execution.steps.ExecuteStep$Mutable.execute(ExecuteStep.java:80)
+	at org.gradle.internal.execution.steps.CancelExecutionStep.execute(CancelExecutionStep.java:42)
+	at org.gradle.internal.execution.steps.TimeoutStep.executeWithoutTimeout(TimeoutStep.java:75)
+	at org.gradle.internal.execution.steps.TimeoutStep.execute(TimeoutStep.java:55)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:51)
+	at org.gradle.internal.execution.steps.PreCreateOutputParentsStep.execute(PreCreateOutputParentsStep.java:29)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.executeMutable(RemovePreviousOutputsStep.java:67)
+	at org.gradle.internal.execution.steps.RemovePreviousOutputsStep.executeMutable(RemovePreviousOutputsStep.java:39)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:42)
+	at org.gradle.internal.execution.steps.BroadcastChangingOutputsStep.execute(BroadcastChangingOutputsStep.java:24)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:69)
+	at org.gradle.internal.execution.steps.CaptureOutputsAfterExecutionStep.execute(CaptureOutputsAfterExecutionStep.java:46)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.executeMutable(ResolveInputChangesStep.java:39)
+	at org.gradle.internal.execution.steps.ResolveInputChangesStep.executeMutable(ResolveInputChangesStep.java:28)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.BuildCacheStep.executeWithoutCache(BuildCacheStep.java:189)
+	at org.gradle.internal.execution.steps.BuildCacheStep.lambda$execute$1(BuildCacheStep.java:76)
+	at org.gradle.internal.Either$Right.fold(Either.java:176)
+	at org.gradle.internal.execution.caching.CachingState.fold(CachingState.java:62)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:74)
+	at org.gradle.internal.execution.steps.BuildCacheStep.execute(BuildCacheStep.java:49)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.executeMutable(StoreExecutionStateStep.java:46)
+	at org.gradle.internal.execution.steps.StoreExecutionStateStep.executeMutable(StoreExecutionStateStep.java:35)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.executeBecause(SkipUpToDateStep.java:75)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.lambda$execute$2(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:53)
+	at org.gradle.internal.execution.steps.SkipUpToDateStep.execute(SkipUpToDateStep.java:35)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:37)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsFinishedStep.execute(MarkSnapshottingInputsFinishedStep.java:27)
+	at org.gradle.internal.execution.steps.ResolveMutableCachingStateStep.executeDelegate(ResolveMutableCachingStateStep.java:70)
+	at org.gradle.internal.execution.steps.ResolveMutableCachingStateStep.executeDelegate(ResolveMutableCachingStateStep.java:32)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:69)
+	at org.gradle.internal.execution.steps.AbstractResolveCachingStateStep.execute(AbstractResolveCachingStateStep.java:37)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.executeMutable(ResolveChangesStep.java:63)
+	at org.gradle.internal.execution.steps.ResolveChangesStep.executeMutable(ResolveChangesStep.java:34)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.executeDelegate(ValidateStep.java:79)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.executeDelegate(ValidateStep.java:65)
+	at org.gradle.internal.execution.steps.ValidateStep.execute(ValidateStep.java:99)
+	at org.gradle.internal.execution.steps.ValidateStep$Mutable.execute(ValidateStep.java:65)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.executeMutable(CaptureMutableStateBeforeExecutionStep.java:86)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.execute(CaptureMutableStateBeforeExecutionStep.java:65)
+	at org.gradle.internal.execution.steps.CaptureMutableStateBeforeExecutionStep.execute(CaptureMutableStateBeforeExecutionStep.java:45)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeWithNonEmptySources(SkipEmptyMutableWorkStep.java:210)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeMutable(SkipEmptyMutableWorkStep.java:90)
+	at org.gradle.internal.execution.steps.SkipEmptyMutableWorkStep.executeMutable(SkipEmptyMutableWorkStep.java:53)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.legacy.MarkSnapshottingInputsStartedStep.execute(MarkSnapshottingInputsStartedStep.java:38)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.executeMutable(LoadPreviousExecutionStateStep.java:36)
+	at org.gradle.internal.execution.steps.LoadPreviousExecutionStateStep.executeMutable(LoadPreviousExecutionStateStep.java:23)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.executeMutable(HandleStaleOutputsStep.java:77)
+	at org.gradle.internal.execution.steps.HandleStaleOutputsStep.executeMutable(HandleStaleOutputsStep.java:43)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.lambda$executeMutable$0(AssignMutableWorkspaceStep.java:34)
+	at org.gradle.api.internal.tasks.execution.TaskExecution$4.withWorkspace(TaskExecution.java:305)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:30)
+	at org.gradle.internal.execution.steps.AssignMutableWorkspaceStep.executeMutable(AssignMutableWorkspaceStep.java:21)
+	at org.gradle.internal.execution.steps.MutableStep.execute(MutableStep.java:26)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:40)
+	at org.gradle.internal.execution.steps.ChoosePipelineStep.execute(ChoosePipelineStep.java:23)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.lambda$execute$2(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:67)
+	at org.gradle.internal.execution.steps.ExecuteWorkBuildOperationFiringStep.execute(ExecuteWorkBuildOperationFiringStep.java:39)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:46)
+	at org.gradle.internal.execution.steps.IdentityCacheStep.execute(IdentityCacheStep.java:34)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:56)
+	at org.gradle.internal.execution.steps.IdentifyStep.execute(IdentifyStep.java:38)
+	at org.gradle.internal.execution.impl.DefaultExecutionEngine$1.execute(DefaultExecutionEngine.java:68)
+	at org.gradle.api.internal.tasks.execution.ExecuteActionsTaskExecuter.executeIfValid(ExecuteActionsTaskExecuter.java:132)
+	... 30 more
+Caused by: org.jetbrains.kotlin.gradle.tasks.OOMErrorException: Not enough memory to run compilation. Try to increase it via 'gradle.properties':
+kotlin.daemon.jvmargs=-Xmx<size>
+	at org.jetbrains.kotlin.gradle.tasks.TasksUtilsKt.OOMErrorException(tasksUtils.kt:83)
+	at org.jetbrains.kotlin.gradle.tasks.TasksUtilsKt.throwExceptionIfCompilationFailed(tasksUtils.kt:24)
+	at org.jetbrains.kotlin.compilerRunner.GradleKotlinCompilerWork.run(GradleKotlinCompilerWork.kt:112)
+	at org.jetbrains.kotlin.compilerRunner.GradleCompilerRunnerWithWorkers$GradleKotlinCompilerWorkAction.execute(GradleCompilerRunnerWithWorkers.kt:75)
+	at org.gradle.workers.internal.DefaultWorkerServer.execute(DefaultWorkerServer.java:68)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:64)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1$1.create(NoIsolationWorkerFactory.java:61)
+	at org.gradle.internal.classloader.ClassLoaderUtils.executeInClassloader(ClassLoaderUtils.java:102)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.lambda$execute$0(NoIsolationWorkerFactory.java:61)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:44)
+	at org.gradle.workers.internal.AbstractWorker$1.call(AbstractWorker.java:41)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:210)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$CallableBuildOperationWorker.execute(DefaultBuildOperationRunner.java:205)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:67)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner$2.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:167)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.execute(DefaultBuildOperationRunner.java:60)
+	at org.gradle.internal.operations.DefaultBuildOperationRunner.call(DefaultBuildOperationRunner.java:54)
+	at org.gradle.workers.internal.AbstractWorker.executeWrappedInBuildOperation(AbstractWorker.java:41)
+	at org.gradle.workers.internal.NoIsolationWorkerFactory$1.execute(NoIsolationWorkerFactory.java:58)
+	at org.gradle.workers.internal.DefaultWorkerExecutor.lambda$submitWork$0(DefaultWorkerExecutor.java:176)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runExecution(DefaultConditionalExecutionQueue.java:194)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.access$700(DefaultConditionalExecutionQueue.java:127)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner$1.run(DefaultConditionalExecutionQueue.java:169)
+	at org.gradle.internal.Factories$1.create(Factories.java:30)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.lambda$withLocksAcquired$0(DefaultWorkerLeaseService.java:275)
+	at org.gradle.internal.work.ResourceLockStatistics$1.measure(ResourceLockStatistics.java:43)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocksAcquired(DefaultWorkerLeaseService.java:273)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.withLocks(DefaultWorkerLeaseService.java:265)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:128)
+	at org.gradle.internal.work.DefaultWorkerLeaseService.runAsWorkerThread(DefaultWorkerLeaseService.java:133)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.runBatch(DefaultConditionalExecutionQueue.java:164)
+	at org.gradle.internal.work.DefaultConditionalExecutionQueue$ExecutionRunner.run(DefaultConditionalExecutionQueue.java:133)
+	... 2 more
+
+
+BUILD FAILED in 9m 13s
+605 actionable tasks: 605 executed
+Configuration cache entry stored.
