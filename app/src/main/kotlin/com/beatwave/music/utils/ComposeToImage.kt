@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -251,7 +251,7 @@ object ComposeToImage {
         canvas.drawOval(logoBoxRect, logoBgPaint)
         
         // Draw Logo Icon
-        val rawLogo = context.getDrawable(R.drawable.beatwave_logo)?.toBitmap()
+        val rawLogo = context.getDrawable(R.drawable.pulsewave_logo)?.toBitmap()
         rawLogo?.let {
             val logoPaint = Paint().apply {
                 // If background is gradient/blur, tint might be tricky. 
@@ -565,7 +565,7 @@ object ComposeToImage {
             val contentValues = ContentValues().apply {
                 put(MediaStore.MediaColumns.DISPLAY_NAME, "$fileName.png")
                 put(MediaStore.MediaColumns.MIME_TYPE, "image/png")
-                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/Averon")
+                put(MediaStore.MediaColumns.RELATIVE_PATH, Environment.DIRECTORY_PICTURES + "/PulseWave")
             }
             val uri = context.contentResolver.insert(
                 MediaStore.Images.Media.EXTERNAL_CONTENT_URI,

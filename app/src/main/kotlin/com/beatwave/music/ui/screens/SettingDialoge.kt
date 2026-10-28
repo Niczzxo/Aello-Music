@@ -110,16 +110,16 @@ fun SettingDialoge(
                         .padding(start = 4.dp, top = 10.dp, end = 4.dp, bottom = 10.dp)
                 ) {
                     Image(
-                        painter = painterResource(id = R.drawable.beatwave_logo),
+                        painter = painterResource(id = R.drawable.pulsewave_logo),
                         contentDescription = "App Icon",
                         modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
+                            .size(26.dp)
+                            .clip(RoundedCornerShape(6.dp))
                     )
                     
                     Text(
                         modifier = Modifier.wrapContentWidth(),
-                        text = "BEATWAVE",
+                        text = "PULSE WAVE",
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             letterSpacing = 1.sp

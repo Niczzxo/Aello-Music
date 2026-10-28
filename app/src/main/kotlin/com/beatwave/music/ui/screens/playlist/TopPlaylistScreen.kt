@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -694,6 +694,7 @@ private fun TopPlaylistHeader(
     val mediaMetadata by playerConnection.mediaMetadata.collectAsState()
 
     val heroUrl = songs.firstOrNull()?.thumbnailUrl
+    val topSize = songs.size
     val heroSource = rememberHeroSource(
         staticArt = heroUrl,
         songs = songs.map { it.thumbnailUrl to false },
@@ -752,10 +753,18 @@ private fun TopPlaylistHeader(
                         if (isPlaying) {
                             playerConnection.player.pause()
                         } else {
+                            val (startIndex, positionMs) = com.beatwave.music.playback.PlaylistPlaybackTracker.resolveStartProgress(
+                                context = context,
+                                playlistId = "top_$topSize",
+                                songIds = songs.map { it.id }
+                            )
                             playerConnection.playQueue(
                                 ListQueue(
                                     title = name,
                                     items = songs.map { it.toMediaItem() },
+                                    startIndex = startIndex,
+                                    position = positionMs,
+                                    playlistId = "top_$topSize"
                                 )
                             )
                         }

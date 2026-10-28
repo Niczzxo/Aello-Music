@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -37,6 +37,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import com.beatwave.music.ui.utils.bounceClick
 import com.beatwave.music.ui.utils.combinedBounceClick
 
@@ -100,6 +101,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEachReversed
 import androidx.media3.exoplayer.offline.Download
@@ -455,6 +457,7 @@ fun OnlinePlaylistScreen(
                                         } else if (songItem.id == mediaMetadata?.id) {
                                             playerConnection.togglePlayPause()
                                         } else {
+                                            com.beatwave.music.playback.PlaylistPlaybackTracker.savePlaylistProgress(context, playlist.id, songItem.id, index)
                                             playerConnection.playQueue(
                                                 YouTubePlaylistQueue(
                                                     playlistId = playlist.id,
@@ -859,12 +862,53 @@ private fun OnlinePlaylistHeader(
                 // Title
                 Text(
                     text = playlist.title,
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        letterSpacing = (-0.5).sp
+                    ),
                     textAlign = TextAlign.Center,
                     color = onTint,
-                    modifier = Modifier.padding(horizontal = 32.dp)
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.padding(horizontal = 24.dp)
                 )
+
+                // Subtitle / Author
+                playlist.author?.name?.let { author ->
+                    Spacer(Modifier.height(6.dp))
+                    Text(
+                        text = author,
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Medium
+                        ),
+                        color = onTint.copy(alpha = 0.72f),
+                        textAlign = TextAlign.Center,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(horizontal = 24.dp)
+                    )
+                }
+
+                // Stats / Song Count Pill Badge
+                val songCount = playlist.songCountText ?: if (songs.isNotEmpty()) "${songs.size} songs" else null
+                if (!songCount.isNullOrBlank()) {
+                    Spacer(Modifier.height(10.dp))
+                    Box(
+                        modifier = Modifier
+                            .clip(ContinuousRoundedRectangle(percent = 50))
+                            .background(Color.White.copy(alpha = 0.08f))
+                            .border(0.5.dp, Color.White.copy(alpha = 0.12f), ContinuousRoundedRectangle(percent = 50))
+                            .padding(horizontal = 14.dp, vertical = 4.dp)
+                    ) {
+                        Text(
+                            text = songCount,
+                            style = MaterialTheme.typography.labelMedium.copy(
+                                fontWeight = FontWeight.SemiBold
+                            ),
+                            color = onTint.copy(alpha = 0.85f),
+                        )
+                    }
+                }
             }
 
             Spacer(Modifier.height(24.dp))
@@ -912,12 +956,20 @@ private fun OnlinePlaylistHeader(
                                 } else if (songs.any { it.id == mediaMetadata?.id }) {
                                     playerConnection.player.play()
                                 } else {
+                                    val resolvedIdx = com.beatwave.music.playback.PlaylistPlaybackTracker.resolveStartIndex(context, playlist.id, songs.map { it.id })
+                                    if (resolvedIdx > 0) {
+                                        val songTitle = songs.getOrNull(resolvedIdx)?.title
+                                        val msg = if (!songTitle.isNullOrBlank()) "Resuming from track #${resolvedIdx + 1}: $songTitle" else "Resuming from track #${resolvedIdx + 1}"
+                                        android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+                                    }
                                     playerConnection.playQueue(
                                         YouTubePlaylistQueue(
                                             playlistId = playlist.id,
                                             playlistTitle = playlist.title,
                                             initialSongs = songs,
-                                            initialContinuation = continuation
+                                            initialContinuation = continuation,
+                                            startIndex = com.beatwave.music.playback.PlaylistPlaybackTracker.resolveStartIndex(context, playlist.id, songs.map { it.id }),
+                                            position = com.beatwave.music.playback.PlaylistPlaybackTracker.getLastPlayedPosition(context, playlist.id)
                                         )
                                     )
                                 }

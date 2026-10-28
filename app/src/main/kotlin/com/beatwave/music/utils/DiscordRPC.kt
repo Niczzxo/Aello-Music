@@ -1,5 +1,5 @@
 /**
- * Averon Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -59,10 +59,10 @@ class DiscordRPC(
         }
         if (button2Visible) {
             val resolvedText = resolveVariables(
-                button2Text.ifEmpty { "Visit Averon" },
+                button2Text.ifEmpty { "Visit Pulse Wave" },
                 song
             )
-            buttonsList.add(resolvedText to "https://github.com/Niczzxo/Averon")
+            buttonsList.add(resolvedText to "https://pulsewave.app")
         }
 
         val type = when (activityType) {

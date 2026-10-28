@@ -42,9 +42,7 @@ android {
     ndkVersion = "27.0.12077973"
 
     defaultConfig {
-        // Averon: own package so it installs cleanly alongside/after any
-        // com.beatwave.music install (original BeatWave or older Averon builds).
-        applicationId = "com.averon.music"
+        applicationId = "com.pulsewave.music"
         minSdk = 26
         targetSdk = 36
         versionCode = appVersionCode
@@ -89,9 +87,16 @@ android {
         // Admin panel password from .env, local.properties, or environment variables
         val adminPassword = envProperties.getProperty("ADMIN_PASSWORD")
             ?: localProperties.getProperty("ADMIN_PASSWORD")
-            ?: System.getenv("ADMIN_PASSWORD")
-            ?: ""
+            ?: System.getenv("ADMIN_PASSWORD")?.takeIf { it.isNotBlank() }
+            ?: "pulsewave5253"
         buildConfigField("String", "ADMIN_PASSWORD", "\"$adminPassword\"")
+
+        // GitHub Issue Token from .env, local.properties, or environment variables
+        val githubIssueToken = envProperties.getProperty("GITHUB_ISSUE_TOKEN")
+            ?: localProperties.getProperty("GITHUB_ISSUE_TOKEN")
+            ?: System.getenv("GITHUB_ISSUE_TOKEN")
+            ?: ""
+        buildConfigField("String", "GITHUB_ISSUE_TOKEN", "\"$githubIssueToken\"")
 
 //add nightly build label support
         val isNightly = project.hasProperty("nightly") && project.property("nightly") == "true"
@@ -150,6 +155,8 @@ android {
             storePassword = "android"
             keyAlias = "androiddebugkey"
             keyPassword = "android"
+            enableV1Signing = true
+            enableV2Signing = true
         }
         create("release") {
             // Signing material comes from the environment only. Never hardcode a
@@ -162,11 +169,15 @@ android {
             storePassword = localProperties.getProperty("STORE_PASSWORD") ?: System.getenv("STORE_PASSWORD")
             keyAlias = localProperties.getProperty("KEY_ALIAS") ?: System.getenv("KEY_ALIAS")
             keyPassword = localProperties.getProperty("KEY_PASSWORD") ?: System.getenv("KEY_PASSWORD")
+            enableV1Signing = true
+            enableV2Signing = true
         }
         getByName("debug") {
             keyAlias = "androiddebugkey"
             keyPassword = "android"
             storePassword = "android"
+            enableV1Signing = true
+            enableV2Signing = true
             storeFile = if (file("persistent-debug.keystore").exists()) {
                 file("persistent-debug.keystore")
             } else {
@@ -284,6 +295,7 @@ protobuf {
 
 ksp {
     arg("room.schemaLocation", "$projectDir/schemas")
+    arg("room.incremental", "false")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {

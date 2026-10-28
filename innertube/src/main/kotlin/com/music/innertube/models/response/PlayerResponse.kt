@@ -36,12 +36,6 @@ data class PlayerResponse(
     }
 
     @Serializable
-    data class Range(
-        val start: String,
-        val end: String,
-    )
-
-    @Serializable
     data class StreamingData(
         val formats: List<Format>?,
         val adaptiveFormats: List<Format>,
@@ -68,12 +62,7 @@ data class PlayerResponse(
             val lastModified: Long?,
             val signatureCipher: String?,
             val cipher: String?,
-            val audioTrack: AudioTrack?,
-            // DASH segment ranges (present in the player response, needed to build
-            // a SegmentBase MPD for video playback). Optional: older cached payloads
-            // without them still decode.
-            val indexRange: Range? = null,
-            val initRange: Range? = null,
+            val audioTrack: AudioTrack?
         ) {
             val isAudio: Boolean
                 get() = width == null

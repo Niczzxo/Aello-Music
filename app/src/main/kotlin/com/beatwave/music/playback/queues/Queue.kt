@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -11,6 +11,8 @@ import com.beatwave.music.models.MediaMetadata
 
 interface Queue {
     val preloadItem: MediaMetadata?
+    val playlistId: String?
+        get() = null
 
     suspend fun getInitialStatus(): Status
 

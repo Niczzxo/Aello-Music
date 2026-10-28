@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -396,6 +396,7 @@ fun AutoPlaylistScreen(
                                     iconRes = iconRes,
                                     context = context,
                                     menuState = menuState,
+                                    playlistType = viewModel.playlist,
                                     modifier = Modifier,
                                 )
                             }
@@ -471,11 +472,14 @@ fun AutoPlaylistScreen(
                                             } else if (song.id == mediaMetadata?.id) {
                                                 playerConnection.togglePlayPause()
                                             } else {
+                                                val songIdx = songs.indexOfFirst { it.id == song.id }
+                                                com.beatwave.music.playback.PlaylistPlaybackTracker.savePlaylistProgress(context, viewModel.playlist, song.id, songIdx)
                                                 playerConnection.playQueue(
                                                     ListQueue(
                                                         title = playlistName,
                                                         items = songs.map { it.toMediaItem() },
-                                                        startIndex = songs.indexOfFirst { it.id == song.id },
+                                                        startIndex = songIdx,
+                                                        playlistId = viewModel.playlist,
                                                     ),
                                                 )
                                             }
@@ -707,6 +711,7 @@ private fun AutoPlaylistHeader(
     iconRes: Int,
     context: android.content.Context,
     menuState: MenuState,
+    playlistType: String = "",
     modifier: Modifier = Modifier,
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
@@ -779,10 +784,15 @@ private fun AutoPlaylistHeader(
                     if (isThisPlaylistPlaying) {
                         playerConnection.player.pause()
                     } else {
+                        val songIds = songs.map { it.id }
+                        val (startIndex, positionMs) = com.beatwave.music.playback.PlaylistPlaybackTracker.resolveStartProgress(context, playlistType, songIds)
                         playerConnection.playQueue(
                             ListQueue(
                                 title = context.getString(titleRes),
                                 items = songs.map { it.toMediaItem() },
+                                startIndex = startIndex,
+                                position = positionMs,
+                                playlistId = playlistType,
                             ),
                         )
                     }

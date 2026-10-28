@@ -1,187 +1,99 @@
 package com.beatwave.music.ui.screens.settings
 
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import android.content.res.Configuration
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import android.os.Build
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.animation.AnimatedVisibility
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.animation.core.Spring
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.animation.core.animateDpAsState
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.animation.core.animateFloatAsState
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.animation.core.spring
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.animation.core.tween
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.animation.fadeIn
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.animation.fadeOut
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.animation.scaleIn
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.animation.scaleOut
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.BorderStroke
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.Canvas
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.background
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
-import com.beatwave.music.ui.utils.bounceClick
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
-import com.beatwave.music.ui.utils.combinedBounceClick
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.isSystemInDarkTheme
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.Arrangement
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.Box
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.Column
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.PaddingValues
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.Row
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.Spacer
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.aspectRatio
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.height
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.heightIn
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.padding
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.size
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.layout.width
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyRow
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.lazy.items
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.rememberScrollState
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.shape.CircleShape
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.shape.RoundedCornerShape
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.foundation.verticalScroll
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.material3.Card
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.material3.CardDefaults
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.material3.ExperimentalMaterial3Api
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.material3.Icon
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.material3.IconButton
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.material3.MaterialTheme
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.material3.Text
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.material3.TextButton
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.material3.TopAppBar
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.material3.dynamicDarkColorScheme
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.material3.dynamicLightColorScheme
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.material3.ripple
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.runtime.Composable
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.runtime.getValue
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.runtime.mutableStateOf
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.runtime.remember
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.runtime.setValue
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
-import com.beatwave.music.ui.component.ColorPickerDialog
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.Alignment
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.Modifier
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.draw.clip
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.geometry.Offset
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.geometry.Size
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.graphics.Color
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.graphics.graphicsLayer
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.graphics.toArgb
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.platform.LocalConfiguration
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.platform.LocalContext
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.res.painterResource
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.res.stringResource
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.semantics.contentDescription
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.semantics.semantics
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.compose.ui.unit.dp
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import androidx.navigation.NavController
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
-import com.materialkolor.PaletteStyle
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
-import com.materialkolor.rememberDynamicColorScheme
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
+import com.beatwave.music.LocalPlayerAwareWindowInsets
 import com.beatwave.music.R
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
-import com.beatwave.music.constants.DarkModeKey
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
-import com.beatwave.music.constants.DynamicThemeKey
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
-import com.beatwave.music.constants.PureBlackKey
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
-import com.beatwave.music.constants.PureBlackMiniPlayerKey
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
-import com.beatwave.music.constants.SelectedThemeColorKey
 import com.beatwave.music.constants.AppBackgroundColorKey
 import com.beatwave.music.constants.AppTextColorKey
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
+import com.beatwave.music.constants.DarkModeKey
+import com.beatwave.music.constants.DynamicThemeKey
+import com.beatwave.music.constants.PureBlackKey
+import com.beatwave.music.constants.PureBlackMiniPlayerKey
+import com.beatwave.music.constants.SelectedThemeColorKey
+import com.beatwave.music.ui.component.ColorPickerDialog
 import com.beatwave.music.ui.theme.AppleTokens
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import com.beatwave.music.ui.theme.DefaultThemeColor
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import com.beatwave.music.ui.theme.vivimusicTheme
 import com.beatwave.music.ui.utils.appTopBarWindowInsets
+import com.beatwave.music.ui.utils.bounceClick
+import com.beatwave.music.ui.utils.combinedBounceClick
 import com.beatwave.music.utils.rememberEnumPreference
-import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import com.beatwave.music.utils.rememberPreference
-import androidx.compose.foundation.layout.windowInsetsPadding
-import com.beatwave.music.LocalPlayerAwareWindowInsets
+import com.materialkolor.PaletteStyle
+import com.materialkolor.rememberDynamicColorScheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -423,13 +335,55 @@ fun ThemeControls(
                 }
             )
 
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
                 Text(
                     text = stringResource(R.string.theme_mode),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
-                
+
+                // Cute Smiling Sun / Sleeping Moon Day-Night Switch
+                val isDarkActive = when (darkMode) {
+                    DarkMode.ON -> true
+                    DarkMode.OFF -> false
+                    DarkMode.AUTO -> androidx.compose.foundation.isSystemInDarkTheme()
+                }
+
+                // Live Dynamic Adobe "Pw" App Logo Preview (Changes with active UI color)
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Column(
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        com.beatwave.music.ui.component.PulseWaveLogo(
+                            size = 72.dp,
+                            accentColor = selectedThemeColor,
+                            isDark = isDarkActive
+                        )
+                        Text(
+                            text = "Dynamic App Logo (Adapts to Color & Mode)",
+                            style = MaterialTheme.typography.labelSmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    com.beatwave.music.ui.component.CuteThemeSwitch(
+                        isDark = isDarkActive,
+                        onToggle = { newDark ->
+                            onDarkModeChange(if (newDark) DarkMode.ON else DarkMode.OFF)
+                            if (!newDark) onPureBlackChange(false)
+                        }
+                    )
+                }
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(16.dp, Alignment.CenterHorizontally),
@@ -518,6 +472,16 @@ data class ThemePresetItem(
 )
 
 private val BuiltinThemePresets = listOf(
+    ThemePresetItem(
+        nameRes = R.string.theme_preset_pulse_wave,
+        darkMode = DarkMode.ON,
+        pureBlack = false,
+        themeColor = AppleTokens.PulseCyan,
+        backgroundColor = AppleTokens.Bg,
+        textColor = Color(0xFFF8FAFC),
+        dynamicTheme = false,
+        previewGradient = listOf(AppleTokens.Bg, AppleTokens.PulseViolet, AppleTokens.PulseCyan)
+    ),
     ThemePresetItem(
         nameRes = R.string.theme_preset_oled,
         darkMode = DarkMode.ON,

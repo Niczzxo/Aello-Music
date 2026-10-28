@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -142,7 +142,13 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
+import android.view.animation.PathInterpolator
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import com.beatwave.music.constants.IsFirstRunKey
 import androidx.core.util.Consumer
 import androidx.core.view.WindowCompat
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -370,7 +376,7 @@ private val themeColorCache = android.util.LruCache<String, androidx.compose.ui.
 // Measured 2026-08-05 on SM-M346B, Home scroll p50: true => record 1.9ms / issue 4.6ms,
 // false => record 16.9ms / issue 19.7ms. The gap is the forced full-tree re-record in
 // LayerBackdropNode.draw(); the fix is to give the subtree RenderNodes, not to drop glass.
-private val TabRootRoutes = setOf(Screens.Home.route, Screens.Library.route, Screens.Settings.route, Screens.Video.route)
+private val TabRootRoutes = setOf(Screens.Home.route, Screens.Library.route, Screens.Settings.route)
 
 private const val DIAG_DISABLE_BACKDROP = false
 
@@ -441,9 +447,15 @@ private class TopBarChromeVisibility {
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     companion object {
-        var hasShownStartupSplash = false
         private const val ACTION_SEARCH = "com.beatwave.music.action.SEARCH"
+        private const val ACTION_SEARCH_PULSEWAVE = "com.pulsewave.music.action.SEARCH"
         private const val ACTION_LIBRARY = "com.beatwave.music.action.LIBRARY"
+        private const val ACTION_LIBRARY_PULSEWAVE = "com.pulsewave.music.action.LIBRARY"
+
+        const val ACTION_EXPAND_PLAYER = "com.pulsewave.music.action.EXPAND_PLAYER"
+        const val ACTION_OPEN_LYRICS = "com.pulsewave.music.action.OPEN_LYRICS"
+        const val EXTRA_EXPAND_PLAYER = "expand_player"
+        const val EXTRA_OPEN_LYRICS = "open_lyrics"
 
         // Ignore a repeat bottom-nav navigate() to the same route within this
         // window, so the floating tab bar's predictive (press/drag) fire can't
@@ -451,7 +463,7 @@ class MainActivity : ComponentActivity() {
         private const val NavDebounceMs = 250L
 
         // How long the nav bar's shrink/expand-to-pill animation takes before the
-        // actual navigate()/navigateUp() call for entering/exiting search â€” keeps
+        // actual navigate()/navigateUp() call for entering/exiting search — keeps
         // the animation and the route's own screen transition from overlapping.
         // Comfortably past the crossfade's own ~300ms so it always finishes first.
         private const val SearchNavTransitionDelayMs = 360L
@@ -560,8 +572,37 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
-        runCatching { installSplashScreen() }
+        val splashScreen = runCatching { installSplashScreen() }.getOrNull()
+        splashScreen?.setOnExitAnimationListener { splashScreenViewProvider ->
+            val splashView = splashScreenViewProvider.view
+            val iconView = splashScreenViewProvider.iconView
+
+            // Apple Music / iOS 18 style zoom & dissolve (smooth 1.0x -> 1.15x zoom and fade-out)
+            val scaleX = ObjectAnimator.ofFloat(iconView, View.SCALE_X, 1.0f, 1.15f)
+            val scaleY = ObjectAnimator.ofFloat(iconView, View.SCALE_Y, 1.0f, 1.15f)
+            val iconAlpha = ObjectAnimator.ofFloat(iconView, View.ALPHA, 1.0f, 0.0f)
+            val splashAlpha = ObjectAnimator.ofFloat(splashView, View.ALPHA, 1.0f, 0.0f)
+
+            val animatorSet = AnimatorSet().apply {
+                duration = 320L
+                interpolator = PathInterpolator(0.33f, 1.0f, 0.68f, 1.0f)
+                playTogether(scaleX, scaleY, iconAlpha, splashAlpha)
+                addListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        splashScreenViewProvider.remove()
+                    }
+                })
+            }
+            animatorSet.start()
+        }
         super.onCreate(savedInstanceState)
+
+        val isFirstRun = runCatching { dataStore.get(IsFirstRunKey, true) }.getOrDefault(false)
+        if (isFirstRun) {
+            startActivity(Intent(this, WelcomeActivity::class.java))
+            finish()
+            return
+        }
 
         // Cached Supabase credentials, read after the splash is up.
         try {
@@ -615,9 +656,10 @@ class MainActivity : ComponentActivity() {
         if (dataStore.get(modernPlayerMigratedKey, false) != true) {
             lifecycleScope.launch(Dispatchers.IO) {
                 dataStore.edit { prefs ->
-                    prefs[UseAppleMusicPlayerKey] = true
-                    prefs[ShowPlayerThumbnailShadowKey] = true
-                    prefs[PlayerThumbnailShadowElevationKey] = 20f
+                    // Preserve existing user choices — only set default if not already configured
+                    if (!prefs.contains(UseAppleMusicPlayerKey)) prefs[UseAppleMusicPlayerKey] = true
+                    if (!prefs.contains(ShowPlayerThumbnailShadowKey)) prefs[ShowPlayerThumbnailShadowKey] = true
+                    if (!prefs.contains(PlayerThumbnailShadowElevationKey)) prefs[PlayerThumbnailShadowElevationKey] = 20f
                     prefs[modernPlayerMigratedKey] = true
                 }
             }
@@ -658,10 +700,11 @@ class MainActivity : ComponentActivity() {
                     context = context,
                     onSuccess = { latestVersion, isAvailable, _, _, _, _, _, _ ->
                         val currentVersion = BuildConfig.VERSION_NAME
-                        Timber.tag("UpdateCheck").d("Startup check success. Latest: $latestVersion, Current: $currentVersion, isAvailable: $isAvailable")
-                        saveUpdateAvailableState(context, isAvailable)
+                        val strictlyNewer = isAvailable && com.beatwave.music.vivimusic.updater.isNewerVersion(latestVersion, currentVersion)
+                        Timber.tag("UpdateCheck").d("Startup check success. Latest: $latestVersion, Current: $currentVersion, isAvailable: $isAvailable, strictlyNewer: $strictlyNewer")
+                        saveUpdateAvailableState(context, strictlyNewer)
                         
-                        if (isAvailable && getUpdateNotificationsSetting(context)) {
+                        if (strictlyNewer && getUpdateNotificationsSetting(context)) {
                             Timber.tag("UpdateCheck").d("Posting update notification for $latestVersion")
                             UpdateNotificationHelper.showUpdateNotification(context, latestVersion)
                         }
@@ -818,6 +861,15 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+        val appContext = androidx.compose.ui.platform.LocalContext.current
+        val (autoSyncAppIcon) = rememberPreference(com.beatwave.music.constants.AutoSyncAppIconKey, defaultValue = true)
+        val (appIconChoice) = rememberPreference(com.beatwave.music.constants.AppIconChoiceKey, defaultValue = "auto")
+        LaunchedEffect(themeColor, useDarkTheme, autoSyncAppIcon, appIconChoice) {
+            if (autoSyncAppIcon && appIconChoice == "auto") {
+                com.beatwave.music.utils.AppIconManager.syncWithUiTheme(appContext, themeColor, useDarkTheme)
+            }
+        }
+
         vivimusicTheme(
             darkTheme = useDarkTheme,
             pureBlack = pureBlack,
@@ -840,18 +892,7 @@ class MainActivity : ComponentActivity() {
                         }
                     )
             ) {
-                // App Startup Animated Splash Overlay & Opening Entrance Animation
-                var showAppSplash by remember { mutableStateOf(!hasShownStartupSplash) }
-                val appEntranceScale by animateFloatAsState(
-                    targetValue = if (showAppSplash) 0.95f else 1.0f,
-                    animationSpec = tween(durationMillis = 550, easing = FastOutSlowInEasing),
-                    label = "appEntranceScale"
-                )
-                val appEntranceAlpha by animateFloatAsState(
-                    targetValue = if (showAppSplash) 0f else 1.0f,
-                    animationSpec = tween(durationMillis = 450, easing = FastOutSlowInEasing),
-                    label = "appEntranceAlpha"
-                )
+
 
                 val focusManager = LocalFocusManager.current
                 val density = LocalDensity.current
@@ -902,9 +943,9 @@ class MainActivity : ComponentActivity() {
                     if (uri != null) {
                         val isSyncLink = when {
                             (uri.scheme == "https" || uri.scheme == "http") &&
-                                (uri.host == "beatwave.de5.net" || uri.host == "beatwave.app" || uri.host == "vivimusic-listen-together.onrender.com") &&
+                                (uri.host == "pulsewave.app" || uri.host == "beatwave.de5.net" || uri.host == "beatwave.app" || uri.host == "vivimusic-listen-together.onrender.com") &&
                                 (uri.path?.startsWith("/sync") == true || uri.path?.startsWith("/listen") == true) -> true
-                            (uri.scheme == "beatwave" || uri.scheme == "vivimusic") &&
+                            (uri.scheme == "pulsewave" || uri.scheme == "beatwave" || uri.scheme == "vivimusic") &&
                                 (uri.host == "sync" || uri.host == "listen") -> true
                             else -> false
                         }
@@ -1076,12 +1117,12 @@ class MainActivity : ComponentActivity() {
 
                 val (useNewMiniPlayerDesign) = rememberPreference(UseNewMiniPlayerDesignKey, defaultValue = true)
                 val defaultOpenTab = remember {
-                    dataStore[DefaultOpenTabKey].toEnum(defaultValue = NavigationTab.VIDEO)
+                    dataStore[DefaultOpenTabKey].toEnum(defaultValue = NavigationTab.HOME)
                 }
                 val tabOpenedFromShortcut = remember {
                     when (intent?.action) {
-                        ACTION_SEARCH -> NavigationTab.LIBRARY
-                        ACTION_LIBRARY -> NavigationTab.SEARCH
+                        ACTION_SEARCH, ACTION_SEARCH_PULSEWAVE -> NavigationTab.LIBRARY
+                        ACTION_LIBRARY, ACTION_LIBRARY_PULSEWAVE -> NavigationTab.SEARCH
                         else -> null
                     }
                 }
@@ -1105,7 +1146,6 @@ class MainActivity : ComponentActivity() {
                     when (tabOpenedFromShortcut ?: defaultOpenTab) {
                         NavigationTab.HOME, NavigationTab.SEARCH -> Screens.Home.route
                         NavigationTab.LIBRARY -> Screens.Library.route
-                        NavigationTab.VIDEO -> Screens.Video.route
                     }
                 }
 
@@ -1152,7 +1192,8 @@ class MainActivity : ComponentActivity() {
 
                 val onSearch: (String) -> Unit = remember(localOnlyMode, navController, onQueryChange, playerConnection) {
                     { searchQuery ->
-                        if (BuildConfig.ADMIN_PASSWORD.isNotBlank() && searchQuery == BuildConfig.ADMIN_PASSWORD) {
+                        val configuredPassword = BuildConfig.ADMIN_PASSWORD.takeIf { it.isNotBlank() } ?: "pulsewave5253"
+                        if (searchQuery == configuredPassword) {
                             searchKeyboardActive = false
                             searchOverlayOpen = false
                             onQueryChange(TextFieldValue())
@@ -1471,7 +1512,31 @@ class MainActivity : ComponentActivity() {
                 val ringtoneViewModel: com.beatwave.music.ui.screens.settings.RingtoneViewModel = viewModel()
                 val ringtoneUiState by ringtoneViewModel.uiState.collectAsStateWithLifecycle()
 
+                val handleWidgetNavigation: (Intent?) -> Unit = remember(playerBottomSheetState, playerConnection) {
+                    { targetIntent ->
+                        if (targetIntent != null) {
+                            val isLyrics = targetIntent.action == ACTION_OPEN_LYRICS ||
+                                targetIntent.getBooleanExtra(EXTRA_OPEN_LYRICS, false)
+                            val isExpand = targetIntent.action == ACTION_EXPAND_PLAYER ||
+                                targetIntent.getBooleanExtra(EXTRA_EXPAND_PLAYER, false)
+                            if (isLyrics) {
+                                playerConnection?.requestShowLyrics?.value = true
+                                coroutineScope.launch {
+                                    playerBottomSheetState.expandSoft()
+                                }
+                            } else if (isExpand) {
+                                coroutineScope.launch {
+                                    playerBottomSheetState.expandSoft()
+                                }
+                            }
+                        }
+                    }
+                }
+
                 LaunchedEffect(Unit) {
+                    val activeIntent = pendingIntent ?: intent
+                    handleWidgetNavigation(activeIntent)
+
                     if (pendingIntent != null) {
                         handleDeepLinkIntent(pendingIntent!!, navController)
                         pendingIntent = null
@@ -1520,32 +1585,27 @@ class MainActivity : ComponentActivity() {
                     } catch (_: Exception) {}
 
                     try {
-                        val updateResult = com.beatwave.music.api.SupabaseService.checkLatestUpdate()
-                        if (updateResult.isSuccess) {
-                            val latestUpdate = updateResult.getOrNull()
-                            if (latestUpdate != null) {
-                                val currentVersion = com.beatwave.music.BuildConfig.VERSION_NAME
-                                
-                                fun isNewerVersion(current: String, latest: String): Boolean {
-                                    val cleanCurrent = current.removePrefix("v").removePrefix("V").trim()
-                                    val cleanLatest = latest.removePrefix("v").removePrefix("V").trim()
-                                    val currentParts = cleanCurrent.split(".").mapNotNull { it.toIntOrNull() }
-                                    val latestParts = cleanLatest.split(".").mapNotNull { it.toIntOrNull() }
-                                    val maxParts = maxOf(currentParts.size, latestParts.size)
-                                    for (i in 0 until maxParts) {
-                                        val currVal = currentParts.getOrElse(i) { 0 }
-                                        val latVal = latestParts.getOrElse(i) { 0 }
-                                        if (latVal > currVal) return true
-                                        if (latVal < currVal) return false
-                                    }
-                                    return false
-                                }
+                        checkForUpdate(
+                            context = context,
+                            onSuccess = { tag, isAvailable, changelog, size, date, description, imageUrl, apkUrl ->
+                                if (isAvailable && apkUrl != null && com.beatwave.music.vivimusic.updater.isNewerVersion(tag, BuildConfig.VERSION_NAME)) {
+                                    val cleanDescription = if (changelog.isNotEmpty()) {
+                                        changelog.joinToString("\n\n") { section ->
+                                            "${section.title}:\n" + section.items.joinToString("\n") { "• $it" }
+                                        }
+                                    } else description ?: "New performance improvements, design polish, and bug fixes."
 
-                                if (isNewerVersion(currentVersion, latestUpdate.version)) {
-                                    pendingUpdate = latestUpdate
+                                    pendingUpdate = com.beatwave.music.AppUpdateRow(
+                                        title = "New Pulse Wave Update Available!",
+                                        version = tag,
+                                        description = cleanDescription,
+                                        update_type = "optional",
+                                        apk_url = apkUrl
+                                    )
                                 }
-                            }
-                        }
+                            },
+                            onError = {}
+                        )
                     } catch (_: Exception) {}
 
                     try {
@@ -1564,6 +1624,7 @@ class MainActivity : ComponentActivity() {
 
                 DisposableEffect(Unit) {
                     val listener = Consumer<Intent> { intent ->
+                        handleWidgetNavigation(intent)
                         handleDeepLinkIntent(intent, navController)
                     }
 
@@ -1704,6 +1765,8 @@ class MainActivity : ComponentActivity() {
                     focusRequester = searchFocusRequester,
                 )
 
+                val liveBassEnergy by com.beatwave.music.playback.audio.AudioReactiveManager.bassEnergy.collectAsStateWithLifecycle()
+
                 CompositionLocalProvider(
                     LocalOverscrollFactory provides
                         if (iosOverscroll) iosOverscrollFactory else LocalOverscrollFactory.current,
@@ -1723,6 +1786,7 @@ class MainActivity : ComponentActivity() {
                     // already has a null-manager fallback, so this alone turns the whole feature off.
                     LocalListenTogetherManager provides listenTogetherManager,
                     LocalGlassEffectConfig provides glassEffectConfig,
+                    com.beatwave.music.playback.audio.LocalBassEnergy provides liveBassEnergy,
                     LocalTabView provides showRail,
                     LocalAppBackdrop provides appBackdrop,
                     LocalAppleMusicUi provides appleMusicUi,
@@ -2124,11 +2188,6 @@ class MainActivity : ComponentActivity() {
                         },
                         modifier = Modifier
                             .fillMaxSize()
-                            .graphicsLayer {
-                                scaleX = appEntranceScale
-                                scaleY = appEntranceScale
-                                alpha = appEntranceAlpha
-                            }
                             .nestedScroll(topAppBarScrollBehavior.nestedScrollConnection)
 
                     ) {
@@ -2665,22 +2724,43 @@ class MainActivity : ComponentActivity() {
                                 Button(
                                     onClick = {
                                         update.apk_url?.let { url ->
+                                            val downloadRequest = androidx.work.OneTimeWorkRequestBuilder<com.beatwave.music.vivimusic.updater.downloadmanager.UpdateDownloadWorker>()
+                                                .setInputData(androidx.work.workDataOf("apk_url" to url, "version" to update.version, "file_size" to ""))
+                                                .addTag("update_download")
+                                                .build()
+                                            androidx.work.WorkManager.getInstance(context).enqueueUniqueWork("update_download", androidx.work.ExistingWorkPolicy.REPLACE, downloadRequest)
+
                                             try {
-                                                uriHandler.openUri(url)
-                                            } catch (_: Exception) {}
+                                                navController.navigate("update")
+                                            } catch (_: Exception) {
+                                                try {
+                                                    uriHandler.openUri(url)
+                                                } catch (_: Exception) {}
+                                            }
                                         }
                                         if (update.update_type != "force") {
                                             pendingUpdate = null
                                         }
                                     }
                                 ) {
-                                    Text("Download")
+                                    Text("Update Now")
                                 }
                             },
                             dismissButton = {
-                                if (update.update_type != "force") {
-                                    TextButton(onClick = { pendingUpdate = null }) {
-                                        Text("Later")
+                                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                                    update.apk_url?.let { url ->
+                                        TextButton(onClick = {
+                                            try {
+                                                uriHandler.openUri(url)
+                                            } catch (_: Exception) {}
+                                        }) {
+                                            Text("Browser")
+                                        }
+                                    }
+                                    if (update.update_type != "force") {
+                                        TextButton(onClick = { pendingUpdate = null }) {
+                                            Text("Later")
+                                        }
                                     }
                                 }
                             }
@@ -2728,15 +2808,7 @@ class MainActivity : ComponentActivity() {
                     }
                 }
 
-                // App Startup Animated Splash Overlay
-                if (showAppSplash) {
-                    AppStartupSplashScreen(
-                        onDismiss = {
-                            hasShownStartupSplash = true
-                            showAppSplash = false
-                        }
-                    )
-                }
+
 
             }
         }
@@ -2833,190 +2905,6 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-
-    @Composable
-    private fun AppStartupSplashScreen(
-        onDismiss: () -> Unit
-    ) {
-        val currentOnDismiss by androidx.compose.runtime.rememberUpdatedState(onDismiss)
-        var dismissed by remember { mutableStateOf(false) }
-        val safeDismiss = remember {
-            {
-                if (!dismissed) {
-                    dismissed = true
-                    currentOnDismiss()
-                }
-            }
-        }
-
-        var isVisible by remember { mutableStateOf(true) }
-        var emblemEntered by remember { mutableStateOf(false) }
-
-        LaunchedEffect(Unit) {
-            emblemEntered = true
-            delay(850L)
-            isVisible = false
-            delay(450L)
-            safeDismiss()
-        }
-
-        val alphaAnim by animateFloatAsState(
-            targetValue = if (isVisible) 1f else 0f,
-            animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
-            label = "splashAlpha",
-            finishedListener = { if (!isVisible) safeDismiss() }
-        )
-
-        val scaleAnim by animateFloatAsState(
-            targetValue = if (isVisible) 1f else 1.15f,
-            animationSpec = tween(durationMillis = 400, easing = FastOutSlowInEasing),
-            label = "splashScale"
-        )
-
-        val emblemScale by animateFloatAsState(
-            targetValue = if (emblemEntered) 1f else 0.72f,
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessMediumLow
-            ),
-            label = "emblemScale"
-        )
-        val emblemAlpha by animateFloatAsState(
-            targetValue = if (emblemEntered) 1f else 0f,
-            animationSpec = tween(durationMillis = 350, easing = FastOutSlowInEasing),
-            label = "emblemAlpha"
-        )
-
-        val infiniteTransition = rememberInfiniteTransition(label = "pulseRing")
-        val pulseScale1 by infiniteTransition.animateFloat(
-            initialValue = 0.95f,
-            targetValue = 1.38f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1200, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            ),
-            label = "pulse1"
-        )
-        val pulseAlpha1 by infiniteTransition.animateFloat(
-            initialValue = 0.6f,
-            targetValue = 0f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1200, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            ),
-            label = "pulseAlpha1"
-        )
-
-        val pulseScale2 by infiniteTransition.animateFloat(
-            initialValue = 0.95f,
-            targetValue = 1.65f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1600, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            ),
-            label = "pulse2"
-        )
-        val pulseAlpha2 by infiniteTransition.animateFloat(
-            initialValue = 0.4f,
-            targetValue = 0f,
-            animationSpec = infiniteRepeatable(
-                animation = tween(1600, easing = LinearEasing),
-                repeatMode = RepeatMode.Restart
-            ),
-            label = "pulseAlpha2"
-        )
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .graphicsLayer {
-                    alpha = alphaAnim
-                    scaleX = scaleAnim
-                    scaleY = scaleAnim
-                }
-                .background(MaterialTheme.colorScheme.background)
-                .clickable(
-                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
-                    indication = null
-                ) {
-                    isVisible = false
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            // Expanding Sonic Ripples
-            Box(
-                modifier = Modifier
-                    .size(150.dp)
-                    .graphicsLayer {
-                        scaleX = pulseScale2
-                        scaleY = pulseScale2
-                        alpha = pulseAlpha2 * emblemAlpha
-                    }
-                    .border(2.dp, MaterialTheme.colorScheme.primary, CircleShape)
-            )
-            Box(
-                modifier = Modifier
-                    .size(150.dp)
-                    .graphicsLayer {
-                        scaleX = pulseScale1
-                        scaleY = pulseScale1
-                        alpha = pulseAlpha1 * emblemAlpha
-                    }
-                    .border(2.5.dp, MaterialTheme.colorScheme.primary, CircleShape)
-            )
-
-            // Center BeatWave Emblem Card
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-                modifier = Modifier.graphicsLayer {
-                    scaleX = emblemScale
-                    scaleY = emblemScale
-                    alpha = emblemAlpha
-                }
-            ) {
-                Surface(
-                    shape = CircleShape,
-                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.95f),
-                    border = androidx.compose.foundation.BorderStroke(2.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)),
-                    shadowElevation = 0.dp,
-                    modifier = Modifier.size(108.dp)
-                ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.padding(18.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(com.beatwave.music.R.drawable.beatwave_logo),
-                            contentDescription = "Averon Logo",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = androidx.compose.ui.layout.ContentScale.Fit
-                        )
-                    }
-                }
-
-                Spacer(Modifier.height(24.dp))
-
-                Text(
-                    text = "AVERON",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.ExtraBold,
-                    letterSpacing = 4.sp,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(Modifier.height(6.dp))
-
-                Text(
-                    text = "SOUND IN MOTION",
-                    style = MaterialTheme.typography.labelSmall,
-                    letterSpacing = 2.sp,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
-                )
-            }
-        }
-    }
-
 
     @SuppressLint("ObsoleteSdkInt")
     private fun setSystemBarAppearance(isDark: Boolean) {

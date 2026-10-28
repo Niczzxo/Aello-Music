@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -236,6 +236,7 @@ import com.beatwave.music.ui.component.WavySlider
 import com.beatwave.music.ui.component.backdrop.backdrops.layerBackdrop
 import com.beatwave.music.ui.component.backdrop.backdrops.rememberLayerBackdrop
 import com.beatwave.music.ui.component.isGlassAllowed
+import com.beatwave.music.ui.component.ReactiveMeshGradient
 import com.beatwave.music.ui.component.liquidGlass
 import com.beatwave.music.ui.component.rememberBottomSheetState
 import com.beatwave.music.ui.component.rememberHeroTint
@@ -1595,159 +1596,18 @@ fun BottomSheetPlayer(
                         }
                     }
                     PlayerBackgroundStyle.LIVE_MESH -> {
-                        val shouldAnimateLiveMesh = isPlaying && !state.isCollapsed
-                        val anchorRotation: androidx.compose.runtime.State<Float>
-                        val fastRotation: androidx.compose.runtime.State<Float>
-                        val slowRotation: androidx.compose.runtime.State<Float>
-
-                        if (shouldAnimateLiveMesh) {
-                            val infiniteTransition = rememberInfiniteTransition(label = "liveMeshRotation")
-                            
-                            anchorRotation = infiniteTransition.animateFloat(
-                                initialValue = 0f,
-                                targetValue = -360f,
-                                animationSpec = infiniteRepeatable(
-                                    animation = tween(80000, easing = LinearEasing),
-                                    repeatMode = RepeatMode.Restart
-                                ),
-                                label = "anchorRotation"
-                            )
-                            
-                            fastRotation = infiniteTransition.animateFloat(
-                                initialValue = 0f,
-                                targetValue = 360f,
-                                animationSpec = infiniteRepeatable(
-                                    animation = tween(40000, easing = LinearEasing),
-                                    repeatMode = RepeatMode.Restart
-                                ),
-                                label = "fastRotation"
-                            )
-                            
-                            slowRotation = infiniteTransition.animateFloat(
-                                initialValue = 0f,
-                                targetValue = 360f,
-                                animationSpec = infiniteRepeatable(
-                                    animation = tween(60000, easing = LinearEasing),
-                                    repeatMode = RepeatMode.Restart
-                                ),
-                                label = "slowRotation"
-                            )
-                        } else {
-                            val zero = remember { mutableFloatStateOf(0f) }
-                            anchorRotation = zero
-                            fastRotation = zero
-                            slowRotation = zero
-                        }
-
-                        AnimatedContent(
-                            targetState = mediaMetadata?.thumbnailUrl,
-                            transitionSpec = {
-                                fadeIn(tween(1500)).togetherWith(fadeOut(tween(1500)))
-                            },
-                            label = "liveMeshBackground"
-                        ) { thumbnailUrl ->
-                            if (thumbnailUrl != null) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .graphicsLayer { alpha = backgroundAlpha() }
-                                        .graphicsLayer {
-                                            // Scale up to avoid showing edges during rotation
-                                            scaleX = 1.7f
-                                            scaleY = 1.7f
-                                        }
-                                ) {
-                                    val matrix = remember { 
-                                        val m = ColorMatrix()
-                                        m.setToSaturation(1.8f) // Reduced to avoid neon look
-                                        m
-                                    }
-                                    val colorFilter = ColorFilter.colorMatrix(matrix)
-
-                                    // All 3 layers depend on Modifier.blur, a no-op below API 31 —
-                                    // without it these would be 3 overlapping, unblurred, rotating
-                                    // 48x48 crops (glitchy), so fall back to solid black there.
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                                        // Layer 1: The Anchor (Full Image, Counter-Clockwise)
-                                        AsyncImage(
-                                            model = ImageRequest.Builder(context)
-                                                .data(thumbnailUrl)
-                                                .size(48, 48) // Downsample significantly for performance
-                                                .allowHardware(false)
-                                                .build(),
-                                            contentDescription = null,
-                                            contentScale = ContentScale.Crop,
-                                            colorFilter = colorFilter,
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .blur(100.dp)
-                                                .graphicsLayer { rotationZ = anchorRotation.value }
-                                        )
-
-                                        // Layer 2: Fast Rotating Crop (Top-Left)
-                                        AsyncImage(
-                                            model = ImageRequest.Builder(context)
-                                                .data(thumbnailUrl)
-                                                .size(48, 48) // Downsample significantly for performance
-                                                .allowHardware(false)
-                                                .build(),
-                                            contentDescription = null,
-                                            contentScale = ContentScale.Crop,
-                                            colorFilter = colorFilter,
-                                            alignment = Alignment.TopStart,
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .blur(120.dp)
-                                                .graphicsLayer {
-                                                    rotationZ = fastRotation.value
-                                                    alpha = 0.6f
-                                                }
-                                        )
-
-                                        // Layer 3: Slow Rotating Crop (Bottom-Right)
-                                        AsyncImage(
-                                            model = ImageRequest.Builder(context)
-                                                .data(thumbnailUrl)
-                                                .size(48, 48) // Downsample significantly for performance
-                                                .allowHardware(false)
-                                                .build(),
-                                            contentDescription = null,
-                                            contentScale = ContentScale.Crop,
-                                            colorFilter = colorFilter,
-                                            alignment = Alignment.BottomEnd,
-                                            modifier = Modifier
-                                                .fillMaxSize()
-                                                .blur(120.dp)
-                                                .graphicsLayer {
-                                                    rotationZ = slowRotation.value
-                                                    alpha = 0.5f
-                                                }
-                                        )
-                                    } else {
-                                        Box(modifier = Modifier.fillMaxSize().background(Color.Black))
-                                    }
-
-                                    // Global dark tint to prevent neon look + vertical gradient for depth
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(Color.Black.copy(alpha = 0.2f))
-                                    )
-                                    Box(
-                                        modifier = Modifier
-                                            .fillMaxSize()
-                                            .background(
-                                                Brush.verticalGradient(
-                                                    listOf(
-                                                        Color.Transparent,
-                                                        Color.Black.copy(alpha = 0.25f)
-                                                    )
-                                                )
-                                            )
-                                    )
-                                }
-                            }
-                        }
+                        val pColor = gradientColors.getOrNull(0) ?: MaterialTheme.colorScheme.primary
+                        val sColor = gradientColors.getOrNull(1) ?: pColor
+                        val tColor = gradientColors.getOrNull(2) ?: Color.Unspecified
+                        ReactiveMeshGradient(
+                            primaryColor = pColor,
+                            secondaryColor = sColor,
+                            tertiaryColor = tColor,
+                            isPlaying = isPlaying,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .graphicsLayer { alpha = backgroundAlpha() }
+                        )
                     }
                     PlayerBackgroundStyle.STATIC -> {
                         Box(
@@ -1793,7 +1653,7 @@ fun BottomSheetPlayer(
                 ) {
                     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                         Image(
-                            painter = painterResource(R.drawable.beatwave_logo),
+                            painter = painterResource(R.drawable.pulsewave_notification),
                             contentDescription = null,
                             colorFilter = ColorFilter.tint(if (useDarkTheme) Color.White else Color.Black),
                             modifier = Modifier.size(96.dp).alpha(0.4f),
@@ -2569,157 +2429,73 @@ fun BottomSheetPlayer(
                     overflow = TextOverflow.Ellipsis,
                 )
 
-                if (showAudioQualityBadge || sleepTimerEnabled) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(TextBackgroundColor.copy(alpha = 0.08f))
-                            .border(
-                                width = 0.5.dp,
-                                color = TextBackgroundColor.copy(alpha = 0.12f),
-                                shape = RoundedCornerShape(4.dp)
-                            )
-                            .clickable {
-                                if (sleepTimerEnabled) {
-                                    showSleepTimerDialog = true
-                                } else {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(6.dp)
+                ) {
+                    if (sleepTimerEnabled) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(TextBackgroundColor.copy(alpha = 0.12f))
+                                .border(
+                                    width = 0.5.dp,
+                                    color = TextBackgroundColor.copy(alpha = 0.20f),
+                                    shape = RoundedCornerShape(4.dp)
+                                )
+                                .clickable { showSleepTimerDialog = true }
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(4.dp)
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.timer),
+                                    contentDescription = null,
+                                    tint = TextBackgroundColor.copy(alpha = 0.85f),
+                                    modifier = Modifier.size(12.dp)
+                                )
+                                Text(
+                                    text = makeTimeString(sleepTimerTimeLeft.coerceAtLeast(0)),
+                                    style = MaterialTheme.typography.labelSmall.copy(
+                                        fontSize = 10.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        letterSpacing = 1.0.sp
+                                    ),
+                                    color = TextBackgroundColor.copy(alpha = 0.85f),
+                                    maxLines = 1,
+                                )
+                            }
+                        }
+                    }
+
+                    if (showAudioQualityBadge) {
+                        Box(
+                            contentAlignment = Alignment.Center,
+                            modifier = Modifier
+                                .clip(RoundedCornerShape(4.dp))
+                                .background(TextBackgroundColor.copy(alpha = 0.08f))
+                                .border(
+                                    width = 0.5.dp,
+                                    color = TextBackgroundColor.copy(alpha = 0.12f),
+                                    shape = RoundedCornerShape(4.dp)
+                                )
+                                .clickable {
                                     mediaMetadata.id.let {
                                         bottomSheetPageState.show {
                                             ShowMediaInfo(it)
                                         }
                                     }
                                 }
-                            }
-                            .padding(horizontal = 6.dp, vertical = 2.dp)
-                    ) {
-                        AnimatedContent(
-                            targetState = sleepTimerEnabled,
-                            transitionSpec = {
-                                fadeIn(animationSpec = tween(300)) togetherWith
-                                        fadeOut(animationSpec = tween(300))
-                            },
-                            label = "QualityTimerSwitcher"
-                        ) { isTimerActive ->
-                            if (isTimerActive) {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    Icon(
-                                        painter = painterResource(R.drawable.timer),
-                                        contentDescription = null,
-                                        tint = TextBackgroundColor.copy(alpha = 0.8f),
-                                        modifier = Modifier.size(12.dp)
-                                    )
-                                    Text(
-                                        text = makeTimeString(sleepTimerTimeLeft.coerceAtLeast(0)),
-                                        style = MaterialTheme.typography.labelSmall.copy(
-                                            fontSize = 10.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            letterSpacing = 1.5.sp
-                                        ),
-                                        color = TextBackgroundColor.copy(alpha = 0.8f),
-                                        maxLines = 1,
-                                    )
-                                }
-                            } else {
-                                Row(
-                                    verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                                ) {
-                                    // An infiniteRepeatable never finishes, so this decorative
-                                    // sweep kept awaiting a frame for as long as the player was
-                                    // on screen — the whole app redrew every vsync, paused
-                                    // included. Spin it only while something is actually playing.
-                                    val animatedRotation = if (isPlaying) {
-                                        val infiniteTransition =
-                                            rememberInfiniteTransition(label = "QualityIconTransition")
-                                        infiniteTransition.animateFloat(
-                                            initialValue = 0f,
-                                            targetValue = 360f,
-                                            animationSpec = infiniteRepeatable(
-                                                animation = tween(2000, easing = LinearEasing),
-                                                repeatMode = RepeatMode.Restart
-                                            ),
-                                            label = "QualityIconRotation"
-                                        )
-                                    } else {
-                                        remember { mutableFloatStateOf(0f) }
-                                    }
-
-                                    val iconBrush = Brush.sweepGradient(
-                                        colors = listOf(
-                                            Color.Transparent,
-                                            TextBackgroundColor.copy(alpha = 1.0f),
-                                            Color.Transparent
-                                        )
-                                    )
-
-                                    Icon(
-                                        painter = painterResource(R.drawable.stream_old_player),
-                                        contentDescription = null,
-                                        tint = Color.Unspecified,
-                                        modifier = Modifier
-                                            .size(12.dp)
-                                            .graphicsLayer(alpha = 0.99f)
-                                            .drawWithCache {
-                                                onDrawWithContent {
-                                                    drawContent()
-                                                    rotate(animatedRotation.value) {
-                                                        drawRect(iconBrush, blendMode = BlendMode.SrcIn)
-                                                    }
-                                                }
-                                            }
-                                    )
-                                    Text(
-                                        text = run {
-                                            val format = playerFormat ?: currentFormat?.let {
-                                                // Fallback to DB info if live format not yet available
-                                                androidx.media3.common.Format.Builder()
-                                                    .setSampleMimeType(it.mimeType)
-                                                    .setCodecs(it.codecs)
-                                                    .setAverageBitrate(it.bitrate ?: 0)
-                                                    .setSampleRate(it.sampleRate ?: 0)
-                                                    .build()
-                                            }
-                                            
-                                            val codecLabel = format?.let { f ->
-                                                val mime = f.sampleMimeType?.lowercase() ?: ""
-                                                val codecs = f.codecs?.lowercase() ?: ""
-                                                when {
-                                                    mime.contains("flac") || codecs.contains("flac") -> "FLAC"
-                                                    mime.contains("opus") || codecs.contains("opus") -> "OPUS"
-                                                    mime.contains("mp4a") || mime.contains("aac") || codecs.contains("mp4a") || codecs.contains("aac") -> "AAC"
-                                                    mime.contains("mp3") || mime.contains("mpeg") || codecs.contains("mp3") || codecs.contains("mpeg") -> "MP3"
-                                                    mime.contains("vorbis") || codecs.contains("vorbis") -> "OGG"
-                                                    mime.contains("webm") || codecs.contains("webm") -> "WEBM"
-                                                    else -> null
-                                                }
-                                            }
-                                            
-                                            val bitrate = format?.bitrate?.takeIf { it > 0 } ?: format?.averageBitrate?.takeIf { it > 0 }
-                                            val bitrateLabel = bitrate?.let { "${it / 1000}kbps" }
-                                            
-                                            val sampleRate = format?.sampleRate?.takeIf { it > 0 }
-                                            val sampleRateLabel = sampleRate?.let { "${it / 1000}.${(it % 1000) / 100}kHz" }
-
-                                            buildString {
-                                                append(codecLabel ?: if (isLosslessStream) "LOSSLESS" else "AUTO")
-                                                if (bitrateLabel != null) append(" • $bitrateLabel")
-                                                if (sampleRateLabel != null) append(" • $sampleRateLabel")
-                                            }
-                                        },
-                                        style = MaterialTheme.typography.labelSmall.copy(
-                                            fontSize = 10.sp,
-                                            fontWeight = FontWeight.Bold,
-                                            letterSpacing = 1.0.sp
-                                        ),
-                                        color = TextBackgroundColor.copy(alpha = 0.8f),
-                                        maxLines = 1,
-                                    )
-                                }
-                            }
+                                .padding(horizontal = 6.dp, vertical = 2.dp)
+                        ) {
+                            AudioQualityBadge(
+                                playerConnection = playerConnection,
+                                tint = TextBackgroundColor,
+                                isPlaying = isPlaying,
+                            )
                         }
                     }
                 }

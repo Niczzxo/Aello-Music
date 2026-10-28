@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -88,7 +88,7 @@ object DebugLogs {
     fun tree(context: Context): FileLoggingTree = FileLoggingTree(file(context))
 
     private fun deviceHeader(context: Context): String = buildString {
-        appendLine("Averon Debug Log")
+        appendLine("Pulse Wave Debug Log")
         appendLine("=".repeat(50))
         appendLine("Time: ${SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US).format(Date())}")
         appendLine("Manufacturer: ${Build.MANUFACTURER}")

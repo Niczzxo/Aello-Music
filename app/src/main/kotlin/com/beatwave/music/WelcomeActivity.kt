@@ -358,20 +358,19 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                         modifier = Modifier.fillMaxWidth()
                     ) {
                         Surface(
-                            shape = RoundedCornerShape(18.dp),
-                            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f),
-                            border = androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)),
+                            shape = RoundedCornerShape(16.dp),
+                            color = Color.Transparent,
                             shadowElevation = 8.dp,
                             modifier = Modifier.size(58.dp)
                         ) {
-                            Box(contentAlignment = Alignment.Center, modifier = Modifier.padding(10.dp)) {
-                                androidx.compose.foundation.Image(
-                                    painter = painterResource(com.beatwave.music.R.drawable.beatwave_logo),
-                                    contentDescription = "Averon Logo",
-                                    modifier = Modifier.fillMaxSize(),
-                                    contentScale = androidx.compose.ui.layout.ContentScale.Fit
-                                )
-                            }
+                            androidx.compose.foundation.Image(
+                                painter = painterResource(com.beatwave.music.R.drawable.pulsewave_logo),
+                                contentDescription = "Pulse Wave Logo",
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .clip(RoundedCornerShape(16.dp)),
+                                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+                            )
                         }
                         Column {
                             Text(
@@ -424,7 +423,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        BeatWaveSonicWaveformVisualizer(
+                        PulseWaveSonicWaveformVisualizer(
                             modifier = Modifier.size(280.dp)
                         )
 
@@ -711,7 +710,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                                 title = "Import Spotify Liked Songs",
                                 description = when {
                                     isImportingSpotifyLiked -> "Importing Spotify Liked Songs... ($importedSpotifyLikedCount)"
-                                    spotifyLikedImportDone -> "Imported $importedSpotifyLikedCount liked songs into Averon library!"
+                                    spotifyLikedImportDone -> "Imported $importedSpotifyLikedCount liked songs into Pulse Wave library!"
                                     else -> "Sync your Spotify Liked Songs directly into your local library."
                                 },
                                 shape = bottomCardShape,
@@ -804,7 +803,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                     Spacer(modifier = Modifier.height(16.dp))
 
                     Text(
-                        text = "Averon is open-source and depends on community support to grow. Your help makes a difference!",
+                        text = "Pulse Wave is open-source and depends on community support to grow. Your help makes a difference!",
                         style = MaterialTheme.typography.bodyLarge.copy(
                             fontFamily = GoogleSansFlex
                         ),
@@ -833,7 +832,7 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
                                 )
                             },
                             onClick = {
-                                uriHandler.safeOpenUri(context, "https://github.com/Niczzxo/Averon")
+                                uriHandler.safeOpenUri(context, "https://github.com/BSFrameworks5253/Plusewave")
                             }
                         )
 
@@ -1231,8 +1230,8 @@ fun WelcomePagerScreen(onFinished: () -> Unit) {
 }
 
 @Composable
-fun BeatWaveSonicWaveformVisualizer(modifier: Modifier = Modifier) {
-    val infiniteTransition = rememberInfiniteTransition(label = "beatwaveSonic")
+fun PulseWaveSonicWaveformVisualizer(modifier: Modifier = Modifier) {
+    val infiniteTransition = rememberInfiniteTransition(label = "pulsewaveSonic")
     val pulseScale by infiniteTransition.animateFloat(
         initialValue = 0.94f,
         targetValue = 1.06f,
@@ -1324,27 +1323,21 @@ fun BeatWaveSonicWaveformVisualizer(modifier: Modifier = Modifier) {
             }
         }
 
-        // Center circular BeatWave emblem
+        // Center Pulse Wave emblem
         Surface(
-            shape = CircleShape,
-            color = MaterialTheme.colorScheme.surface,
-            border = androidx.compose.foundation.BorderStroke(2.5.dp, primaryColor.copy(alpha = 0.9f)),
+            shape = RoundedCornerShape(22.dp),
+            color = Color.Transparent,
             shadowElevation = 14.dp,
             modifier = Modifier.size(80.dp)
         ) {
-            Box(
-                contentAlignment = Alignment.Center,
+            androidx.compose.foundation.Image(
+                painter = painterResource(com.beatwave.music.R.drawable.pulsewave_logo),
+                contentDescription = "Pulse Wave Logo",
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(14.dp)
-            ) {
-                androidx.compose.foundation.Image(
-                    painter = painterResource(com.beatwave.music.R.drawable.beatwave_logo),
-                    contentDescription = "Averon Logo",
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = androidx.compose.ui.layout.ContentScale.Fit
-                )
-            }
+                    .clip(RoundedCornerShape(22.dp)),
+                contentScale = androidx.compose.ui.layout.ContentScale.Crop
+            )
         }
     }
 }

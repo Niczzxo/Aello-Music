@@ -32,9 +32,9 @@ object UpdateNotificationHelper {
 
         // Direct download URL format from vivimusicupdater - use the full tag (vX.X.X or bX.X.X) or nightly link
         val apkUrl = if (versionName.contains("nightly", ignoreCase = true)) {
-            "https://nightly.link/Niczzxo/Averon/workflows/nightly.yml/main/beatwave-gms-nightly.zip"
+            "https://nightly.link/BSFrameworks5253/Plusewave/workflows/nightly.yml/main/pulsewave-gms-nightly.zip"
         } else {
-            "https://github.com/Niczzxo/Averon/releases/download/$versionName/beatwave-$versionName.apk"
+            "https://github.com/BSFrameworks5253/Plusewave/releases/download/$versionName/PulseWave-$versionName-universal-release.apk"
         }
         val intent = Intent(Intent.ACTION_VIEW, apkUrl.toUri())
 
@@ -42,7 +42,7 @@ object UpdateNotificationHelper {
         val pending = PendingIntent.getActivity(context, NOTIFICATION_ID, intent, flags)
 
         val notif = NotificationCompat.Builder(context, CHANNEL_ID)
-            .setSmallIcon(R.drawable.beatwave_notification)
+            .setSmallIcon(R.drawable.pulsewave_notification)
             .setContentTitle(context.getString(R.string.update_available_title))
             .setContentText(versionName)
             .setContentIntent(pending)

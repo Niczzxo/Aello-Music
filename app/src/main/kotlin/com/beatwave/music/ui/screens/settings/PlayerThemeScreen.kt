@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -307,7 +307,7 @@ fun PlayerThemeScreen(
                         verticalArrangement = Arrangement.Center
                     ) {
                         androidx.compose.foundation.Image(
-                            painter = painterResource(R.drawable.beatwave_logo),
+                            painter = painterResource(R.drawable.pulsewave_logo),
                             contentDescription = null,
                             modifier = Modifier.size(36.dp),
                         )
@@ -850,8 +850,8 @@ private fun SlotPreviewBlock(slot: PlayerSlot, artworkUrl: String?) {
                     model = artworkUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    fallback = painterResource(R.drawable.beatwave_logo),
-                    error = painterResource(R.drawable.beatwave_logo),
+                    fallback = painterResource(R.drawable.pulsewave_logo),
+                    error = painterResource(R.drawable.pulsewave_logo),
                     modifier = Modifier.fillMaxSize(),
                 )
             }
@@ -1028,8 +1028,8 @@ private fun PlayerPreview(
                 model = artworkUrl,
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
-                fallback = painterResource(R.drawable.beatwave_logo),
-                error = painterResource(R.drawable.beatwave_logo),
+                fallback = painterResource(R.drawable.pulsewave_logo),
+                error = painterResource(R.drawable.pulsewave_logo),
                 modifier = Modifier.fillMaxSize(),
             )
             if (previewShape == CircleShape && artworkStyle == PlayerArtworkStyle.VINYL) {

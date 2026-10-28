@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -137,6 +137,11 @@ class App : Application(), SingletonImageLoader.Factory {
         applicationScope.launch(Dispatchers.IO) {
             runCatching { downloadUtilProvider.get() }
                 .onFailure { Timber.e(it, "Cache warm-up failed") }
+
+            runCatching {
+                com.beatwave.music.spotify.SpotifySyncWorker.schedule(this@App)
+                com.beatwave.music.playback.SmartAutoDownloadWorker.schedule(this@App)
+            }.onFailure { Timber.w(it, "Failed to schedule background workers") }
         }
 
         // Initialize application settings on launch safely
@@ -272,8 +277,7 @@ class App : Application(), SingletonImageLoader.Factory {
                     try {
                         YouTube.cookie = cookie?.takeIf { it.isNotBlank() && it != "null" }
                     } catch (e: Exception) {
-                        Timber.e(e, "Could not parse cookie. Clearing existing cookie.")
-                        forgetAccount(this@App)
+                        Timber.e(e, "Could not parse cookie: ${e.message}")
                     }
                 }
         }
@@ -329,14 +333,13 @@ class App : Application(), SingletonImageLoader.Factory {
     private var cachedCoilCacheSize: Int? = null
 
     override fun newImageLoader(context: PlatformContext): ImageLoader {
-        val cacheSize = cachedCoilCacheSize ?: runBlocking {
-            dataStore.data.map { it[MaxImageCacheSizeKey] ?: 512 }.first()
-        }
+        val cacheSize = cachedCoilCacheSize ?: 512
         return ImageLoader.Builder(this).apply {
-            crossfade(false)
-            // Use HARDWARE bitmap configuration for direct zero-copy GPU texture uploads
-            allowHardware(true)
-            bitmapConfig(Bitmap.Config.HARDWARE)
+            // Smooth 200ms crossfade to eliminate thumbnail flashing and flickering
+            crossfade(200)
+            // Use ARGB_8888 for safe Compose canvas, palette extraction, and morph layer blending
+            allowHardware(false)
+            bitmapConfig(Bitmap.Config.ARGB_8888)
             // Animated GIF backgrounds (Home background picker allows GIF): the
             // platform decoder needs API 28+, GifDecoder covers everything below.
             components {
@@ -353,6 +356,7 @@ class App : Application(), SingletonImageLoader.Factory {
             memoryCache {
                 MemoryCache.Builder()
                     .maxSizePercent(context, 0.35)
+                    .strongReferencesEnabled(true)
                     .build()
             }
             if (cacheSize == 0) {

@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -15,7 +15,7 @@ import com.beatwave.music.constants.BrandFontEnabledKey
 import com.beatwave.music.utils.rememberPreference
 
 /** The product wordmark. */
-const val BrandName = "Averon"
+const val BrandName = "Pulse Wave"
 
 /** Chillax — display face for artist titles. */
 val ChillaxFontFamily: FontFamily by lazy {
@@ -31,7 +31,7 @@ val ChillaxFontFamily: FontFamily by lazy {
 }
 
 /**
- * Outfit font family for the BeatWave brand wordmark and display headers.
+ * Outfit font family for the Pulse Wave brand wordmark and display headers.
  * Falls back to null when brand font preference is disabled.
  */
 @Composable

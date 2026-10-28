@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -22,6 +22,8 @@ import com.beatwave.music.constants.SongSortType
 import com.beatwave.music.ui.utils.bounceClick
 import com.beatwave.music.ui.utils.combinedBounceClick
 import kotlinx.coroutines.flow.first
+import sh.calvin.reorderable.ReorderableItem
+import sh.calvin.reorderable.rememberReorderableLazyListState
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +56,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.toMutableStateList
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -263,6 +266,7 @@ fun LibraryPlaylistsScreen(
                 onSortDescendingChange = onSortDescendingChange,
                 sortTypeText = { sortType ->
                     when (sortType) {
+                        PlaylistSortType.CUSTOM -> R.string.sort_by_custom
                         PlaylistSortType.CREATE_DATE -> R.string.sort_by_create_date
                         PlaylistSortType.NAME -> R.string.sort_by_name
                         PlaylistSortType.SONG_COUNT -> R.string.sort_by_song_count
@@ -317,6 +321,33 @@ fun LibraryPlaylistsScreen(
     // Hoisted: both view types de-duped the same list separately, and the scroll rail
     // needs the resulting count too.
     val visiblePlaylists = remember(playlists) { playlists.distinctBy { it.id } }
+    // In-memory mutable list for 60fps smooth dragging without IO DataStore write spam
+    val localPlaylists = remember(visiblePlaylists) { visiblePlaylists.toMutableStateList() }
+    var hasDragged by remember { mutableStateOf(false) }
+
+    val reorderableListState = rememberReorderableLazyListState(
+        lazyListState = lazyListState,
+        scrollThresholdPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues()
+    ) { from, to ->
+        val headerCount = 3 + (if (showLiked) 1 else 0) + (if (showDownloaded) 1 else 0) +
+            (if (showTop) 1 else 0) + (if (showCached) 1 else 0) + (if (showUploaded) 1 else 0)
+        if (from.index >= headerCount && to.index >= headerCount) {
+            val fromIdx = from.index - headerCount
+            val toIdx = to.index - headerCount
+            if (fromIdx in localPlaylists.indices && toIdx in localPlaylists.indices) {
+                localPlaylists.add(toIdx, localPlaylists.removeAt(fromIdx))
+                hasDragged = true
+            }
+        }
+    }
+
+    // Persist only on drag completion when the user drops the item
+    LaunchedEffect(reorderableListState.isAnyItemDragging) {
+        if (!reorderableListState.isAnyItemDragging && hasDragged) {
+            viewModel.setCustomPlaylistOrder(localPlaylists.map { it.id })
+            hasDragged = false
+        }
+    }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -432,18 +463,37 @@ fun LibraryPlaylistsScreen(
                         }
 
                         items(
-                            items = visiblePlaylists,
+                            items = localPlaylists,
                             key = { it.id },
                             contentType = { CONTENT_TYPE_PLAYLIST },
                         ) { playlist ->
-                            LibraryPlaylistListItem(
-                                navController = navController,
-                                menuState = menuState,
-                                coroutineScope = coroutineScope,
-                                playlist = playlist,
-                                showIconOnly = libraryIconsOnly,
-                                modifier = Modifier.animateItem()
-                            )
+                            if (sortType == PlaylistSortType.CUSTOM) {
+                                ReorderableItem(
+                                    state = reorderableListState,
+                                    key = playlist.id
+                                ) { isDragging ->
+                                    LibraryPlaylistListItem(
+                                        navController = navController,
+                                        menuState = menuState,
+                                        coroutineScope = coroutineScope,
+                                        playlist = playlist,
+                                        showIconOnly = libraryIconsOnly,
+                                        isCustomSort = true,
+                                        dragHandleModifier = Modifier.draggableHandle(),
+                                        modifier = Modifier.animateItem()
+                                    )
+                                }
+                            } else {
+                                LibraryPlaylistListItem(
+                                    navController = navController,
+                                    menuState = menuState,
+                                    coroutineScope = coroutineScope,
+                                    playlist = playlist,
+                                    showIconOnly = libraryIconsOnly,
+                                    isCustomSort = false,
+                                    modifier = Modifier.animateItem()
+                                )
+                            }
                         }
                     }
                 }
@@ -571,7 +621,7 @@ fun LibraryPlaylistsScreen(
                         }
 
                         items(
-                            items = visiblePlaylists,
+                            items = localPlaylists,
                             key = { it.id },
                             contentType = { CONTENT_TYPE_PLAYLIST },
                         ) { playlist ->

@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -15,6 +15,7 @@ class ListQueue(
     val startIndex: Int = 0,
     val position: Long = 0L,
     override val preloadItem: MediaMetadata? = items.getOrNull(startIndex)?.metadata,
+    override val playlistId: String? = null,
 ) : Queue {
 
     override suspend fun getInitialStatus() = Queue.Status(title, items, startIndex, position)

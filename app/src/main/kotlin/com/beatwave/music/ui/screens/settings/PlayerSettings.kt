@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -137,11 +137,11 @@ fun PlayerSettings(
     )
     val (crossfadeEnabled, onCrossfadeEnabledChange) = rememberPreference(
         CrossfadeEnabledKey,
-        defaultValue = false
+        defaultValue = true
     )
     val (crossfadeDuration, onCrossfadeDurationChange) = rememberPreference(
         CrossfadeDurationKey,
-        defaultValue = 5f
+        defaultValue = 4f
     )
     val (crossfadeGapless, onCrossfadeGaplessChange) = rememberPreference(
         CrossfadeGaplessKey,
@@ -149,7 +149,7 @@ fun PlayerSettings(
     )
     val (manualCrossfadeEnabled, onManualCrossfadeEnabledChange) = rememberPreference(
         ManualCrossfadeEnabledKey,
-        defaultValue = false
+        defaultValue = true
     )
     val (manualCrossfadeDuration, onManualCrossfadeDurationChange) = rememberPreference(
         ManualCrossfadeDurationKey,

@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -58,8 +58,6 @@ import com.beatwave.music.ui.screens.recognition.RecognitionHistoryScreen
 import com.beatwave.music.ui.screens.recognition.RecognitionScreen
 import com.beatwave.music.ui.screens.search.OnlineSearchResult
 import com.beatwave.music.ui.screens.search.SearchScreen
-import com.beatwave.music.ui.screens.video.VideoPlayerScreen
-import com.beatwave.music.ui.screens.video.VideoScreen
 import com.beatwave.music.ui.screens.settings.AboutScreen
 import com.beatwave.music.ui.screens.settings.SuggestionScreen
 import com.beatwave.music.ui.screens.settings.AccountSettingsScreen
@@ -132,25 +130,6 @@ fun NavGraphBuilder.navigationBuilder(
 
     sharedComposable(Screens.Library.route) {
         LibraryScreen(navController)
-    }
-
-    // Averon: in-app video section (tab) + video player screen.
-    sharedComposable(Screens.Video.route) {
-        VideoScreen(navController)
-    }
-
-    sharedComposable(
-        route = "video_player/{videoId}",
-        arguments = listOf(
-            navArgument("videoId") {
-                type = NavType.StringType
-            },
-        ),
-    ) {
-        VideoPlayerScreen(
-            navController = navController,
-            videoId = it.arguments?.getString("videoId").orEmpty(),
-        )
     }
 
     sharedComposable(Screens.Settings.route) {
@@ -426,7 +405,15 @@ fun NavGraphBuilder.navigationBuilder(
     }
 
     sharedComposable("settings/suggestions") {
-        SuggestionScreen(navController, scrollBehavior)
+        SuggestionScreen(navController, scrollBehavior, initialTab = 0)
+    }
+
+    sharedComposable("settings/suggestions/recommendations") {
+        SuggestionScreen(navController, scrollBehavior, initialTab = 0)
+    }
+
+    sharedComposable("settings/suggestions/issues") {
+        SuggestionScreen(navController, scrollBehavior, initialTab = 1)
     }
 
 
@@ -535,6 +522,10 @@ fun NavGraphBuilder.navigationBuilder(
         ListenTogetherSettings(navController, scrollBehavior)
     }
 
+    sharedComposable(route = "settings/desktop_sync") {
+        com.beatwave.music.ui.screens.settings.DesktopSyncScreen(navController, scrollBehavior)
+    }
+
     sharedComposable("settings/discord/login") {
         DiscordLoginScreen(navController)
     }
@@ -561,6 +552,10 @@ fun NavGraphBuilder.navigationBuilder(
 
     sharedComposable("wrapped") {
         WrappedScreen(navController)
+    }
+
+    sharedComposable("stats") {
+        StatsScreen(navController)
     }
 
     sharedComposable("ambient_mode") {

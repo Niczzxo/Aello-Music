@@ -1,63 +1,56 @@
 {
-  "description": "BeatWave 6.1.1 — Universal playlist & album import (Spotify, Apple Music, Amazon Music), Spotify account login & dual Wrapped playback sync, Liked Songs import fix, smart shuffle overhaul, and overall performance optimizations.",
+  "description": "Pulse Wave 6.1.16 — Dual V1 (JAR) & V2 APK Signing, Package Installer Compatibility Fix, Direct Vinyl Controls & In-App Updater Overhaul.",
   "image": "",
   "changelog": [
     {
-      "title": "Universal Playlist & Album Importer",
+      "title": "Dual V1 & V2 APK Signing (Fixes 'Package is invalid')",
       "items": [
-        "Import playlists and albums from Spotify, Apple Music, and Amazon Music simply by pasting their public share links.",
-        "High-accuracy track matching with automatic HTML entity unescaping, cover art retrieval, and instant progress dialogs.",
-        "Batch database insertion and in-memory search query caching for blazing-fast imports without freezing playback or UI."
+        "Full Dual Signing: Explicitly enabled both V1 JAR signing and V2 APK Signature Scheme across all build flavors.",
+        "Universal Package Installer Compatibility: Resolves 'Package is invalid' / 'Problem parsing the package' parse errors across HyperOS, MIUI, Samsung, and Android 12+ package installers.",
+        "FileProvider Grant Permissions: Preserves full Uri read permissions for system installers."
       ]
     },
     {
-      "title": "Spotify Account & Dual Wrapped Sync",
+      "title": "Direct Vinyl Play/Pause/Prev/Next Controls",
       "items": [
-        "Connect your Spotify account directly in Settings > Account alongside YouTube Music with one-tap login/logout.",
-        "Dual Wrapped Playback Sync: songs played in BeatWave now automatically sync with both your YouTube Music Recap and Spotify Wrapped / Recently Played.",
-        "Completely fixed Spotify Liked Songs import with robust OAuth token refreshing and multi-tier GraphQL fallback."
+        "Platter Tap Controls (Player & Widget): Tap the center of the vinyl record to toggle Play / Pause instantly with tactile haptic feedback.",
+        "Edge Skip Controls: Tap the left edge of the vinyl disc to skip to the Previous song, or tap the right edge to skip to the Next song.",
+        "Double-Tap Quick Skip: Double-tap either side of the vinyl disc in the player for rapid track navigation.",
+        "Turntable Widget Platter Touch: Control music directly from the home screen turntable disc even in pure size-oriented layout."
       ]
     },
     {
-      "title": "Smart Shuffle & Infinite Genre Automix",
+      "title": "In-App Updater Overhaul & Installation Fix",
       "items": [
-        "Fixed shuffle loop issue where single tracks repeated indefinitely: turning on shuffle now dynamically spins up an automix of similar genre and style tracks.",
-        "Fixed single-track queues by linking YouTube Automix radio (RDAMVM) and related genre tracks automatically across Search, Home, and Suggestions.",
-        "Seamless Autoplay: when reaching the end of a queue with Repeat Off, BeatWave automatically loads more tracks of the same genre so your music never abruptly stops."
+        "OkHttp Multi-Hop Redirect Engine: Swapped out legacy connection with OkHttp supporting 302 GitHub redirect asset streams and proper user-agent headers.",
+        "Internal Cache Storage: Moved update staging to internal app cache to bypass Android 11+ / HyperOS Scoped Storage file blocks.",
+        "Full FileProvider Permissions: Added missing XML roots and granted explicit read URI permissions to system package installers (MIUI, Samsung, Google).",
+        "Direct Browser Download Fallback: Added an instant 'Browser' download action directly inside the update alert dialog.",
+        "Auto-Install Trigger: Automatically launches the package installer prompt as soon as the APK download finishes."
       ]
     },
     {
-      "title": "Device Compatibility & Crash Fixes",
+      "title": "Interactive Vinyl Turntable & Scratching",
       "items": [
-        "Fixed critical ExceptionInInitializerError crash on Vivo, Honor, Motorola, Samsung, and Realme devices caused by font variation settings.",
-        "Fixed ConcurrentModificationException crash during dynamic Spotify recommendations background indexing.",
-        "Strengthened Proguard and R8 optimization keep rules for typography and serialization across all architectures."
+        "Scratch & Seek Vinyl Disc: Grab and spin the vinyl record in the player forward or backward to scrub through songs with real-time audio scrubbing physics.",
+        "Realistic Vinyl Scratch Sound: Synthesized needle-on-groove DJ scratch audio effect pitch-bent to your rotational drag velocity.",
+        "Animated Tonearm Stylus: Mechanical needle swings into the groove during playback and lifts away into resting stand on pause.",
+        "DJ Scratch Mode Easter Egg: Triple-tap the center vinyl label to trigger instant DJ Spinback mode!"
       ]
     },
     {
-      "title": "Visual Engine & Cover Art Overhaul",
+      "title": "Pure Size-Oriented Turntable Widget",
       "items": [
-        "Crystal-clear high-resolution album art: eliminated blurry/pixelated thumbnails across YouTube Music and Spotify feeds by dynamically serving up to 800x800 and 640x640 covers.",
-        "Smooth hero art tinting: removed pitch-black screen flashes when navigating into albums and artist pages.",
-        "Solid Apple Music-inspired elevated dock for keyboard search bar, eliminating distorted background shaders."
+        "Pure Turntable Platter: Clean circular vinyl deck with tonearm and ambient glow with no clutter, scaling responsively to any widget dimension.",
+        "Continuous Spin Tracking: Platter tracks live playback state directly from your home screen."
       ]
     },
     {
-      "title": "Audio Playback & Crossfade Polish",
+      "title": "Library Playlist Reordering Fix",
       "items": [
-        "Instant crossfade activation: changes to crossfade toggles and duration now immediately apply to the actively playing song without requiring a track change or restart.",
-        "Optimized gapless transition detection."
-      ]
-    },
-    {
-      "title": "Admin Panel Enhancements & Mashup Studio",
-      "items": [
-        "Added real-time search filtering and status chips across all User Suggestions and Bug Reports.",
-        "One-tap Admin quick replies for rapid issue triaging ('Fixed in v6.1.1!', 'Investigating now', etc.).",
-        "Added Bug Report deletion support to keep issue queues clean and actionable.",
-        "New Mashup Studio (AI DJ Lab): interactive admin console to configure and preview real-time multi-track beat matching, stem isolation, and line-by-line / verse-by-verse transitions."
+        "Silky Smooth Reordering: Swapped to 60fps in-memory list updates during drag so dragging never drops frames or gets canceled.",
+        "Atomic Drop Persistence: Preferences are saved once upon releasing the drag handle, eliminating DataStore write collisions."
       ]
     }
   ]
 }
-

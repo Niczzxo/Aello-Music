@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -139,7 +139,7 @@ object SongExporter {
             val copied = runCatching {
                 source.open(
                     DataSpec.Builder()
-                        .setUri(Uri.parse("beatwave://cache/$songId"))
+                        .setUri(Uri.parse("pulsewave://cache/$songId"))
                         .setKey(songId)
                         .setPosition(0)
                         .setLength(length)

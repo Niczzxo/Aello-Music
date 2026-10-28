@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -49,6 +49,8 @@ val UseAppleMusicPlayerKey = booleanPreferencesKey("useAppleMusicPlayer")
 val ShowPlayerThumbnailShadowKey = booleanPreferencesKey("showPlayerThumbnailShadow")
 val PlayerThumbnailShadowElevationKey = floatPreferencesKey("playerThumbnailShadowElevation")
 val SelectedFontKey = stringPreferencesKey("selected_font")
+val AutoSyncAppIconKey = booleanPreferencesKey("autoSyncAppIcon")
+val AppIconChoiceKey = stringPreferencesKey("appIconChoice")
 
 enum class AppFont(val value: String) {
     SYSTEM("system"),
@@ -346,6 +348,7 @@ val LocalSongSortTypeKey = stringPreferencesKey("localSongSortType")
 val LocalSongSortDescendingKey = booleanPreferencesKey("localSongSortDescending")
 val PlaylistSortTypeKey = stringPreferencesKey("playlistSortType")
 val PlaylistSortDescendingKey = booleanPreferencesKey("playlistSortDescending")
+val CustomPlaylistOrderKey = stringPreferencesKey("custom_playlist_order")
 val AddToPlaylistSortTypeKey = stringPreferencesKey("addToPlaylistSortType")
 val AddToPlaylistSortDescendingKey = booleanPreferencesKey("addToPlaylistSortDescending")
 val ArtistSongSortTypeKey = stringPreferencesKey("artistSongSortType")
@@ -487,6 +490,7 @@ enum class AlbumSortType {
 }
 
 enum class PlaylistSortType {
+    CUSTOM,
     CREATE_DATE,
     NAME,
     SONG_COUNT,

@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -35,11 +35,9 @@ sealed class Screens(
     fun icon(appleMusicUi: Boolean): Int = if (appleMusicUi) iosIcon else icon
 
     object Home : Screens(
-        // Averon: the music tab is labelled "Music" — Video is the first tab.
-        // Music icon, not the home/house icon.
-        titleId = R.string.music,
+        titleId = R.string.home,
         route = "home",
-        icon = R.drawable.music_note,
+        icon = R.drawable.accord_home,
     )
 
     object Search : Screens(
@@ -47,13 +45,6 @@ sealed class Screens(
         route = "search_input",
         icon = R.drawable.search,
         iosIcon = R.drawable.cosmos_search,
-    )
-
-    /** Averon: in-app video section — search any YouTube video, watch ad-free. */
-    object Video : Screens(
-        titleId = R.string.video,
-        route = "video",
-        icon = R.drawable.slow_motion_video,
     )
 
     object ListenTogether : Screens(
@@ -88,9 +79,8 @@ sealed class Screens(
         // Listen Together is reachable from the top bar and its own route, never as a
         // tab: as a pager page it sat between Search and Library, so every tab switch
         // that crossed it flashed the screen on the way past.
-        // Averon: Video is the first tab, Music (Home) second.
         val MainScreens: List<Screens>
-            get() = listOf(Video, Home, Search, Library)
+            get() = listOf(Home, Search, Library)
 
         /**
          * The bar's contents for the current mode. Local-only mode promotes [Songs] to a
@@ -103,6 +93,6 @@ sealed class Screens(
 
         /** Every route that counts as a tab root, in either mode. */
         val MainRoutes: Set<String>
-            get() = setOf(Home.route, Search.route, Video.route, Library.route, Songs.route)
+            get() = setOf(Home.route, Search.route, Library.route, Songs.route)
     }
 }

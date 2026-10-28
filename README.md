@@ -1,27 +1,27 @@
 <div align="center">
-  <h1>BEATWAVE</h1>
-  <h3>BeatWave is an open-source, Liquid Glass music player for Android</h3>
+  <h1>PULSE WAVE</h1>
+  <h3>Pulse Wave is an open-source, Liquid Glass music player for Android</h3>
 
   <p>
-    <a href="https://github.com/beatlabs790/BeatWave/releases/tag/v5.0.0">
-      <img src="https://img.shields.io/badge/%E2%AC%87%EF%B8%8F%20DOWNLOAD%20BEATWAVE%201.5.2-4CAF50?style=for-the-badge&logo=android&logoColor=white" alt="Download BeatWave v5.1.2">
+    <a href="https://github.com/BSFrameworks5253/Plusewave/releases">
+      <img src="https://img.shields.io/badge/%E2%AC%87%EF%B8%8F%20DOWNLOAD%20PULSE%20WAVE-4CAF50?style=for-the-badge&logo=android&logoColor=white" alt="Download Pulse Wave">
     </a>
   </p>
   <p>
-    <b><a href="https://github.com/beatlabs790/BeatWave/releases/tag/latest">⬇️ DOWNLOAD Latest Build.</a></b>
+    <b><a href="https://github.com/BSFrameworks5253/Plusewave/releases/latest">⬇️ DOWNLOAD Latest Build.</a></b>
     — Latest release. Works on Android 8.0+.
   </p>
   <p>
-    <a href="https://github.com/beatlabs790/BeatWave/releases">
-      <img src="https://img.shields.io/github/downloads/beatlabs790/BeatWave/total?style=for-the-badge&color=blue" alt="Downloads">
+    <a href="https://github.com/BSFrameworks5253/Plusewave/releases">
+      <img src="https://img.shields.io/github/downloads/BSFrameworks5253/Plusewave/total?style=for-the-badge&color=blue" alt="Downloads">
     </a>
     <a href="LICENSE">
-      <img src="https://img.shields.io/github/license/beatlabs790/BeatWave?style=for-the-badge" alt="License">
+      <img src="https://img.shields.io/github/license/BSFrameworks5253/Plusewave?style=for-the-badge" alt="License">
     </a>
     <a href="https://discord.gg/spbuDTePSR">
       <img src="https://img.shields.io/badge/Discord-Join%20Us-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Join Discord">
     <a href="https://support-akshansh.vercel.app">
-      <img src="https://img.shields.io/badge/BeatWave-Website-8A2BE2?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Visit BeatWave Website">
+      <img src="https://img.shields.io/badge/Pulse Wave-Website-8A2BE2?style=for-the-badge&logo=googlechrome&logoColor=white" alt="Visit Pulse Wave Website">
     </a>
   </p>
   <p>
@@ -32,11 +32,11 @@
 
 <hr>
 
-<h2>🎵 About BeatWave</h2>
+<h2>🎵 About Pulse Wave</h2>
 
-<p><b>BeatWave</b> is a free, open-source music player for Android that streams from YouTube Music, built with <b>Jetpack Compose</b> on a <b>Media3</b> ExoPlayer core. The UI is a custom <b>Liquid Glass</b> design system — frosted, refractive surfaces, iOS-style bouncy scrolling, and progressive blur chrome — instead of stock Material widgets.</p>
+<p><b>Pulse Wave</b> is a free, open-source music player for Android that streams from YouTube Music, built with <b>Jetpack Compose</b> on a <b>Media3</b> ExoPlayer core. The UI is a custom <b>Liquid Glass</b> design system — frosted, refractive surfaces, iOS-style bouncy scrolling, and progressive blur chrome — instead of stock Material widgets.</p>
 
-<p>BeatWave started as a fork of <a href="https://github.com/cosmictaserdev-creator/Convx">CONVX</a>; see <a href="#-credits">Credits</a> below.</p>
+<p>Pulse Wave started as a fork of <a href="https://github.com/cosmictaserdev-creator/Convx">CONVX</a>; see <a href="#-credits">Credits</a> below.</p>
 
 <hr>
 
@@ -99,7 +99,7 @@
 
 <h2>🚗 Android Auto Setup</h2>
 
-<p>If BeatWave doesn't appear in Android Auto:</p>
+<p>If Pulse Wave doesn't appear in Android Auto:</p>
 
 <ol>
   <li>Open <strong>Android Auto</strong> on your phone</li>
@@ -129,7 +129,7 @@
 
 <h2>🛡️ Privacy & Data Collection</h2>
 
-<p>At <strong>BeatWave</strong>, your privacy is our top priority. We believe that your music and data belong exclusively to you.</p>
+<p>At <strong>Pulse Wave</strong>, your privacy is our top priority. We believe that your music and data belong exclusively to you.</p>
 
 <ul>
   <li><strong>Zero Data Collection:</strong> we do <strong>not</strong> collect, store, or share any of your personal information, usage habits, or listening history.</li>
@@ -145,7 +145,7 @@
 
 <p>Any trademark, service mark, trade name, or other intellectual property rights used in this project are owned by their respective owners.</p>
 
-<p><strong>BeatWave</strong> is an independent project created for educational and personal use purposes.</p>
+<p><strong>Pulse Wave</strong> is an independent project created for educational and personal use purposes.</p>
 
 <hr>
 
@@ -166,9 +166,9 @@
         </a>
         <br><br>
         <sub>
-          <a href="https://github.com/beatlabs790/BeatWave/issues">🐞 Report Bugs</a> &nbsp;•&nbsp;
-          <a href="https://github.com/beatlabs790/BeatWave/discussions">💬 Discussions</a> &nbsp;•&nbsp;
-          <a href="https://github.com/beatlabs790/BeatWave/releases">🚀 Releases</a>
+          <a href="https://github.com/BSFrameworks5253/Plusewave/issues">🐞 Report Bugs</a> &nbsp;•&nbsp;
+          <a href="https://github.com/BSFrameworks5253/Plusewave/discussions">💬 Discussions</a> &nbsp;•&nbsp;
+          <a href="https://github.com/BSFrameworks5253/Plusewave/releases">🚀 Releases</a>
         </sub>
       </td>
     </tr>
@@ -181,14 +181,14 @@
 
   <h2>🙏 Credits</h2>
 
-  <p>BeatWave is developed and maintained by <a href="https://github.com/vortexapps67">Vortex Apps</a>. See <a href="https://support-akshansh.vercel.app">support-akshansh.vercel.app</a> for support.</p>
+  <p>Pulse Wave is developed and maintained by <a href="https://github.com/vortexapps67">Vortex Apps</a>. See <a href="https://support-akshansh.vercel.app">support-akshansh.vercel.app</a> for support.</p>
 
   <table border="0" cellpadding="10" cellspacing="0" width="90%">
     <tr valign="top">
       <td width="40%" align="left">
         <b>💡 Built On</b>
         <ul>
-          <li><strong><a href="https://github.com/vivizzz007/vivi-music">vivi-music</a></strong> by <strong>Vividh P Ashokan</strong> — the project BeatWave was forked from.</li>
+          <li><strong><a href="https://github.com/vivizzz007/vivi-music">vivi-music</a></strong> by <strong>Vividh P Ashokan</strong> — the project Pulse Wave was forked from.</li>
           <li>The <strong>Apple Music Player V17</strong> full-screen player style (Settings → Player Theme) is ported from <a href="https://github.com/vivizzz007/vivi-music">vivi-music</a>'s Apple Music player UI, GPL-3.0.</li>
         </ul>
       </td>
@@ -208,5 +208,5 @@
   <p align="center">The open-source community for tools, libraries, and APIs that make this project possible.</p>
   <hr width="60%">
   <p align="center"><strong>Made with ❤️ for music lovers everywhere</strong></p>
-  <p align="center">⭐ Star this repo if you enjoy BeatWave!</p>
+  <p align="center">⭐ Star this repo if you enjoy Pulse Wave!</p>
 </div>

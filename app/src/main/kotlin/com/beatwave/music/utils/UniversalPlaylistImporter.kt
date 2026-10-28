@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -8,6 +8,8 @@ package com.beatwave.music.utils
 import com.beatwave.music.db.entities.ArtistEntity
 import com.beatwave.music.db.entities.SongEntity
 import com.beatwave.music.db.entities.Song
+import com.music.spotify.Spotify
+import com.music.spotify.SpotifyMapper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.json.Json
@@ -144,7 +146,7 @@ object UniversalPlaylistImporter {
             ?.get("url")?.jsonPrimitive?.contentOrNull
 
         val trackList = entity?.get("trackList")?.jsonArray ?: emptyList()
-        val songs = trackList.mapNotNull { trackElement ->
+        val fallbackSongs = trackList.mapNotNull { trackElement ->
             val trackObj = trackElement.jsonObject
             val title = trackObj["title"]?.jsonPrimitive?.contentOrNull?.let { unescapeHtml(it) } ?: return@mapNotNull null
             val artist = trackObj["subtitle"]?.jsonPrimitive?.contentOrNull?.let { unescapeHtml(it) } ?: "Unknown Artist"
@@ -160,6 +162,43 @@ object UniversalPlaylistImporter {
                 artists = listOf(ArtistEntity(id = "", name = artist)),
             )
         }
+
+        val fullSongs = mutableListOf<Song>()
+        if (type == "playlist") {
+            try {
+                var offset = 0
+                val limit = 100
+                while (true) {
+                    val pageResult = Spotify.playlistTracks(id, limit = limit, offset = offset)
+                    val page = pageResult.getOrNull() ?: break
+                    if (page.items.isEmpty()) break
+                    val pageSongs = page.items.mapNotNull { item ->
+                        val track = item.track ?: return@mapNotNull null
+                        Song(
+                            song = SongEntity(
+                                id = "",
+                                title = track.name,
+                                duration = track.durationMs / 1000,
+                                thumbnailUrl = SpotifyMapper.getTrackThumbnail(track) ?: coverUrl,
+                            ),
+                            artists = track.artists.map { ArtistEntity(id = "", name = it.name) },
+                        )
+                    }
+                    if (pageSongs.isEmpty()) break
+                    fullSongs.addAll(pageSongs)
+                    offset += limit
+                    if (page.total > 0) {
+                        if (offset >= page.total) break
+                    } else {
+                        if (page.items.size < limit) break
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Error fetching full Spotify playlist tracks via API")
+            }
+        }
+
+        val songs = if (fullSongs.isNotEmpty()) fullSongs else fallbackSongs
 
         if (songs.isEmpty()) {
             throw Exception("No tracks found in the Spotify $type. Make sure it is public.")

@@ -183,13 +183,26 @@ class SpotifyImportViewModel @Inject constructor(
                     runCatching { refreshWithCookies(session.spDc, session.spKey.orEmpty()) }
                         .onSuccess { loadSources() }
                         .onFailure { error ->
-                            logout()
-                            _uiState.update {
-                                it.copy(
-                                    isAuthenticated = false,
-                                    isLoading = false,
-                                    errorMessage = "Session expired. Please log in again."
-                                )
+                            val isAuthFailure = error.message?.contains("401") == true || error.message?.contains("Unauthorized", ignoreCase = true) == true
+                            if (isAuthFailure) {
+                                logout()
+                                _uiState.update {
+                                    it.copy(
+                                        isAuthenticated = false,
+                                        isLoading = false,
+                                        errorMessage = "Session expired. Please log in again."
+                                    )
+                                }
+                            } else {
+                                // Network / transient failure: keep session active so user is never logged out unexpectedly
+                                _uiState.update {
+                                    it.copy(
+                                        isAuthenticated = true,
+                                        accountName = session.accountName.orEmpty(),
+                                        accountAvatarUrl = session.accountAvatarUrl,
+                                        isLoading = false
+                                    )
+                                }
                             }
                         }
                 }
@@ -243,8 +256,12 @@ class SpotifyImportViewModel @Inject constructor(
                     }
                     if (page.items.isEmpty()) break
                     playlistsList.addAll(page.items)
-                    offset += page.items.size
-                    if (offset >= page.total || page.items.size < limit) break
+                    offset += limit
+                    if (page.total > 0) {
+                        if (offset >= page.total) break
+                    } else {
+                        if (page.items.size < limit) break
+                    }
                 }
 
                 _uiState.update {
@@ -303,8 +320,12 @@ class SpotifyImportViewModel @Inject constructor(
             }
             if (page.items.isEmpty()) break
             tracks.addAll(page.items.mapNotNull { it.track })
-            offset += page.items.size
-            if (offset >= page.total || page.items.size < limit) break
+            offset += limit
+            if (page.total > 0) {
+                if (offset >= page.total) break
+            } else {
+                if (page.items.size < limit) break
+            }
         }
 
         return@withContext tracks.map { track ->
@@ -331,8 +352,12 @@ class SpotifyImportViewModel @Inject constructor(
             }
             if (page.items.isEmpty()) break
             tracks.addAll(page.items.map { it.track })
-            offset += page.items.size
-            if (offset >= page.total || page.items.size < limit) break
+            offset += limit
+            if (page.total > 0) {
+                if (offset >= page.total) break
+            } else {
+                if (page.items.size < limit) break
+            }
         }
 
         return@withContext tracks.map { track ->
@@ -410,7 +435,6 @@ class SpotifyImportViewModel @Inject constructor(
                                 isEditable = true,
                             )
                             if (existing == null) insert(entity) else update(entity)
-                            clearPlaylist(importData.localPlaylistId)
                         }
 
                         _importProgress.update {
@@ -534,11 +558,13 @@ class SpotifyImportViewModel @Inject constructor(
                     throw Exception("No songs found in playlist. Please make sure the link is public.")
                 }
 
-                val safeId = Math.abs(cleanLink.hashCode()).toString()
+                val spotifyId = extractPlaylistId(cleanLink)
+                val localId = if (spotifyId != null) "SPOTIFY_PLAYLIST_$spotifyId"
+                else "PLAYLIST_${parsed.source.uppercase()}_${Math.abs(cleanLink.substringBefore("?").hashCode())}"
                 val importData = PlaylistImportData(
                     title = parsed.title,
                     songs = parsed.songs,
-                    localPlaylistId = "PLAYLIST_${parsed.source.uppercase()}_$safeId",
+                    localPlaylistId = localId,
                     thumbnailUrl = parsed.coverUrl
                 )
 
@@ -664,19 +690,27 @@ class SpotifyImportViewModel @Inject constructor(
         database.withTransaction {
             val existing = playlist(importData.localPlaylistId).first()
             val now = LocalDateTime.now()
+            val spotifyId = if (importData.localPlaylistId.startsWith("SPOTIFY_PLAYLIST_")) {
+                importData.localPlaylistId.removePrefix("SPOTIFY_PLAYLIST_")
+            } else null
+
             val entity = existing?.playlist?.copy(
                 name = importData.title,
+                browseId = existing.playlist.browseId ?: spotifyId,
                 bookmarkedAt = existing.playlist.bookmarkedAt ?: now,
                 lastUpdateTime = now,
-                thumbnailUrl = importData.thumbnailUrl,
+                thumbnailUrl = importData.thumbnailUrl ?: existing.playlist.thumbnailUrl,
                 isEditable = true,
+                isAutoSync = true,
             ) ?: PlaylistEntity(
                 id = importData.localPlaylistId,
                 name = importData.title,
+                browseId = spotifyId,
                 bookmarkedAt = now,
                 lastUpdateTime = now,
                 thumbnailUrl = importData.thumbnailUrl,
                 isEditable = true,
+                isAutoSync = true,
             )
 
             if (existing == null) {
@@ -685,7 +719,29 @@ class SpotifyImportViewModel @Inject constructor(
                 update(entity)
             }
 
-            matchedMedia.chunked(25).forEach { chunk ->
+            // Fetch current songs in playlist to deduplicate and prevent overwriting existing tracks
+            val currentPlaylistSongs = playlistSongs(importData.localPlaylistId).first()
+            val existingSongIds = currentPlaylistSongs.map { it.map.songId }.toSet()
+            val existingSignatures = currentPlaylistSongs.map {
+                val cleanTitle = it.song.title.trim().lowercase()
+                    .replace(Regex("""\s*\(.*?\)\s*"""), " ")
+                    .replace(Regex("""\s*\[.*?\]\s*"""), " ")
+                    .trim()
+                val cleanArtist = it.song.artists.firstOrNull()?.name?.trim()?.lowercase().orEmpty()
+                "$cleanTitle###$cleanArtist"
+            }.toSet()
+
+            val newMedia = matchedMedia.filter { media ->
+                val cleanTitle = media.title.trim().lowercase()
+                    .replace(Regex("""\s*\(.*?\)\s*"""), " ")
+                    .replace(Regex("""\s*\[.*?\]\s*"""), " ")
+                    .trim()
+                val cleanArtist = media.artists.firstOrNull()?.name?.trim()?.lowercase().orEmpty()
+                val sig = "$cleanTitle###$cleanArtist"
+                media.id !in existingSongIds && sig !in existingSignatures
+            }
+
+            newMedia.chunked(25).forEach { chunk ->
                 chunk.forEach { metadata ->
                     insert(metadata)
                     if (importData.localPlaylistId == "SPOTIFY_LIKED_SONGS") {
@@ -703,13 +759,13 @@ class SpotifyImportViewModel @Inject constructor(
                 }
             }
 
-            clearPlaylist(importData.localPlaylistId)
-            matchedMedia.forEachIndexed { index, metadata ->
+            val currentMaxPosition = currentPlaylistSongs.maxOfOrNull { it.map.position } ?: -1
+            newMedia.forEachIndexed { index, metadata ->
                 insert(
                     PlaylistSongMap(
                         playlistId = importData.localPlaylistId,
                         songId = metadata.id,
-                        position = index,
+                        position = currentMaxPosition + 1 + index,
                         setVideoId = metadata.setVideoId,
                     )
                 )

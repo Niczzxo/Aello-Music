@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -13,6 +13,7 @@ import androidx.media3.datasource.cache.NoOpCacheEvictor
 import androidx.media3.datasource.cache.SimpleCache
 import androidx.room.Room
 import com.beatwave.music.constants.MaxSongCacheSizeKey
+import com.beatwave.music.db.DatabaseDao
 import com.beatwave.music.db.InternalDatabase
 import com.beatwave.music.db.MusicDatabase
 import com.beatwave.music.listentogether.ListenTogetherClient
@@ -44,7 +45,7 @@ object AppModule {
     @Provides
     fun provideDao(
         database: InternalDatabase,
-    ) = database.dao
+    ): DatabaseDao = database.dao
 
     // Both of these come from InternalDatabase.newInstance, which is the ONLY
     // place the builder is configured. This provider used to run its own bare
@@ -57,7 +58,7 @@ object AppModule {
     @Provides
     fun provideDatabase(
         @ApplicationContext context: Context,
-    ): MusicDatabase = InternalDatabase.newInstance(context)
+    ): MusicDatabase = MusicDatabase.newInstance(context)
 
     @Singleton
     @Provides

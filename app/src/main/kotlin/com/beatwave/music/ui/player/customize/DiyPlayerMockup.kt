@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -383,7 +383,7 @@ private fun MockArtwork(style: MockupStyle, isPortrait: Boolean, modifier: Modif
         contentAlignment = Alignment.Center,
     ) {
         Image(
-            painter = painterResource(R.drawable.beatwave_logo),
+            painter = painterResource(R.drawable.pulsewave_logo),
             contentDescription = null,
             contentScale = ContentScale.Fit,
             modifier = Modifier.fillMaxSize(0.34f),

@@ -1,5 +1,5 @@
 /**
- * Averon Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -20,16 +20,16 @@ object ListenTogetherServers {
     private const val ServersJson = """
         [
           {
-            "name": "Averon Sync (Global)",
+            "name": "Pulse Wave Sync (Global)",
             "url": "wss://devilmi-vivi-music-listen-together.hf.space",
             "location": "Global",
-            "operator": "Averon"
+            "operator": "Pulse Wave"
           },
           {
-            "name": "Averon Sync (USA)",
+            "name": "Pulse Wave Sync (USA)",
             "url": "wss://vivimusic-listen-together.onrender.com",
             "location": "USA",
-            "operator": "Averon"
+            "operator": "Pulse Wave"
           }
         ]
     """

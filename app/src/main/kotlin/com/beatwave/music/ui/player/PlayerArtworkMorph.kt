@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 package com.beatwave.music.ui.player
@@ -104,8 +104,15 @@ private val miniArtworkRadius = androidx.compose.runtime.mutableFloatStateOf(0f)
 private val fullArtworkRadius = androidx.compose.runtime.mutableFloatStateOf(0f)
 
 fun Modifier.registerMiniArtworkRect(cornerRadiusPx: Float = 0f): Modifier = onGloballyPositioned {
-    miniArtworkRadius.floatValue = cornerRadiusPx
-    if (it.isAttached) miniArtworkRect.value = it.boundsInRoot()
+    if (it.isAttached) {
+        val bounds = it.boundsInRoot()
+        if (miniArtworkRect.value != bounds) {
+            miniArtworkRect.value = bounds
+        }
+        if (miniArtworkRadius.floatValue != cornerRadiusPx) {
+            miniArtworkRadius.floatValue = cornerRadiusPx
+        }
+    }
 }
 
 /** Call on the full player's own artwork container. Same contract as
@@ -115,8 +122,15 @@ fun Modifier.registerFullArtworkRect(cornerRadiusPx: Float = 0f): Modifier = onG
     // too -- and the last one to report would win. Only the page actually on screen may
     // claim the target rect; an off-screen page's window bounds are empty.
     if (it.boundsInWindow().isEmpty) return@onGloballyPositioned
-    fullArtworkRadius.floatValue = cornerRadiusPx
-    if (it.isAttached) fullArtworkRect.value = it.boundsInRoot()
+    if (it.isAttached) {
+        val bounds = it.boundsInRoot()
+        if (fullArtworkRect.value != bounds) {
+            fullArtworkRect.value = bounds
+        }
+        if (fullArtworkRadius.floatValue != cornerRadiusPx) {
+            fullArtworkRadius.floatValue = cornerRadiusPx
+        }
+    }
 }
 
 /**
@@ -485,7 +499,7 @@ fun MorphingCoverArt(
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(R.drawable.beatwave_logo),
+                    painter = painterResource(R.drawable.pulsewave_notification),
                     contentDescription = contentDescription,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                     modifier = Modifier.size(64.dp)

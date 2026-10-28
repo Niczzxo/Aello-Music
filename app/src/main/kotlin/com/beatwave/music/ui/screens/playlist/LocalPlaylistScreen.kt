@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -21,6 +21,7 @@ import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -121,6 +122,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.compose.ui.util.fastForEachReversed
@@ -697,7 +699,8 @@ fun LocalPlaylistScreen(
                                 onStartSearch = { isSearching = true },
                                 snackbarHostState = snackbarHostState,
                                 heroScale = heroZoom.scale,
-                                modifier = Modifier.animateItem()
+                                modifier = Modifier.animateItem(),
+                                onSync = { viewModel.refresh() }
                             )
                         }
                     }
@@ -879,11 +882,16 @@ fun LocalPlaylistScreen(
                                         } else if (song.song.id == mediaMetadata?.id) {
                                             playerConnection.togglePlayPause()
                                         } else {
+                                            val songIdx = songs.indexOfFirst { it.map.id == song.map.id }
+                                            playlist?.id?.let { pid ->
+                                                com.beatwave.music.playback.PlaylistPlaybackTracker.savePlaylistProgress(context, pid, song.song.id, songIdx)
+                                            }
                                             playerConnection.playQueue(
                                                 ListQueue(
                                                     title = playlist!!.playlist.name,
                                                     items = songs.map { it.song.toMediaItem() },
-                                                    startIndex = songs.indexOfFirst { it.map.id == song.map.id },
+                                                    startIndex = songIdx,
+                                                    playlistId = playlist?.id,
                                                 ),
                                             )
                                         }
@@ -1140,6 +1148,7 @@ fun LocalPlaylistHeader(
     snackbarHostState: SnackbarHostState,
     modifier: Modifier,
     heroScale: Float = 1f,
+    onSync: () -> Unit = {},
 ) {
     val playerConnection = LocalPlayerConnection.current ?: return
     val isPlaying by playerConnection.isEffectivelyPlaying.collectAsState()
@@ -1181,7 +1190,7 @@ fun LocalPlaylistHeader(
 
     val overrideThumbnail = remember {mutableStateOf<String?>(null)}
     var isCustomThumbnail: Boolean = playlist.thumbnails.firstOrNull()?.let {
-        it.contains("studio_square_thumbnail") || it.contains("content://com.vivimusic.music")
+        it.contains("studio_square_thumbnail") || it.contains("content://")
     } ?: false
 
 
@@ -1389,10 +1398,11 @@ fun LocalPlaylistHeader(
                 if (editable) {
                     Box(
                         modifier = Modifier
-                            .padding(12.dp)
-                            .size(36.dp)
+                            .padding(bottom = 20.dp, end = 20.dp)
+                            .size(38.dp)
                             .clip(CircleShape)
-                            .background(Color.Black.copy(alpha = 0.45f))
+                            .background(Color.Black.copy(alpha = 0.65f))
+                            .border(1.dp, Color.White.copy(alpha = 0.25f), CircleShape)
                             .clickable { showEditNoteDialog = true },
                         contentAlignment = Alignment.Center,
                     ) {
@@ -1400,47 +1410,60 @@ fun LocalPlaylistHeader(
                             painter = painterResource(R.drawable.edit),
                             contentDescription = stringResource(R.string.edit_playlist_cover),
                             tint = Color.White,
-                            modifier = Modifier.size(20.dp),
+                            modifier = Modifier.size(18.dp),
                         )
                     }
                 }
             }
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(14.dp))
 
             // Playlist Name
             Text(
                 text = playlist.playlist.name,
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.headlineMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = (-0.5).sp
+                ),
                 textAlign = TextAlign.Center,
                 color = onTint,
                 maxLines = 2,
                 overflow = TextOverflow.Ellipsis,
-                modifier = Modifier.padding(horizontal = 32.dp)
+                modifier = Modifier.padding(horizontal = 24.dp)
             )
 
             playlist.playlist.description?.takeIf { it.isNotBlank() }?.let { desc ->
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Text(
                     text = desc,
                     style = MaterialTheme.typography.bodyMedium,
                     textAlign = TextAlign.Center,
-                    color = onTint.copy(alpha = 0.7f),
+                    color = onTint.copy(alpha = 0.72f),
                     maxLines = 3,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(horizontal = 32.dp)
+                    modifier = Modifier.padding(horizontal = 24.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Metadata - Song Count • Duration
-            Text(
-                text = playlistInfoText,
-                style = MaterialTheme.typography.bodyMedium,
-                color = onTint.copy(alpha = 0.7f)
-            )
+            // Stats / Song Count • Duration Pill Badge
+            if (playlistInfoText.isNotBlank()) {
+                Spacer(modifier = Modifier.height(10.dp))
+                Box(
+                    modifier = Modifier
+                        .clip(ContinuousRoundedRectangle(percent = 50))
+                        .background(Color.White.copy(alpha = 0.08f))
+                        .border(0.5.dp, Color.White.copy(alpha = 0.12f), ContinuousRoundedRectangle(percent = 50))
+                        .padding(horizontal = 14.dp, vertical = 4.dp)
+                ) {
+                    Text(
+                        text = playlistInfoText,
+                        style = MaterialTheme.typography.labelMedium.copy(
+                            fontWeight = FontWeight.SemiBold
+                        ),
+                        color = onTint.copy(alpha = 0.85f)
+                    )
+                }
+            }
             }
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -1470,26 +1493,7 @@ fun LocalPlaylistHeader(
                                 downloadState = downloadState,
                                 onEdit = onShowEditDialog,
                                 onSync = {
-                                    scope.launch(Dispatchers.IO) {
-                                        val playlistPage = YouTube.playlist(playlist.playlist.browseId!!)
-                                            .completed()
-                                            .getOrNull() ?: return@launch
-                                        database.transaction {
-                                            clearPlaylist(playlist.id)
-                                            playlistPage.songs
-                                                .map(SongItem::toMediaMetadata)
-                                                .onEach(::insert)
-                                                .mapIndexed { position, song ->
-                                                    PlaylistSongMap(
-                                                        songId = song.id,
-                                                        playlistId = playlist.id,
-                                                        position = position,
-                                                        setVideoId = song.setVideoId
-                                                    )
-                                                }
-                                                .forEach(::insert)
-                                        }
-                                    }
+                                    onSync()
                                     scope.launch(Dispatchers.Main) {
                                         snackbarHostState.showSnackbar(context.getString(R.string.playlist_synced))
                                     }
@@ -1549,10 +1553,20 @@ fun LocalPlaylistHeader(
                         } else if (songs.any { it.song.id == mediaMetadata?.id }) {
                             playerConnection.player.play()
                         } else {
+                            val songIds = songs.map { it.song.id }
+                            val (startIndex, positionMs) = com.beatwave.music.playback.PlaylistPlaybackTracker.resolveStartProgress(context, playlist.id, songIds)
+                            if (startIndex > 0) {
+                                val songTitle = songs.getOrNull(startIndex)?.song?.title
+                                val msg = if (!songTitle.isNullOrBlank()) "Resuming from track #${startIndex + 1}: $songTitle" else "Resuming from track #${startIndex + 1}"
+                                android.widget.Toast.makeText(context, msg, android.widget.Toast.LENGTH_SHORT).show()
+                            }
                             playerConnection.playQueue(
                                 ListQueue(
                                     title = playlist.playlist.name,
                                     items = songs.map { it.song.toMediaItem() },
+                                    startIndex = startIndex,
+                                    position = positionMs,
+                                    playlistId = playlist.id,
                                 )
                             )
                         }
@@ -1580,7 +1594,33 @@ fun LocalPlaylistHeader(
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.shuffle),
-                        contentDescription = null,
+                        contentDescription = "Shuffle",
+                        modifier = Modifier.size(20.dp),
+                    )
+                }
+
+                Spacer(modifier = Modifier.width(12.dp))
+
+                // Spotify Smart Recommendations / Radio (Far Right)
+                GlassCircleButton(
+                    onClick = {
+                        val firstSong = songs.firstOrNull()?.song
+                        if (firstSong != null) {
+                            playerConnection.playQueue(
+                                ListQueue(
+                                    title = "${playlist.playlist.name} • Radio",
+                                    items = listOf(firstSong.toMediaItem()),
+                                )
+                            )
+                            playerConnection.startRadioSeamlessly()
+                            android.widget.Toast.makeText(context, "✨ Started Smart Radio based on ${playlist.playlist.name}", android.widget.Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    size = 48.dp,
+                ) {
+                    Icon(
+                        painter = painterResource(R.drawable.radio),
+                        contentDescription = "Song Radio",
                         modifier = Modifier.size(20.dp),
                     )
                 }

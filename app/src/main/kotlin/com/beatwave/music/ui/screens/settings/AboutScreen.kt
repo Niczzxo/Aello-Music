@@ -1,9 +1,14 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
 package com.beatwave.music.ui.screens.settings
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -17,6 +22,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.only
@@ -69,6 +75,7 @@ import com.beatwave.music.constants.DonationUpiId
 import com.beatwave.music.constants.DonationUpiUri
 import com.beatwave.music.R
 import com.beatwave.music.ui.component.IconButton
+import com.beatwave.music.ui.component.PulseWaveLogo
 import com.beatwave.music.ui.component.Material3SettingsGroup
 import com.beatwave.music.ui.component.Material3SettingsItem
 import com.beatwave.music.ui.utils.appTopBarWindowInsets
@@ -107,59 +114,45 @@ fun AboutScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp),
     ) {
-        // Header with Official BeatWave Logo
+        // Header with Official Pulse Wave Adobe-style Pw Logo
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 28.dp, bottom = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // BeatWave Logo with glowing ambient backdrop and elevated container
+            // Pulse Wave Logo with glowing ambient backdrop and modern squircle showcase
             Box(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.padding(bottom = 18.dp)
             ) {
-                // Ambient glow
+                // Radiant ambient aura
                 Box(
                     modifier = Modifier
-                        .size(104.dp)
+                        .size(120.dp)
                         .background(
                             brush = Brush.radialGradient(
                                 colors = listOf(
-                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.32f),
+                                    MaterialTheme.colorScheme.primary.copy(alpha = 0.45f),
                                     Color.Transparent
                                 )
                             ),
                             shape = CircleShape
                         )
                 )
-                // Elevated Logo Container
+                // Elevated Master Logo
                 Surface(
-                    shape = RoundedCornerShape(26.dp),
-                    color = MaterialTheme.colorScheme.surfaceContainerHigh.copy(alpha = 0.7f),
-                    border = BorderStroke(
-                        1.5.dp,
-                        MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.45f)
-                    ),
+                    shape = RoundedCornerShape(22.dp),
+                    color = Color.Transparent,
                     shadowElevation = 8.dp,
-                    modifier = Modifier.size(92.dp)
+                    modifier = Modifier.size(96.dp)
                 ) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.padding(14.dp)
-                    ) {
-                        Image(
-                            painter = painterResource(R.drawable.beatwave_logo),
-                            contentDescription = stringResource(R.string.wrapped_logo_content_description),
-                            modifier = Modifier.size(64.dp),
-                            contentScale = ContentScale.Fit
-                        )
-                    }
+                    PulseWaveLogo(size = 96.dp)
                 }
             }
 
             Text(
-                text = "Averon",
+                text = "Pulse Wave",
                 style = MaterialTheme.typography.displaySmall.copy(
                     fontFamily = rememberBrandFontFamily(),
                     fontWeight = FontWeight.Bold,
@@ -183,16 +176,33 @@ fun AboutScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 Image(
-                    painter = painterResource(R.drawable.beatwave_logo),
+                    painter = painterResource(R.drawable.pulsewave_notification),
                     contentDescription = null,
-                    modifier = Modifier.size(20.dp),
+                    modifier = Modifier.size(18.dp),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
                 )
+
+                var easterEggTaps by remember { mutableIntStateOf(0) }
+                var lastTapTime by remember { mutableLongStateOf(0L) }
 
                 Text(
                     text = "v${BuildConfig.VERSION_NAME} • ${stringResource(if (BuildConfig.IS_NIGHTLY) R.string.build_nightly else R.string.build_stable)}",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.clickable {
+                        val now = System.currentTimeMillis()
+                        if (now - lastTapTime < 800L) {
+                            easterEggTaps++
+                            if (easterEggTaps >= 7) {
+                                easterEggTaps = 0
+                                com.beatwave.music.utils.VinylScratchSynthesizer.playScratch(45f)
+                                android.widget.Toast.makeText(context, "🌟 PulseWave VIP Master Audio Mode Unlocked!", android.widget.Toast.LENGTH_LONG).show()
+                            }
+                        } else {
+                            easterEggTaps = 1
+                        }
+                        lastTapTime = now
+                    }
                 )
             }
         }
@@ -221,13 +231,31 @@ fun AboutScreen(
                     icon = painterResource(R.drawable.github),
                     title = { Text(stringResource(R.string.github_repository)) },
                     description = { Text(stringResource(R.string.view_source_code)) },
-                    onClick = { uriHandler.safeOpenUri(context, "https://github.com/Niczzxo/Averon") }
+                    onClick = { uriHandler.safeOpenUri(context, "https://github.com/BSFrameworks5253/Plusewave") }
+                ),
+                Material3SettingsItem(
+                    icon = painterResource(R.drawable.discord),
+                    title = { Text(stringResource(R.string.discord_channel)) },
+                    description = { Text(stringResource(R.string.join_discord)) },
+                    onClick = { uriHandler.safeOpenUri(context, "https://discord.gg/spbuDTePSR") }
                 )
             )
         )
 
         Spacer(modifier = Modifier.height(27.dp))
 
+        // Support Section
+        Material3SettingsGroup(
+            title = stringResource(R.string.support_section),
+            items = listOf(
+                Material3SettingsItem(
+                    icon = painterResource(R.drawable.favorite),
+                    title = { Text(stringResource(R.string.support_upi)) },
+                    description = { Text(DonationUpiId) },
+                    onClick = { uriHandler.safeOpenUri(context, DonationUpiUri) }
+                ),
+            )
+        )
         Spacer(modifier = Modifier.height(27.dp))
 
         // App Information Section
@@ -248,7 +276,7 @@ fun AboutScreen(
                     icon = painterResource(R.drawable.license_vivi),
                     title = { Text(stringResource(R.string.license)) },
                     description = { Text("GPL-3.0 • Free Open Source Software") },
-                    onClick = { uriHandler.safeOpenUri(context, "https://github.com/Niczzxo/Averon/blob/main/LICENSE") }
+                    onClick = { uriHandler.safeOpenUri(context, "https://www.gnu.org/licenses/gpl-3.0.html") }
                 ),
             )
         )

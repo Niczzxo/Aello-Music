@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -408,7 +408,7 @@ fun LyricsImageCard(
                         contentAlignment = Alignment.Center
                     ) {
                         Image(
-                            painter = painterResource(id = R.drawable.beatwave_logo),
+                            painter = painterResource(id = R.drawable.pulsewave_logo),
                             contentDescription = null,
                             modifier = Modifier
                                 .size(16.dp)

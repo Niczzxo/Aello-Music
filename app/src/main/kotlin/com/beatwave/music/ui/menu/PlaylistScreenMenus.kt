@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -89,6 +89,7 @@ fun LocalPlaylistMenu(
         )
     }
 
+    val isSyncablePlaylist = playlist.playlist.browseId != null || playlist.playlist.id.startsWith("SPOTIFY_PLAYLIST_")
     val isYouTubePlaylist = playlist.playlist.browseId != null
 
     val menuItems = buildList {
@@ -109,8 +110,8 @@ fun LocalPlaylistMenu(
             )
         )
 
-        // Show sync button only for YouTube playlists
-        if (isYouTubePlaylist) {
+        // Show sync button for YouTube and Spotify playlists
+        if (isSyncablePlaylist) {
             add(
                 Material3MenuItemData(
                     title = { Text(stringResource(R.string.action_sync)) },

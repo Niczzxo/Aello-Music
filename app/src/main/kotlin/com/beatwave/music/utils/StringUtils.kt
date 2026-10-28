@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -21,6 +21,24 @@ fun makeTimeString(duration: Long?): String {
         day > 0 -> "%d:%02d:%02d:%02d".format(day, hour, minute, sec)
         hour > 0 -> "%d:%02d:%02d".format(hour, minute, sec)
         else -> "%d:%02d".format(minute, sec)
+    }
+}
+
+fun formatListeningTime(durationMs: Long?): String {
+    if (durationMs == null || durationMs <= 0L) return "0s"
+    val totalSeconds = durationMs / 1000
+    val days = totalSeconds / 86400
+    val remainderDay = totalSeconds % 86400
+    val hours = remainderDay / 3600
+    val remainderHour = remainderDay % 3600
+    val minutes = remainderHour / 60
+    val seconds = remainderHour % 60
+
+    return when {
+        days > 0 -> if (hours > 0) "${days}d ${hours}h" else "${days}d"
+        hours > 0 -> if (minutes > 0) "${hours}h ${minutes}m" else "${hours}h"
+        minutes > 0 -> if (seconds > 0) "${minutes}m ${seconds}s" else "${minutes}m"
+        else -> "${seconds}s"
     }
 }
 

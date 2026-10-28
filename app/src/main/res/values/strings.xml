@@ -3,24 +3,12 @@
 <!-- Upstream InnerTune strings -->
 <!-- Do not add new features here -->
 <!-- Try to re-use strings here, but be careful on its usage e.g. verb vs noun -->
-<!-- "InnerTune" is replaced with "Averon" -->
+<!-- "InnerTune" is replaced with "Pulse Wave" -->
 <!-- Translators: Do not modify this file for translations, use InnerTune's Weblate instead. -->
 
 <resources>
     <!-- Bottom navigation -->
     <string name="home">Home</string>
-    <!-- Averon: video section + Home YouTube login card -->
-    <string name="video">Video</string>
-    <string name="video_search_hint">Search videos…</string>
-    <string name="video_now_playing">Now playing</string>
-    <string name="video_open_player">Open</string>
-    <string name="video_retry">Retry</string>
-    <string name="video_no_results">No videos found</string>
-    <string name="video_quality_auto">Auto</string>
-    <string name="video_background_note">Audio keeps playing in the background if you leave this screen or turn the screen off. Stop it from the notification.</string>
-    <string name="video_login_card_title">Log in to YouTube</string>
-    <string name="video_login_card_subtitle">Log in to see your personalised home, subscriptions and ad-free videos.</string>
-    <string name="video_login_button">Log in</string>
     <string name="music">Music</string>
     <string name="songs">Songs</string>
     <string name="artists">Artists</string>
@@ -39,6 +27,7 @@
     <string name="good_night">Good night</string>
     <string name="history">History</string>
     <string name="stats">Stats</string>
+    <string name="total_listening_time">Total Listening Time</string>
     <string name="mood_and_genres">Mood and Genres</string>
     <string name="account">Account</string>
     <string name="quick_picks">Quick picks</string>
@@ -48,6 +37,9 @@
     <string name="recently_played">Recently Played</string>
     <string name="recently_added">Recently Added</string>
     <string name="home_section_hero">Featured card</string>
+    <string name="home_section_spotify_discovery">Spotify Discovery</string>
+    <string name="spotify_discovery_title">Spotify Discovery</string>
+    <string name="spotify_discovery_subtitle">Trending charts and curated feeds</string>
     <string name="home_section_community">From the community</string>
     <string name="home_section_daily_discover">Daily discover</string>
     <string name="home_section_account_playlists">Your playlists</string>
@@ -458,7 +450,7 @@
     <string name="restore_failed">Failed to restore backup</string>
 
     <string name="discord_integration">Discord Integration</string>
-    <string name="discord_information">Averon uses the KizzyRPC library to set your Discord account\'s status. This involves using the Discord Gateway connection, which may be considered a violation of Discord\'s TOS. However, there are no known cases of user accounts being suspended for this reason. Use at your own risk.\n\Averon will only extract your token, and everything else is stored locally.</string>
+    <string name="discord_information">Pulse Wave uses the KizzyRPC library to set your Discord account\'s status. This involves using the Discord Gateway connection, which may be considered a violation of Discord\'s TOS. However, there are no known cases of user accounts being suspended for this reason. Use at your own risk.\n\Pulse Wave will only extract your token, and everything else is stored locally.</string>
     <string name="dismiss">Dismiss</string>
     <string name="options">Options</string>
     <string name="preview">Preview</string>
@@ -525,7 +517,7 @@
 
     <!-- App icon -->
     <string name="app_icon">App icon</string>
-    <string name="app_icon_desc">Pick the icon Averon shows on your home screen</string>
+    <string name="app_icon_desc">Pick the icon Pulse Wave shows on your home screen</string>
     <string name="app_icon_change_warning">The icon may take a few seconds to update, and some launchers drop the shortcut from your home screen until you re-add it.</string>
     <string name="app_icon_og">THE OG</string>
     <string name="app_icon_best">The Best One</string>
@@ -546,7 +538,7 @@
     <string name="preset_imported">Preset imported</string>
     <string name="preset_import_failed">That file is not a valid preset.</string>
     <string name="preset_import_too_large">That preset is too large to import.</string>
-    <string name="preset_import_newer_version">That preset was made with a newer version of Averon.</string>
+    <string name="preset_import_newer_version">That preset was made with a newer version of Pulse Wave.</string>
     <string name="preset_category_colors">Colors</string>
     <string name="preset_category_layout">Layout and sizing</string>
     <string name="preset_category_font">Fonts</string>
@@ -597,7 +589,7 @@
 
     <string name="media_import_too_large">That file is too large.</string>
     <string name="media_import_unsupported">Only PNG, JPEG, WebP and SVG images are supported.</string>
-    <string name="media_import_unsafe_svg">That SVG uses features Averon will not render.</string>
+    <string name="media_import_unsafe_svg">That SVG uses features Pulse Wave will not render.</string>
     <string name="media_import_corrupt">That image could not be read.</string>
     <string name="media_import_too_many_pixels">That image is too big to decode safely.</string>
     <string name="media_import_io">Could not read that file.</string>
@@ -609,7 +601,7 @@
     <string name="diy_rotation">Rotation</string>
     <string name="diy_size">Size</string>
     <string name="recommended_because_listened">Because you listened to</string>
-    <string name="beatwave_sync">Averon Sync</string>
+    <string name="beatwave_sync">Pulse Wave Sync</string>
     <string name="beatwave_sync_desc">Collaborative live rooms, shared playlists &amp; real-time chat with friends</string>
     <string name="share_sync_link">Share Sync Link</string>
     <string name="save_as_playlist">Save as Playlist</string>
@@ -617,6 +609,7 @@
     <string name="chat">Chat</string>
     <string name="send_message_hint">Type a message...</string>
     <string name="theme_presets">Theme Presets</string>
+    <string name="theme_preset_pulse_wave">Pulse Wave Obsidian</string>
     <string name="theme_preset_oled">Deep Midnight OLED</string>
     <string name="theme_preset_cyberpunk">Cyberpunk Neon</string>
     <string name="theme_preset_emerald">Emerald Frosted Glass</string>

@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -234,8 +234,8 @@ class WrappedManager(
                 30 -> "Monthly Wrapped"
                 60 -> "Past 2 Months"
                 90 -> "Past 3 Months"
-                365 -> "Averon ${WrappedConstants.YEAR}"
-                else -> "Averon ${WrappedConstants.YEAR}"
+                365 -> "Pulse Wave ${WrappedConstants.YEAR}"
+                else -> "Pulse Wave ${WrappedConstants.YEAR}"
             }
 
             _state.update {

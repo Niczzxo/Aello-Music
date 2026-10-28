@@ -1,5 +1,5 @@
 ﻿/**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 package com.beatwave.music.utils
@@ -12,7 +12,7 @@ import androidx.core.net.toUri
 /**
  * Hands a local file to whatever tag editor the user has installed.
  *
- * BeatWave does not write tags itself and this is not a step towards doing so: editing
+ * Pulse Wave does not write tags itself and this is not a step towards doing so: editing
  * ID3/Vorbis frames correctly across every container is a whole application's worth of
  * work, and several good ones already exist. This just opens the file in one.
  *

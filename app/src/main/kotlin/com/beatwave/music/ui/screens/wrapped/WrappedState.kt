@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -21,7 +21,7 @@ data class WrappedState(
     val uniqueArtistCount: Int = 0,
     val totalAlbums: Int = 0,
     val isDataReady: Boolean = false,
-    val periodTitle: String = "Averon Wrapped",
+    val periodTitle: String = "Pulse Wave Wrapped",
     val trackMap: Map<WrappedScreenType, String?> = emptyMap(),
     val playlistCreationState: PlaylistCreationState = PlaylistCreationState.Idle
 )

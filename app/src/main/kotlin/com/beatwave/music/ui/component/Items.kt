@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  * 
  * Optimized for minimal recomposition during navigation
@@ -48,7 +48,9 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.MutableState
@@ -64,6 +66,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
@@ -71,6 +75,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -927,6 +932,31 @@ private fun getAutoPlaylistIcon(name: String): Int = when {
 }
 
 @Composable
+private fun getAutoPlaylistGradient(name: String): Brush = when {
+    name == stringResource(R.string.liked) -> Brush.linearGradient(
+        colors = listOf(Color(0xFF450AF5), Color(0xFF8E8EE5))
+    )
+    name == stringResource(R.string.offline) -> Brush.linearGradient(
+        colors = listOf(Color(0xFF006450), Color(0xFF1DB954))
+    )
+    name == stringResource(R.string.cached_playlist) -> Brush.linearGradient(
+        colors = listOf(Color(0xFF1E3A8A), Color(0xFF3B82F6))
+    )
+    name == stringResource(R.string.uploaded_playlist) -> Brush.linearGradient(
+        colors = listOf(Color(0xFF7C3AED), Color(0xFFA78BFA))
+    )
+    name == stringResource(R.string.filter_local) -> Brush.linearGradient(
+        colors = listOf(Color(0xFFB45309), Color(0xFFF59E0B))
+    )
+    name.startsWith(stringResource(R.string.my_top)) -> Brush.linearGradient(
+        colors = listOf(Color(0xFFE11D48), Color(0xFFFB7185))
+    )
+    else -> Brush.linearGradient(
+        colors = listOf(Color(0xFF282828), Color(0xFF181818))
+    )
+}
+
+@Composable
 fun PlaylistListItem(
     playlist: Playlist,
     modifier: Modifier = Modifier,
@@ -1084,39 +1114,31 @@ fun PlaylistGridItem(
     },
     fillMaxWidth: Boolean = false,
     showIconOnly: Boolean = false,
+    onQuickPlay: (() -> Unit)? = null,
 ) = GridItem(
     title = {
         Text(
             text = playlist.playlist.name,
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
+            fontWeight = FontWeight.SemiBold,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.marqueeWhenVisible().fillMaxWidth()
         )
     },
     subtitle = {
-        val subtitle = if (autoPlaylist) {
-            ""
+        val count = if (playlist.songCount == 0 && playlist.playlist.remoteSongCount != null) {
+            playlist.playlist.remoteSongCount
         } else {
-            if (playlist.songCount == 0 && playlist.playlist.remoteSongCount != null) {
-                pluralStringResource(
-                    R.plurals.n_song,
-                    playlist.playlist.remoteSongCount,
-                    playlist.playlist.remoteSongCount
-                )
-            } else {
-                pluralStringResource(
-                    R.plurals.n_song,
-                    playlist.songCount,
-                    playlist.songCount
-                )
-            }
+            playlist.songCount
         }
+        val countStr = if (count != null && count > 0) {
+            " • $count ${if (count == 1) "song" else "songs"}"
+        } else ""
         Text(
-            text = subtitle,
+            text = "Playlist$countStr",
             style = MaterialTheme.typography.bodySmall,
-            color = AppleTokens.Metadata,
+            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
@@ -1124,48 +1146,126 @@ fun PlaylistGridItem(
     badges = badges,
     thumbnailContent = {
         val width = maxWidth
-        if (thumbnailOverrideUrl != null) {
-            AsyncImage(
-                model = thumbnailOverrideUrl,
-                contentDescription = null,
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxSize(),
-            )
-        } else if (showIconOnly) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(LocalContentColor.current.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(getAutoPlaylistIcon(playlist.playlist.name)),
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(8.dp))
+        ) {
+            if (thumbnailOverrideUrl != null) {
+                AsyncImage(
+                    model = thumbnailOverrideUrl,
                     contentDescription = null,
-                    modifier = Modifier.size(width / 3),
-                    tint = LocalContentColor.current.copy(alpha = 0.6f)
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier.fillMaxSize(),
                 )
-            }
-        } else {
-        PlaylistThumbnail(
-            thumbnails = playlist.thumbnails,
-            size = width,
-            placeHolder = {
+            } else if (autoPlaylist || showIconOnly) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(LocalContentColor.current.copy(alpha = 0.1f)),
+                        .background(getAutoPlaylistGradient(playlist.playlist.name)),
                     contentAlignment = Alignment.Center
                 ) {
+                    val iconRes = if (playlist.playlist.name == stringResource(R.string.liked)) {
+                        R.drawable.favorite
+                    } else {
+                        getAutoPlaylistIcon(playlist.playlist.name)
+                    }
                     Icon(
-                        painter = painterResource(getAutoPlaylistIcon(playlist.playlist.name)),
+                        painter = painterResource(iconRes),
                         contentDescription = null,
-                        tint = LocalContentColor.current.copy(alpha = 0.6f),
-                        modifier = Modifier.size(width / 2)
+                        modifier = Modifier.size(width * 0.42f),
+                        tint = Color.White
                     )
                 }
-            },
-            shape = ThumbnailRoundedShape
-        )
+            } else {
+                PlaylistThumbnail(
+                    thumbnails = playlist.thumbnails,
+                    size = width,
+                    placeHolder = {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    Brush.linearGradient(
+                                        listOf(Color(0xFF282828), Color(0xFF181818))
+                                    )
+                                )
+                                .blur(2.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.queue_music),
+                                contentDescription = null,
+                                tint = Color.White.copy(alpha = 0.5f),
+                                modifier = Modifier.size(width / 3)
+                            )
+                        }
+                    },
+                    shape = RoundedCornerShape(8.dp)
+                )
+            }
+
+            // Track count chip on top-start
+            val count = if (playlist.songCount == 0 && playlist.playlist.remoteSongCount != null) {
+                playlist.playlist.remoteSongCount
+            } else {
+                playlist.songCount
+            }
+            if (count != null && count > 0) {
+                Surface(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(6.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    color = Color.Black.copy(alpha = 0.65f),
+                    contentColor = Color.White
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 6.dp, vertical = 2.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.queue_music),
+                            contentDescription = null,
+                            modifier = Modifier.size(11.dp),
+                            tint = Color.White.copy(alpha = 0.85f)
+                        )
+                        Spacer(modifier = Modifier.width(3.dp))
+                        Text(
+                            text = "$count",
+                            style = MaterialTheme.typography.labelSmall,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                }
+            }
+
+            // Spotify floating play button badge at bottom right
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(8.dp)
+                    .size(36.dp)
+                    .shadow(elevation = 6.dp, shape = CircleShape)
+                    .background(Color(0xFF1DB954), shape = CircleShape)
+                    .then(
+                        if (onQuickPlay != null) {
+                            Modifier.clickable(
+                                onClick = onQuickPlay,
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = ripple(bounded = false, radius = 24.dp)
+                            )
+                        } else Modifier
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.play),
+                    contentDescription = "Quick Play",
+                    modifier = Modifier.size(17.dp),
+                    tint = Color(0xFF000000)
+                )
+            }
         }
     },
     fillMaxWidth = fillMaxWidth,

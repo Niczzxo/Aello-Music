@@ -19,31 +19,45 @@ import androidx.compose.ui.unit.sp
  * adaptive contrast helpers. Every screen references these instead of hardcoding values.
  */
 object AppleTokens {
-    // Accent
+    // Pulse Wave Signatures & Accents (Professional, non-bluish palette)
+    val PulseElectric = Color(0xFF8B5CF6) // Signature Electric Violet
+    val PulseCyan = Color(0xFF00E5FF)
+    val PulseViolet = Color(0xFF8B5CF6)
+    val PulseMagenta = Color(0xFFE040FB)
     val AccentRed = Color(0xFFFA2D48)
+    val SpotifyGreen = Color(0xFF1DB954)
 
-    // Surfaces — Apple-style soft dark greys, not pure black (pure black stays an
-    // opt-in via the PureBlack setting for OLED). Monotonic elevation ladder.
-    val Bg = Color(0xFF121212)
-    val BgElevated = Color(0xFF1A1A1A)
-    val Card = Color(0xFF1C1C1E)
-    val CardSecondary = Color(0xFF2C2C2E)
+    // Surfaces — True luxury neutral obsidian dark tones (no unwanted bluish tint)
+    val Bg = Color(0xFF08080A)
+    val BgElevated = Color(0xFF111113)
+    val Card = Color(0xFF18181B)
+    val CardSecondary = Color(0xFF222226)
+
+    // Light Mode Surfaces — Clean, premium Apple Music snow/porcelain surfaces
+    val LightBg = Color(0xFFF8F9FA)
+    val LightBgElevated = Color(0xFFFFFFFF)
+    val LightCard = Color(0xFFFFFFFF)
+    val LightCardSecondary = Color(0xFFF1F5F9)
+    val LightMetadata = Color(0xFF64748B)
+    val LightGlassSurface = Color(0xE6FFFFFF)
+    val LightGlassBorder = Color(0x14000000)
+
+    // Apple Liquid Glass Design System
+    val GlassSurface = Color(0x1AFFFFFF)
+    val GlassSurfaceElevated = Color(0x28FFFFFF)
+    val GlassBorder = Color(0x26FFFFFF)
+    val GlassBorderSubtle = Color(0x14FFFFFF)
 
     /**
-     * Hairline rule on whatever surface the caller sits on. Derived from the
-     * content colour rather than fixed to white: a constant white rule is
-     * invisible on the light theme, and on an artwork-tinted screen it reads as
-     * a foreign line instead of one belonging to the surface.
+     * Hairline rule on whatever surface the caller sits on.
      */
     val divider: Color
-        @Composable get() = LocalContentColor.current.copy(alpha = 0.12f)
+        @Composable get() = LocalContentColor.current.copy(alpha = 0.08f)
 
     /**
-     * Metadata text — artist names, subtitles, durations. One step down from
-     * on-surface, never full white: the hierarchy on Home is carried by this
-     * contrast step rather than by size, since title and subtitle share a size.
+     * Metadata text — artist names, subtitles, durations. Crisp neutral contrast.
      */
-    val Metadata = Color(0xFF8E8E93)
+    val Metadata = Color(0xFF94A3B8)
 
     // Spacing — the whole scale. Screens reference these, never a dp literal.
 

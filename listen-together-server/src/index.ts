@@ -1,5 +1,5 @@
 /**
- * BeatWave Listen Together — Cloudflare Worker router.
+ * Pulse Wave Listen Together — Cloudflare Worker router.
  *
  * The Worker is stateless. Its only job is to turn a room code into the one
  * Durable Object that owns that room, and hand the socket over. Everything

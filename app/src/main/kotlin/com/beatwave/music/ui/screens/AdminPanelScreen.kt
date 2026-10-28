@@ -27,6 +27,7 @@ import com.beatwave.music.R
 import com.beatwave.music.SuggestionRow
 import com.beatwave.music.BugReportRow
 import com.beatwave.music.api.SupabaseService
+import com.beatwave.music.api.GitHubIssueService
 import com.beatwave.music.LocalDatabase
 import com.beatwave.music.constants.ShowWrappedCardKey
 import com.beatwave.music.constants.WrappedSeenKey
@@ -37,6 +38,8 @@ import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import com.beatwave.music.utils.dataStore
 import androidx.datastore.preferences.core.edit
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +50,7 @@ fun AdminPanelScreen(
     val context = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
     var selectedTab by remember { mutableStateOf(0) }
-    val tabs = listOf("Publish Update", "Publish News", "Test Wrapped", "Suggestions", "Bug Reports")
+    val tabs = listOf("Recommendations", "Issue Noting", "Publish Update", "Publish News", "Test Wrapped")
 
     Scaffold(
         topBar = {
@@ -84,11 +87,11 @@ fun AdminPanelScreen(
             val playerBottomPadding = LocalPlayerAwareWindowInsets.current.asPaddingValues().calculateBottomPadding()
             Box(modifier = Modifier.fillMaxSize()) {
                 when (selectedTab) {
-                    0 -> PublishUpdateTab(navController, playerBottomPadding)
-                    1 -> PublishNewsTab(navController, playerBottomPadding)
-                    2 -> TestWrappedTab(navController, playerBottomPadding)
-                    3 -> SuggestionsTab(playerBottomPadding)
-                    else -> BugReportsTab(playerBottomPadding)
+                    0 -> SuggestionsTab(playerBottomPadding)
+                    1 -> BugReportsTab(playerBottomPadding)
+                    2 -> PublishUpdateTab(navController, playerBottomPadding)
+                    3 -> PublishNewsTab(navController, playerBottomPadding)
+                    else -> TestWrappedTab(navController, playerBottomPadding)
                 }
             }
         }
@@ -255,6 +258,44 @@ fun SuggestionsTab(bottomPadding: androidx.compose.ui.unit.Dp = 0.dp) {
         }
     }
 
+    var showClearAllDialog by remember { mutableStateOf(false) }
+
+    if (showClearAllDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showClearAllDialog = false },
+            title = { Text("Purge All Suggestions?") },
+            text = { Text("This will permanently delete all user suggestions from the database. This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showClearAllDialog = false
+                        isFetching = true
+                        coroutineScope.launch(Dispatchers.IO) {
+                            val res = SupabaseService.clearAllSuggestions()
+                            withContext(Dispatchers.Main) {
+                                isFetching = false
+                                if (res.isSuccess) {
+                                    Toast.makeText(context, "All suggestions purged", Toast.LENGTH_SHORT).show()
+                                    refreshSuggestions()
+                                } else {
+                                    Toast.makeText(context, "Failed to purge suggestions: ${res.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Purge All")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearAllDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     if (isFetching) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
@@ -286,17 +327,36 @@ fun SuggestionsTab(bottomPadding: androidx.compose.ui.unit.Dp = 0.dp) {
                     }
                 )
 
-                LazyRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.fillMaxWidth()
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    items(statusOptions) { status ->
-                        val count = if (status == "All") suggestions.size else suggestions.count { it.status.equals(status, ignoreCase = true) }
-                        FilterChip(
-                            selected = selectedStatus == status,
-                            onClick = { selectedStatus = status },
-                            label = { Text("$status ($count)") }
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        items(statusOptions) { status ->
+                            val count = if (status == "All") suggestions.size else suggestions.count { it.status.equals(status, ignoreCase = true) }
+                            FilterChip(
+                                selected = selectedStatus == status,
+                                onClick = { selectedStatus = status },
+                                label = { Text("$status ($count)") }
+                            )
+                        }
+                    }
+                    Spacer(Modifier.width(8.dp))
+                    Button(
+                        onClick = { showClearAllDialog = true },
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
                         )
+                    ) {
+                        Icon(painterResource(R.drawable.delete), contentDescription = null, modifier = Modifier.size(16.dp))
+                        Spacer(Modifier.width(4.dp))
+                        Text("Purge")
                     }
                 }
             }
@@ -714,13 +774,64 @@ fun BugReportsTab(bottomPadding: androidx.compose.ui.unit.Dp = 0.dp) {
         }
     }
 
+    var showClearAllDialog by remember { mutableStateOf(false) }
+
+    if (showClearAllDialog) {
+        androidx.compose.material3.AlertDialog(
+            onDismissRequest = { showClearAllDialog = false },
+            title = { Text("Purge Bug Reports & Logs?") },
+            text = { Text("This will permanently delete all bug reports from the server and purge all local crash logs, dumps, and debug trace files. This action cannot be undone.") },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showClearAllDialog = false
+                        isFetching = true
+                        coroutineScope.launch(Dispatchers.IO) {
+                            val res = SupabaseService.clearAllBugReports()
+                            runCatching {
+                                java.io.File(context.filesDir, "latest_crash.txt").delete()
+                                context.cacheDir.listFiles { _, name ->
+                                    name.startsWith("pulsewave_crash_") ||
+                                    name.startsWith("beatwave_crash_") ||
+                                    name.startsWith("crash_") ||
+                                    name.endsWith(".log") ||
+                                    name.endsWith(".trace")
+                                }?.forEach { it.delete() }
+                                context.filesDir.listFiles { _, name ->
+                                    name.startsWith("pulsewave_crash_") ||
+                                    name.startsWith("beatwave_crash_") ||
+                                    name.startsWith("crash_") ||
+                                    name.endsWith(".log") ||
+                                    name.endsWith(".trace")
+                                }?.forEach { it.delete() }
+                            }
+                            withContext(Dispatchers.Main) {
+                                isFetching = false
+                                if (res.isSuccess) {
+                                    Toast.makeText(context, "Bug reports & crash logs purged", Toast.LENGTH_SHORT).show()
+                                    refreshBugReports()
+                                } else {
+                                    Toast.makeText(context, "Purged local logs. Server: ${res.exceptionOrNull()?.message}", Toast.LENGTH_LONG).show()
+                                }
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.error)
+                ) {
+                    Text("Purge All")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showClearAllDialog = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+
     if (isFetching) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             CircularProgressIndicator()
-        }
-    } else if (bugReports.isEmpty()) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Text("No bug reports submitted yet.", style = MaterialTheme.typography.bodyMedium)
         }
     } else {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -758,11 +869,51 @@ fun BugReportsTab(bottomPadding: androidx.compose.ui.unit.Dp = 0.dp) {
                         )
                     }
                 }
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    OutlinedButton(
+                        onClick = { GitHubIssueService.openIssuesPanel(context) },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.github),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text("GitHub Issues ↗")
+                    }
+
+                    Button(
+                        onClick = { showClearAllDialog = true },
+                        modifier = Modifier.weight(1f),
+                        shape = RoundedCornerShape(8.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
+                            contentColor = MaterialTheme.colorScheme.onErrorContainer
+                        )
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Delete,
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(8.dp))
+                        Text("Purge Reports & Logs")
+                    }
+                }
             }
 
             if (filteredBugReports.isEmpty()) {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                    Text("No bug reports match current filter.", style = MaterialTheme.typography.bodyMedium)
+                    Text(
+                        if (bugReports.isEmpty()) "No bug reports submitted yet." else "No bug reports match current filter.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             } else {
                 LazyColumn(
@@ -933,6 +1084,29 @@ fun BugReportItemCard(
                         colors = ButtonDefaults.textButtonColors(contentColor = Color(0xFFFF9800))
                     ) {
                         Text("Close")
+                    }
+
+                    val context = LocalContext.current
+                    TextButton(
+                        onClick = {
+                            GitHubIssueService.openPrefilledIssueInBrowser(
+                                context = context,
+                                title = item.description.lines().firstOrNull()?.take(60) ?: "Bug Report",
+                                description = item.description,
+                                reporterName = item.user_name,
+                                instaId = item.insta_id,
+                                deviceInfo = item.device_info,
+                                isBug = true
+                            )
+                        }
+                    ) {
+                        Icon(
+                            painter = painterResource(R.drawable.github),
+                            contentDescription = null,
+                            modifier = Modifier.size(16.dp)
+                        )
+                        Spacer(Modifier.width(4.dp))
+                        Text("GitHub")
                     }
                 }
             }
@@ -1125,7 +1299,7 @@ fun DjMashupStudioTab(bottomPadding: androidx.compose.ui.unit.Dp = 0.dp) {
     var keyMatchTolerance by remember { mutableStateOf("Harmonic Key (Camelot ±1)") }
 
     var isSimulating by remember { mutableStateOf(false) }
-    var simulatedCurrentTrack by remember { mutableStateOf("Track 1 - Line 1: 'Averon Harmonic'") }
+    var simulatedCurrentTrack by remember { mutableStateOf("Track 1 - Line 1: 'Pulse Wave Harmonic'") }
     var simulationBeatBpm by remember { mutableIntStateOf(128) }
 
     val coroutineScope = rememberCoroutineScope()

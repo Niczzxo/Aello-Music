@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -53,7 +53,8 @@ import java.util.zip.ZipOutputStream
  */
 object PresetStore {
 
-    const val FILE_EXTENSION = "beatwavepreset"
+    const val FILE_EXTENSION = "pulsewavepreset"
+    const val LEGACY_FILE_EXTENSION = "beatwavepreset"
     private const val MANIFEST = "manifest.json"
     private const val THUMB = "thumb.webp"
     private const val ASSETS = "assets"

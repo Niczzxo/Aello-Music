@@ -29,7 +29,7 @@ object SpotifyLikedSongsImporter {
 
     suspend fun importLikedSongs(
         context: Context,
-        database: MusicDatabase = InternalDatabase.newInstance(context),
+        database: MusicDatabase = MusicDatabase.newInstance(context),
         onProgress: ((done: Int, total: Int) -> Unit)? = null,
     ): Result<Int> = withContext(Dispatchers.IO) {
         runCatching {
@@ -52,8 +52,12 @@ object SpotifyLikedSongsImporter {
                 val page = Spotify.likedSongs(limit = limit, offset = offset).getOrThrow()
                 if (page.items.isEmpty()) break
                 allTracks.addAll(page.items.map { it.track })
-                offset += page.items.size
-                if (offset >= page.total || page.items.size < limit) break
+                offset += limit
+                if (page.total > 0) {
+                    if (offset >= page.total) break
+                } else {
+                    if (page.items.size < limit) break
+                }
             }
 
             val totalSongs = allTracks.size
@@ -123,13 +127,34 @@ object SpotifyLikedSongsImporter {
                     }
                 }
 
-                clearPlaylist(playlistId)
-                matchedMedia.forEachIndexed { index, metadata ->
+                val currentSongs = playlistSongs(playlistId).first()
+                val existingSongIds = currentSongs.map { it.map.songId }.toSet()
+                val existingSignatures = currentSongs.map {
+                    val cleanTitle = it.song.title.trim().lowercase()
+                        .replace(Regex("""\s*\(.*?\)\s*"""), " ")
+                        .replace(Regex("""\s*\[.*?\]\s*"""), " ")
+                        .trim()
+                    val cleanArtist = it.song.artists.firstOrNull()?.name?.trim()?.lowercase().orEmpty()
+                    "$cleanTitle###$cleanArtist"
+                }.toSet()
+
+                val newMedia = matchedMedia.filter { media ->
+                    val cleanTitle = media.title.trim().lowercase()
+                        .replace(Regex("""\s*\(.*?\)\s*"""), " ")
+                        .replace(Regex("""\s*\[.*?\]\s*"""), " ")
+                        .trim()
+                    val cleanArtist = media.artists.firstOrNull()?.name?.trim()?.lowercase().orEmpty()
+                    val sig = "$cleanTitle###$cleanArtist"
+                    media.id !in existingSongIds && sig !in existingSignatures
+                }
+
+                val maxPos = currentSongs.maxOfOrNull { it.map.position } ?: -1
+                newMedia.forEachIndexed { index, metadata ->
                     insert(
                         PlaylistSongMap(
                             playlistId = playlistId,
                             songId = metadata.id,
-                            position = index,
+                            position = maxPos + 1 + index,
                             setVideoId = metadata.setVideoId,
                         ),
                     )

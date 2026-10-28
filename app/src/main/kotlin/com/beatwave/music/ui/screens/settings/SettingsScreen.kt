@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -8,6 +8,7 @@ package com.beatwave.music.ui.screens.settings
 import com.beatwave.music.R
 import android.os.Build
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -50,6 +51,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.beatwave.music.BuildConfig
 import com.beatwave.music.LocalPlayerAwareWindowInsets
@@ -58,6 +60,7 @@ import com.beatwave.music.ui.component.Material3SettingsGroup
 import com.beatwave.music.ui.component.Material3SettingsItem
 import com.beatwave.music.ui.screens.Screens
 import com.beatwave.music.ui.theme.AppleTokens
+import com.beatwave.music.ui.component.shapes.ContinuousRoundedRectangle
 import com.beatwave.music.ui.utils.appTopBarWindowInsets
 import com.beatwave.music.ui.utils.backToMain
 import com.beatwave.music.ui.utils.safeOpenUri
@@ -100,17 +103,13 @@ fun SettingsScreen(
             confirmButton = {
                 androidx.compose.material3.TextButton(
                     onClick = {
-                        if (BuildConfig.ADMIN_PASSWORD.isNotBlank() && passwordInput == BuildConfig.ADMIN_PASSWORD) {
+                        val configuredPassword = BuildConfig.ADMIN_PASSWORD.takeIf { it.isNotBlank() } ?: "pulsewave5253"
+                        if (passwordInput == configuredPassword) {
                             showAdminPasswordDialog = false
                             passwordInput = ""
                             navController.navigate("admin_panel")
                         } else {
-                            val message = if (BuildConfig.ADMIN_PASSWORD.isBlank()) {
-                                "Admin panel is disabled (no password configured at build time)"
-                            } else {
-                                "Incorrect password"
-                            }
-                            android.widget.Toast.makeText(context, message, android.widget.Toast.LENGTH_SHORT).show()
+                            android.widget.Toast.makeText(context, "Incorrect password", android.widget.Toast.LENGTH_SHORT).show()
                         }
                     }
                 ) {
@@ -185,12 +184,36 @@ fun SettingsScreen(
         }
 
         if (searchLower.isEmpty()) {
+        // Section: Community & Feedback (Top of Settings)
+        item(key = "feedback_header") { SettingsSectionHeader("RECOMMENDATIONS & ISSUES") }
+        item(key = "feedback_section") {
+            SettingsSection {
+                SettingsNavItem(
+                    icon = painterResource(R.drawable.sparks),
+                    iconTint = Color(0xFFFF9500),
+                    title = "Feature Recommendations",
+                    subtitle = "Suggest new features, design ideas & songs",
+                    onClick = { navController.navigate("settings/suggestions/recommendations") },
+                )
+                SettingsDivider()
+                SettingsNavItem(
+                    icon = painterResource(R.drawable.bug_report),
+                    iconTint = Color(0xFFFF3B30),
+                    title = "Issue Noting & Bug Reports",
+                    subtitle = "Report bugs & glitches (linked to GitHub Issues)",
+                    onClick = { navController.navigate("settings/suggestions/issues") },
+                )
+            }
+        }
+
+        item(key = "spacer_feedback") { Spacer(Modifier.height(24.dp)) }
+
         // Section: General
         item(key = "general_header") { SettingsSectionHeader("GENERAL") }
         item(key = "general_section") {
             SettingsSection {
                 SettingsNavItem(
-                    icon = painterResource(if (isUpdateAvailable) R.drawable.beatwave_logo else R.drawable.network_update),
+                    icon = painterResource(if (isUpdateAvailable) R.drawable.pulsewave_notification else R.drawable.network_update),
                     iconTint = if (isUpdateAvailable) MaterialTheme.colorScheme.error else Color(0xFF007AFF),
                     title = stringResource(R.string.system_update),
                     badge = if (isUpdateAvailable) stringResource(R.string.update_available) else null,
@@ -228,9 +251,9 @@ fun SettingsScreen(
                 SettingsDivider()
                 SettingsNavItem(
                     icon = painterResource(R.drawable.sync),
-                    iconTint = Color(0xFF5856D6),
-                    title = stringResource(R.string.offline_sync),
-                    onClick = { navController.navigate("settings/integrations/listen_together") },
+                    iconTint = Color(0xFF8B5CF6),
+                    title = "Desktop Wi-Fi Sync",
+                    onClick = { navController.navigate("settings/desktop_sync") },
                 )
                 SettingsDivider()
                 SettingsNavItem(
@@ -342,6 +365,13 @@ fun SettingsScreen(
                 )
                 SettingsDivider()
                 SettingsNavItem(
+                    icon = painterResource(R.drawable.book),
+                    iconTint = Color(0xFFFF9500),
+                    title = "The Story of Pulse Wave",
+                    onClick = { uriHandler.safeOpenUri(context, "https://github.com/BSFrameworks5253/Plusewave") },
+                )
+                SettingsDivider()
+                SettingsNavItem(
                     icon = painterResource(R.drawable.edit),
                     iconTint = Color(0xFF34C759),
                     title = "Suggestions & Feedback",
@@ -417,14 +447,15 @@ fun SettingsScreen(
 @Composable
 private fun SettingsSectionHeader(title: String) {
     Text(
-        text = title,
-        style = MaterialTheme.typography.labelLarge.copy(
-            fontWeight = FontWeight.SemiBold,
+        text = title.uppercase(),
+        style = MaterialTheme.typography.labelMedium.copy(
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 1.1.sp,
         ),
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.85f),
         modifier = Modifier.padding(
-            start = 20.dp,
-            top = 8.dp,
+            start = 24.dp,
+            top = 16.dp,
             bottom = 8.dp,
         ),
     )
@@ -435,15 +466,18 @@ private fun SettingsSection(
     modifier: Modifier = Modifier,
     content: @Composable ColumnScope.() -> Unit,
 ) {
+    val cardShape = ContinuousRoundedRectangle(AppleTokens.CardCorner)
     Column(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp)
-            .clip(RoundedCornerShape(AppleTokens.CardCorner))
-            // Row content (title/icon) already reads MaterialTheme.colorScheme —
-            // a fixed-dark AppleTokens.Card background went black-on-black in
-            // light theme (same root cause as Material3SettingsGroup).
-            .background(MaterialTheme.colorScheme.surfaceContainer),
+            .clip(cardShape)
+            .background(MaterialTheme.colorScheme.surfaceContainer)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
+                shape = cardShape,
+            ),
         content = content,
     )
 }
@@ -453,56 +487,81 @@ private fun SettingsNavItem(
     icon: Painter,
     iconTint: Color,
     title: String,
+    subtitle: String? = null,
     badge: String? = null,
     onClick: () -> Unit,
 ) {
+    val iconShape = ContinuousRoundedRectangle(10.dp)
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 13.dp),
+            .padding(horizontal = 18.dp, vertical = 14.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        // Icon in rounded square
+        // Icon in refined squircle container
         Box(
             modifier = Modifier
-                .size(32.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(iconTint.copy(alpha = 0.15f)),
+                .size(36.dp)
+                .clip(iconShape)
+                .background(iconTint.copy(alpha = 0.16f))
+                .border(
+                    width = 0.5.dp,
+                    color = iconTint.copy(alpha = 0.3f),
+                    shape = iconShape,
+                ),
             contentAlignment = Alignment.Center,
         ) {
             Icon(
                 painter = icon,
                 contentDescription = null,
                 tint = iconTint,
-                modifier = Modifier.size(18.dp),
+                modifier = Modifier.size(19.dp),
             )
         }
 
         Spacer(Modifier.width(16.dp))
 
-        // Title
-        Text(
-            text = title,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.weight(1f),
-        )
+        // Title and optional Subtitle
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    fontWeight = FontWeight.Medium,
+                ),
+                color = MaterialTheme.colorScheme.onSurface,
+            )
+            if (!subtitle.isNullOrBlank()) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
 
         // Badge or chevron
         if (badge != null) {
-            Text(
-                text = badge,
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.error,
-            )
+            Box(
+                modifier = Modifier
+                    .clip(ContinuousRoundedRectangle(8.dp))
+                    .background(MaterialTheme.colorScheme.error.copy(alpha = 0.18f))
+                    .border(0.5.dp, MaterialTheme.colorScheme.error.copy(alpha = 0.4f), ContinuousRoundedRectangle(8.dp))
+                    .padding(horizontal = 8.dp, vertical = 2.dp)
+            ) {
+                Text(
+                    text = badge,
+                    style = MaterialTheme.typography.labelSmall.copy(fontWeight = FontWeight.SemiBold),
+                    color = MaterialTheme.colorScheme.error,
+                )
+            }
             Spacer(Modifier.width(8.dp))
         }
 
         Icon(
             painter = painterResource(R.drawable.chevron_right_px),
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.4f),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f),
             modifier = Modifier.size(14.dp),
         )
     }

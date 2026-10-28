@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -21,8 +21,8 @@ class LocalSocketTransport(
     private val onConnectionStateChanged: (ConnectionState) -> Unit,
     private val onLog: (String) -> Unit
 ) {
-    private val serviceType = "_beatwave-sync._tcp"
-    private val serviceName = "AveronOffline"
+    private val serviceType = "_pulsewave-sync._tcp"
+    private val serviceName = "PulseWaveOffline"
     private val port = 8282
 
     private var serverSocket: ServerSocket? = null

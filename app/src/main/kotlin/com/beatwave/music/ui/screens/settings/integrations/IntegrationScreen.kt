@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -71,6 +71,13 @@ fun IntegrationScreen(
                     title = { Text(stringResource(R.string.discord_integration)) },
                     onClick = {
                         navController.navigate("settings/integrations/discord")
+                    }
+                ),
+                IntegrationCardItem(
+                    icon = painterResource(R.drawable.sync),
+                    title = { Text("Desktop Wi-Fi Sync") },
+                    onClick = {
+                        navController.navigate("settings/desktop_sync")
                     }
                 ),
                 IntegrationCardItem(

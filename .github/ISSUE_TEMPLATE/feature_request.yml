@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         ### 💡 Feature Proposal
-        Help us make BeatWave even more awesome.
+        Help us make Pulse Wave even more awesome.
 
   - type: dropdown
     id: category

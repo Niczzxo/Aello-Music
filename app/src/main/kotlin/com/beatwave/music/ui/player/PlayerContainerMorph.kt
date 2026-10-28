@@ -1,5 +1,5 @@
-﻿/**
- * BeatWave Project (C) 2026
+/**
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 package com.beatwave.music.ui.player
@@ -42,7 +42,12 @@ internal val miniPlayerContainerRect: Rect? get() = miniContainerRect.value
  * pill's bounds and changes nothing about how the pill renders.
  */
 fun Modifier.registerMiniContainerRect(): Modifier = onGloballyPositioned {
-    if (it.isAttached) miniContainerRect.value = it.boundsInRoot()
+    if (it.isAttached) {
+        val bounds = it.boundsInRoot()
+        if (miniContainerRect.value != bounds) {
+            miniContainerRect.value = bounds
+        }
+    }
 }
 
 /** The mini player's recording fades out across the first quarter of the flight. */

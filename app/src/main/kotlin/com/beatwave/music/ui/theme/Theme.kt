@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -7,6 +7,8 @@ package com.beatwave.music.ui.theme
 
 import android.graphics.Bitmap
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -28,7 +30,7 @@ import com.materialkolor.dynamiccolor.ColorSpec
 import com.materialkolor.rememberDynamicColorScheme
 import com.materialkolor.score.Score
 
-val DefaultThemeColor = Color(0xFFFB2831)
+val DefaultThemeColor = AppleTokens.PulseElectric
 
 /**
  * The user's chosen accent color, provided app-wide. ONLY the nav bar uses this
@@ -72,22 +74,48 @@ fun vivimusicTheme(
         seedColor = themeColor,
         isDark = darkTheme,
         specVersion = ColorSpec.SpecVersion.SPEC_2025,
-        style = PaletteStyle.TonalSpot,
+        style = PaletteStyle.Neutral,
     )
 
     val (appTextColorInt) = rememberPreference(AppTextColorKey, defaultValue = 0)
 
-    val colorScheme = remember(baseColorScheme, pureBlack, darkTheme, themeColor, appTextColorInt) {
-        val withApple = if (darkTheme) baseColorScheme.appleSurfaces() else baseColorScheme
+    val targetColorScheme = remember(baseColorScheme, pureBlack, darkTheme, themeColor, appTextColorInt) {
+        val withApple = if (darkTheme) baseColorScheme.appleSurfaces() else baseColorScheme.appleLightSurfaces()
         val withBlack = if (darkTheme && pureBlack) withApple.pureBlack(true) else withApple
         val withAccentText = withBlack.accentText(themeColor, darkTheme)
-        // Theme screen's explicit text color, when set, replaces the accent-tinted
-        // text roles everywhere they're read from MaterialTheme.colorScheme — this
-        // is the single root override every screen's default Text() picks up, same
-        // mechanism accentText itself uses. Fill/control roles (primary, onPrimary)
-        // are left alone; only text roles change.
         if (appTextColorInt != 0) withAccentText.flatText(Color(appTextColorInt)) else withAccentText
     }
+
+    val themeSpring = spring<Color>(dampingRatio = 0.85f, stiffness = 300f)
+    val animatedBg by animateColorAsState(targetColorScheme.background, animationSpec = themeSpring, label = "themeBg")
+    val animatedSurface by animateColorAsState(targetColorScheme.surface, animationSpec = themeSpring, label = "themeSurface")
+    val animatedScLowest by animateColorAsState(targetColorScheme.surfaceContainerLowest, animationSpec = themeSpring, label = "themeScLowest")
+    val animatedScLow by animateColorAsState(targetColorScheme.surfaceContainerLow, animationSpec = themeSpring, label = "themeScLow")
+    val animatedSc by animateColorAsState(targetColorScheme.surfaceContainer, animationSpec = themeSpring, label = "themeSc")
+    val animatedScHigh by animateColorAsState(targetColorScheme.surfaceContainerHigh, animationSpec = themeSpring, label = "themeScHigh")
+    val animatedScHighest by animateColorAsState(targetColorScheme.surfaceContainerHighest, animationSpec = themeSpring, label = "themeScHighest")
+    val animatedSurfaceVar by animateColorAsState(targetColorScheme.surfaceVariant, animationSpec = themeSpring, label = "themeSurfaceVar")
+    val animatedOnBg by animateColorAsState(targetColorScheme.onBackground, animationSpec = themeSpring, label = "themeOnBg")
+    val animatedOnSurface by animateColorAsState(targetColorScheme.onSurface, animationSpec = themeSpring, label = "themeOnSurface")
+    val animatedOnSurfaceVar by animateColorAsState(targetColorScheme.onSurfaceVariant, animationSpec = themeSpring, label = "themeOnSurfaceVar")
+    val animatedOutline by animateColorAsState(targetColorScheme.outline, animationSpec = themeSpring, label = "themeOutline")
+    val animatedOutlineVar by animateColorAsState(targetColorScheme.outlineVariant, animationSpec = themeSpring, label = "themeOutlineVar")
+
+    val colorScheme = targetColorScheme.copy(
+        background = animatedBg,
+        surface = animatedSurface,
+        surfaceContainerLowest = animatedScLowest,
+        surfaceContainerLow = animatedScLow,
+        surfaceContainer = animatedSc,
+        surfaceContainerHigh = animatedScHigh,
+        surfaceContainerHighest = animatedScHighest,
+        surfaceVariant = animatedSurfaceVar,
+        onBackground = animatedOnBg,
+        onSurface = animatedOnSurface,
+        onSurfaceVariant = animatedOnSurfaceVar,
+        outline = animatedOutline,
+        outlineVariant = animatedOutlineVar,
+    )
 
     val (selectedFont) = rememberPreference(SelectedFontKey, defaultValue = AppFont.SYSTEM.value)
     val customFont = rememberCustomFontFamily()
@@ -251,49 +279,55 @@ fun ColorScheme.appleSurfaces() = copy(
     surfaceContainerHigh = AppleTokens.Card,
     surfaceContainerHighest = AppleTokens.CardSecondary,
     surfaceVariant = AppleTokens.CardSecondary,
-    // primary/onPrimary set here are only a base — accentText runs afterwards and
-    // gives them the contrast-clamped accent, so controls and link text carry the
-    // theme colour rather than rendering flat white.
-    primary = Color.White,
-    onPrimary = Color.Black,
+    primary = AppleTokens.PulseElectric,
+    onPrimary = Color.White,
     primaryContainer = AppleTokens.CardSecondary,
     onPrimaryContainer = Color.White,
+    outline = Color.White.copy(alpha = 0.16f),
+    outlineVariant = Color.White.copy(alpha = 0.08f),
 )
 
 /**
- * Swaps Material's neutral text roles for accent-contrast ones, so every screen
- * picks it up from `MaterialTheme.colorScheme` without being edited.
- *
- * Body text keeps only a whisper of the accent — it has to stay readable over
- * long lists — while secondary text carries it plainly, which is what replaces
- * M3's washed-out grey. Tune the two lerp amounts to taste; they are the whole
- * calibration.
+ * Apple-light surface overrides applied in light mode.
+ * Clean, luminous porcelain and snow-white surfaces with crisp slate outlines.
+ */
+fun ColorScheme.appleLightSurfaces() = copy(
+    background = AppleTokens.LightBg,
+    surface = AppleTokens.LightBg,
+    surfaceContainerLowest = AppleTokens.LightBg,
+    surfaceContainerLow = AppleTokens.LightBgElevated,
+    surfaceContainer = AppleTokens.LightCard,
+    surfaceContainerHigh = AppleTokens.LightCard,
+    surfaceContainerHighest = AppleTokens.LightCardSecondary,
+    surfaceVariant = AppleTokens.LightCardSecondary,
+    primary = AppleTokens.PulseElectric,
+    onPrimary = Color.White,
+    primaryContainer = AppleTokens.LightCardSecondary,
+    onPrimaryContainer = Color(0xFF0F172A),
+    outline = Color.Black.copy(alpha = 0.12f),
+    outlineVariant = Color.Black.copy(alpha = 0.06f),
+)
+
+/**
+ * Standardizes text roles for high readability and crisp contrast.
+ * Primary text is clear crisp white/slate, subtitles and metadata are clean
+ * neutral slate (AppleTokens.Metadata), and controls/highlights adopt the theme accent.
  */
 fun ColorScheme.accentText(accent: Color, dark: Boolean): ColorScheme {
-    val body = if (dark) {
-        androidx.compose.ui.graphics.lerp(accent, Color.White, 0.86f)
-    } else {
-        androidx.compose.ui.graphics.lerp(accent, Color.Black, 0.86f)
-    }
-    val secondary = accentTextColor(accent, dark)
+    val body = if (dark) Color(0xFFF8FAFC) else Color(0xFF0F172A)
+    val secondary = if (dark) AppleTokens.Metadata else Color(0xFF64748B)
     return copy(
         onSurface = body,
         onBackground = body,
         onSurfaceVariant = secondary,
         onSecondaryContainer = secondary,
         onTertiaryContainer = secondary,
-        onPrimaryContainer = secondary,
-        onSecondary = secondary,
-        // The subtitle role: the artist name under a song or album title reads
-        // through this everywhere in the app.
+        onPrimaryContainer = if (dark) Color(0xFF0A0B10) else Color.White,
+        onSecondary = if (dark) Color(0xFF0A0B10) else Color.White,
         secondary = secondary,
-        // `primary` is the app's second-largest text/icon role after
-        // onSurfaceVariant — links, selected states, section actions. appleSurfaces
-        // had pinned it to flat white in dark mode, which is most of what still
-        // read as untinted Material. It doubles as a fill (buttons, sliders), so
-        // onPrimary flips to the opposite extreme to keep those legible.
-        primary = secondary,
-        onPrimary = if (dark) Color.Black else Color.White,
+        primary = accent,
+        onPrimary = if (accent.luminance() > 0.45f) Color(0xFF0A0B10) else Color.White,
+        outlineVariant = if (dark) Color.White.copy(alpha = 0.08f) else Color.Black.copy(alpha = 0.08f),
     )
 }
 

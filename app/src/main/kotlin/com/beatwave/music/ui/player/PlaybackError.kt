@@ -1,5 +1,5 @@
 /**
- * Averon Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -77,7 +77,7 @@ fun PlaybackError(
     // report is diagnosable without a follow-up round trip.
     val copyDetails = remember(error, rawErrorMessage) {
         buildString {
-            appendLine("Averon playback error")
+            appendLine("Pulse Wave playback error")
             appendLine("code: ${getErrorCodeName(error.errorCode)} (${error.errorCode})")
             httpStatus?.let { appendLine("http: $it") }
             appendLine("detail: $rawErrorMessage")

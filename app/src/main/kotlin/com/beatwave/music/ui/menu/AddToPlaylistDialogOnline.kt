@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -208,6 +208,7 @@ fun AddToPlaylistDialogOnline(
                             onSortDescendingChange = onSortDescendingChange,
                             sortTypeText = { sortType ->
                                 when (sortType) {
+                                    PlaylistSortType.CUSTOM -> R.string.sort_by_custom
                                     PlaylistSortType.CREATE_DATE -> R.string.sort_by_create_date
                                     PlaylistSortType.NAME -> R.string.sort_by_name
                                     PlaylistSortType.SONG_COUNT -> R.string.sort_by_song_count

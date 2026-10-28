@@ -1,5 +1,5 @@
 /**
- * BeatWave Project (C) 2026
+ * Pulse Wave Project (C) 2026
  * Licensed under GPL-3.0 | See git history for contributors
  */
 
@@ -108,7 +108,7 @@ fun WrappedIntro(onNext: () -> Unit) {
                         slideInVertically(animationSpec = tween(SLIDE_IN_DURATION, delayMillis = ICON_DELAY))
             ) {
                 Image(
-                    painter = painterResource(id = R.drawable.beatwave_logo),
+                    painter = painterResource(id = R.drawable.pulsewave_logo),
                     contentDescription = stringResource(id = R.string.wrapped_logo_content_description),
                     modifier = Modifier
                         .size(100.dp)
@@ -118,7 +118,7 @@ fun WrappedIntro(onNext: () -> Unit) {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // BeatWave Title with Layered Effect
+            // Pulse Wave Title with Layered Effect
             val manager = com.beatwave.music.ui.screens.wrapped.LocalWrappedManager.current
             val periodTitle = manager?.state?.collectAsState()?.value?.periodTitle ?: stringResource(id = R.string.wrapped_intro_title)
 
