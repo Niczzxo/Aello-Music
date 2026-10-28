@@ -14,6 +14,8 @@ jobs:
         run: |
           gh release download source-drop -p averon-source.zip --repo ${{ github.repository }}
           unzip -o -q averon-source.zip
+          # Clean replacement: remove Averon-only files that the new tree does not contain, so the overlay leaves no stale code or branding behind.
+          rm -f .codegraph/.gitignore app/src/main/kotlin/com/beatwave/music/playback/VideoPlaybackService.kt app/src/main/kotlin/com/beatwave/music/ui/screens/video/VideoPlayerScreen.kt app/src/main/kotlin/com/beatwave/music/ui/screens/video/VideoScreen.kt app/src/main/res/drawable-nodpi/beatwave_logo.png app/src/main/res/drawable/beatwave_logo.png app/src/main/res/drawable/beatwave_notification.xml app/src/main/res/drawable/ic_launcher_mono.png innertube/src/main/kotlin/com/music/innertube/pages/VideoSearch.kt
           cp -a averon-push/. .
           rm -rf averon-push averon-source.zip
       - name: Commit full tree
@@ -21,5 +23,5 @@ jobs:
           git config user.name "Averon Bot"
           git config user.email "averon-bot@users.noreply.github.com"
           git add -A
-          git commit -m "Averon — complete source"
+          git commit -m "Complete source upload"
           git push
