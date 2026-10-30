@@ -1,7 +1,7 @@
 [package]
 name = "aello"
-version = "0.1.0"
-description = "Aello for Windows — desktop music player (v0.1.0 milestone: shell + local files + InnerTube streaming)"
+version = "6.1.45"
+description = "Aello for Windows — desktop music player (v6.1.45: professional desktop UI + full Android feature parity; unified version with Android)"
 authors = ["Niczzxo"]
 edition = "2021"
 
@@ -28,3 +28,12 @@ reqwest = { version = "0.12", default-features = false, features = ["json", "rus
 tokio = { version = "1", features = ["full"] }
 url = "2"
 regex = "1"
+# base64 for the get_transcript params (base64("\n\x0b" + videoId)).
+base64 = "0.22"
+
+# SMTC (Windows only): the `windows` crate is NOT in the Linux build at
+# all — target-specific so `cargo check` on Linux still passes. Version
+# 0.62 matches the copy already in Cargo.lock (transitive via Tauri);
+# the contract's 0.58 is superseded by the locked version.
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = ["Media", "Foundation", "Storage_Streams", "Win32_Foundation"] }
