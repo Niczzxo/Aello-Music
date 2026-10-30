@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en" data-accent="aello-red" data-appearance="system">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aello</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<p id="bridge-notice" class="bridge-notice" hidden>
+  Preview mode: this page is running in a plain browser, so the desktop
+  bridge is unavailable. The interface works, but no music can load until
+  it runs inside the Aello desktop app.
+</p>
+
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">A</span>
+      <div class="brand-text">
+        <strong>Aello</strong>
+        <small>Sound in Motion</small>
+      </div>
+    </div>
+    <nav class="nav" aria-label="Sections">
+      <button class="nav-item active" type="button" data-view="home">Music</button>
+      <button class="nav-item" type="button" data-view="library">Library</button>
+      <button class="nav-item" type="button" data-view="settings">Settings</button>
+    </nav>
+    <div class="sidebar-foot">
+      <button class="nav-item" type="button" data-view="about">About</button>
+    </div>
+  </aside>
+
+  <main class="content">
+    <header class="topbar">
+      <input id="search-input" type="search" placeholder="Search songs, albums, playlists" aria-label="Search">
+      <button id="search-btn" type="button">Search</button>
+      <span id="account-state" class="account-state">Not signed in</span>
+    </header>
+
+    <section id="view-home" class="view" aria-label="Music">
+      <h1>Music</h1>
+      <p id="home-status" class="status" role="status">Loading…</p>
+      <div id="home-sections"></div>
+    </section>
+
+    <section id="view-library" class="view" hidden aria-label="Library">
+      <h1>Library</h1>
+      <div class="segments" role="group" aria-label="Library segments">
+        <button type="button" class="segment active" data-segment="playlists">Playlists</button>
+        <button type="button" class="segment" data-segment="albums">Albums</button>
+        <button type="button" class="segment" data-segment="artists">Artists</button>
+        <button type="button" class="segment" data-segment="songs">Songs</button>
+        <button type="button" class="segment" data-segment="downloads">Downloads</button>
+      </div>
+      <div class="library-toolbar">
+        <button id="library-open-files" type="button">Open audio files…</button>
+        <span class="muted">Local files play from this computer and last for this session only.</span>
+      </div>
+      <div id="library-list"></div>
+    </section>
+
+    <section id="view-settings" class="view" hidden aria-label="Settings">
+      <h1>Settings</h1>
+      <form id="settings-form">
+        <fieldset>
+          <legend>Accent color</legend>
+          <label><input type="radio" name="accent" value="aello-red" checked> Aello Red (default)</label>
+          <label><input type="radio" name="accent" value="violet"> Violet</label>
+          <label><input type="radio" name="accent" value="teal"> Teal</label>
+          <label><input type="radio" name="accent" value="amber"> Amber</label>
+        </fieldset>
+        <fieldset>
+          <legend>Appearance</legend>
+          <label>Theme
+            <select id="setting-appearance" name="appearance">
+              <option value="system" selected>System</option>
+              <option value="dark">Dark</option>
+              <option value="light">Light</option>
+            </select>
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Playback</legend>
+          <label>Volume
+            <input id="setting-volume" type="range" min="0" max="1" step="0.01" value="0.8">
+          </label>
+          <label><input id="setting-updates" type="checkbox" checked> Check for updates on startup (planned — no updater yet)</label>
+        </fieldset>
+        <p class="status" id="settings-status" role="status"></p>
+        <p class="muted">Download folder (planned): <span id="download-dir-display">Loading…</span></p>
+        <button type="submit">Save settings</button>
+      </form>
+    </section>
+
+    <section id="view-player" class="view" hidden aria-label="Now playing">
+      <button type="button" class="back-btn" data-view="home">← Back</button>
+      <div class="full-player">
+        <div id="fp-artwork" class="fp-artwork" aria-hidden="true">A</div>
+        <h2 id="fp-title">Nothing playing</h2>
+        <p id="fp-artist" class="muted">Pick a song to start listening.</p>
+        <input id="fp-progress" type="range" min="0" max="100" step="0.1" value="0" aria-label="Seek">
+        <p class="muted"><span id="fp-current-time">0:00</span> / <span id="fp-duration">0:00</span></p>
+        <div class="fp-controls">
+          <button id="fp-prev" type="button">Previous</button>
+          <button id="fp-play" type="button">Play</button>
+          <button id="fp-next" type="button">Next</button>
+          <button id="fp-mute" type="button">Mute</button>
+        </div>
+        <h3>Queue</h3>
+        <ul id="fp-queue" class="queue"></ul>
+        <h3>Lyrics</h3>
+        <p class="muted">Synced lyrics are planned for a later phase and are not available in v0.1.0.</p>
+      </div>
+    </section>
+
+    <section id="view-about" class="view" hidden aria-label="About">
+      <h1>About Aello</h1>
+      <p><strong>Aello</strong> — Sound in Motion.</p>
+      <p>Version 0.1.0 · Windows desktop (unsigned preview build).</p>
+      <p>Developer: Niczzxo</p>
+      <p>
+        Aello is open-source software under the GPL-3.0 license, based on the
+        open-source BeatWave and PulseWave projects. This Windows version is
+        a fresh implementation for desktop; it is not affiliated with
+        YouTube, Google, or Spotify.
+      </p>
+      <p class="muted">
+        No account is signed in. Account sign-in, downloads, lyrics, the
+        equalizer, Listen Together, and Cast are planned for later phases.
+      </p>
+    </section>
+  </main>
+
+  <footer class="player-bar">
+    <div class="pb-track">
+      <span id="pb-artwork" class="pb-artwork" aria-hidden="true">A</span>
+      <div class="pb-meta">
+        <strong id="pb-title">Nothing playing</strong>
+        <small id="pb-artist" class="muted">—</small>
+      </div>
+    </div>
+    <div class="pb-controls">
+      <button id="pb-prev" type="button" aria-label="Previous">⏮</button>
+      <button id="pb-play" type="button" aria-label="Play or pause">▶</button>
+      <button id="pb-next" type="button" aria-label="Next">⏭</button>
+      <span id="pb-current-time">0:00</span>
+      <input id="pb-progress" type="range" min="0" max="100" step="0.1" value="0" aria-label="Seek">
+      <span id="pb-duration">0:00</span>
+    </div>
+    <div class="pb-side">
+      <button id="pb-mute" type="button" aria-label="Mute or unmute">🔊</button>
+      <button id="pb-open-files" type="button">Open files</button>
+      <label>Volume <input id="pb-volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume"></label>
+      <button id="pb-expand" type="button" data-view="player">Full player</button>
+    </div>
+    <p id="pb-status" class="pb-status" role="status"></p>
+  </footer>
+</div>
+
+<audio id="audio" preload="metadata"></audio>
+
+<script src="js/api.js"></script>
+<script src="js/player.js"></script>
+<script src="js/views.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

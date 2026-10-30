@@ -1,0 +1,14 @@
+# Rust / Tauri build outputs
+/src-tauri/target/
+/src-tauri/gen/
+
+# Tauri CLI artifacts
+/src-tauri/WixTools/
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*~

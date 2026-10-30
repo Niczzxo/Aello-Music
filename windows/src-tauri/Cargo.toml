@@ -1,0 +1,30 @@
+[package]
+name = "aello"
+version = "0.1.0"
+description = "Aello for Windows — desktop music player (v0.1.0 milestone: shell + local files + InnerTube streaming)"
+authors = ["Niczzxo"]
+edition = "2021"
+
+# Windows builds run on GitHub Actions (windows-latest); see
+# .github/workflows/windows.yml. Local `cargo check` on Linux validates
+# the Rust code (Tauri itself is cross-platform); the NSIS bundle is
+# Windows-only and is produced by the Actions runner.
+
+[lib]
+name = "aello_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+# InnerTube client (Phase 3): pure-Rust HTTPS via rustls so the Windows
+# build needs no OpenSSL. tokio full: the Tauri runtime already uses it.
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+tokio = { version = "1", features = ["full"] }
+url = "2"
+regex = "1"
