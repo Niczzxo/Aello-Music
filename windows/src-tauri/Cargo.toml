@@ -35,5 +35,8 @@ base64 = "0.22"
 # all — target-specific so `cargo check` on Linux still passes. Version
 # 0.62 matches the copy already in Cargo.lock (transitive via Tauri);
 # the contract's 0.58 is superseded by the locked version.
+# `Win32_System_WinRT` is needed for the shipped
+# `ISystemMediaTransportControlsInterop` used by smtc.rs (the Win32 way
+# to get an SMTC instance for a window).
 [target.'cfg(windows)'.dependencies]
-windows = { version = "0.62", features = ["Media", "Foundation", "Storage_Streams", "Win32_Foundation"] }
+windows = { version = "0.62", features = ["Media", "Foundation", "Storage_Streams", "Win32_Foundation", "Win32_System_WinRT"] }
