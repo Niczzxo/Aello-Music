@@ -52,10 +52,15 @@ fn audio_formats(v: &Value) -> Vec<&Value> {
     out
 }
 
-/// Pick the best AAC/MP4 audio format (highest bitrate). Returns
-/// `Err(NoPlayableFormat)` when audio exists but only Opus/WebM,
+/// Pick the AAC/MP4 audio format for the requested quality.
+/// Returns `Err(NoPlayableFormat)` when audio exists but only Opus/WebM,
 /// `Err(NoStream)` when there is no audio at all.
-fn select_aac_format(v: &Value) -> Result<&Value, StreamError> {
+///
+/// Quality (GAP_TABLE #25): "low" prefers itag 139 (AAC ~48kbps),
+/// falling back to the lowest-bitrate AAC when 139 is absent;
+/// "auto" / "high" prefer itag 140 (AAC ~128kbps), falling back to the
+/// highest-bitrate AAC when 140 is absent.
+fn select_aac_format<'a>(v: &'a Value, audio_quality: &str) -> Result<&'a Value, StreamError> {
     let audio = audio_formats(v);
     if audio.is_empty() {
         return Err(StreamError::NoStream);
@@ -72,9 +77,24 @@ fn select_aac_format(v: &Value) -> Result<&Value, StreamError> {
     if aac.is_empty() {
         return Err(StreamError::NoPlayableFormat);
     }
+    let itag_of = |f: &&Value| f.get("itag").and_then(|i| i.as_i64()).unwrap_or(0);
+    let bitrate_of = |f: &&Value| f.get("bitrate").and_then(|b| b.as_i64()).unwrap_or(0);
+    if audio_quality == "low" {
+        if let Some(f) = aac.iter().find(|f| itag_of(f) == 139) {
+            return Ok(f);
+        }
+        let lowest = aac
+            .into_iter()
+            .min_by_key(|f| bitrate_of(f))
+            .expect("non-empty aac list");
+        return Ok(lowest);
+    }
+    if let Some(f) = aac.iter().find(|f| itag_of(f) == 140) {
+        return Ok(f);
+    }
     let best = aac
         .into_iter()
-        .max_by_key(|f| f.get("bitrate").and_then(|b| b.as_i64()).unwrap_or(0))
+        .max_by_key(|f| bitrate_of(f))
         .expect("non-empty aac list");
     Ok(best)
 }
@@ -126,6 +146,7 @@ async fn try_client(
     video_id: &str,
     playlist_id: Option<&str>,
     skip_validation: bool,
+    audio_quality: &str,
 ) -> Result<Option<StreamUrl>, StreamError> {
     let sig_ts = if client.use_signature_timestamp {
         session.signature_timestamp(video_id, None).await
@@ -144,7 +165,7 @@ async fn try_client(
     }
     // The player response may itself carry the JS URL for deciphering;
     // keep it attached by re-using `resp` below.
-    let format = match select_aac_format(&resp) {
+    let format = match select_aac_format(&resp, audio_quality) {
         Ok(f) => f,
         Err(e) => return Err(e),
     };
@@ -191,18 +212,20 @@ async fn try_client(
 pub async fn resolve_stream(
     session: &InnerTubeSession,
     video_id: &str,
+    audio_quality: &str,
 ) -> Result<StreamUrl, StreamError> {
-    resolve_stream_with_playlist(session, video_id, None).await
+    resolve_stream_with_playlist(session, video_id, None, audio_quality).await
 }
 
 pub async fn resolve_stream_with_playlist(
     session: &InnerTubeSession,
     video_id: &str,
     playlist_id: Option<&str>,
+    audio_quality: &str,
 ) -> Result<StreamUrl, StreamError> {
     // MAIN_CLIENT first.
     let mut last_err: Option<StreamError>;
-    match try_client(session, MAIN_CLIENT, video_id, playlist_id, false).await {
+    match try_client(session, MAIN_CLIENT, video_id, playlist_id, false, audio_quality).await {
         Ok(Some(url)) => return Ok(url),
         Ok(None) => {
             last_err = Some(StreamError::NoStream);
@@ -225,7 +248,7 @@ pub async fn resolve_stream_with_playlist(
         // Android skips validation for the last client (and for private
         // tracks, detected inside try_client via the response — here we
         // approximate with the last-client rule only).
-        match try_client(session, **client, video_id, playlist_id, is_last).await {
+        match try_client(session, **client, video_id, playlist_id, is_last, audio_quality).await {
             Ok(Some(url)) => return Ok(url),
             Ok(None) => {
                 // A client that returns no URL must not overwrite an

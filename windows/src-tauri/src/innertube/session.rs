@@ -8,13 +8,14 @@
 
 use crate::innertube::client::{
     API_URL_YOUTUBE_MUSIC, ORIGIN_YOUTUBE_MUSIC, REFERER_YOUTUBE_MUSIC, USER_AGENT_WEB,
-    WEB_REMIX, YouTubeClient,
+    WEB, WEB_REMIX, YouTubeClient,
 };
 use crate::innertube::error::StreamError;
 use regex::Regex;
 use reqwest::{Client, StatusCode};
 use serde_json::{json, Value};
 use std::collections::HashMap;
+use std::path::Path;
 use std::sync::Mutex;
 use std::time::Duration;
 use tokio::sync::RwLock;
@@ -32,6 +33,11 @@ pub const DEFAULT_STREAM_EXPIRY_SECONDS: i64 = 21600;
 pub struct InnerTubeSession {
     http: Client,
     visitor_data: RwLock<Option<String>>,
+    /// Google sign-in cookie (raw `Cookie` header value), set by
+    /// `signin_finish`, cleared by `sign_out`. `std` lock (not tokio):
+    /// the cookie is set synchronously from Tauri `setup`, which runs
+    /// outside the async runtime. `None` = guest mode.
+    cookie: std::sync::RwLock<Option<String>>,
     /// player JS URL → source text (cached; base.js is ~1MB and stable
     /// per release).
     player_js: Mutex<HashMap<String, String>>,
@@ -58,10 +64,39 @@ impl InnerTubeSession {
         Self {
             http,
             visitor_data: RwLock::new(None),
+            cookie: std::sync::RwLock::new(None),
             player_js: Mutex::new(HashMap::new()),
             sig_ts: Mutex::new(HashMap::new()),
             js_url_cache: Mutex::new(None),
         }
+    }
+
+    // ── sign-in cookie ──────────────────────────────────────────────────
+
+    /// Current cookie, if signed in.
+    pub fn cookie(&self) -> Option<String> {
+        self.cookie.read().ok().and_then(|c| c.clone())
+    }
+
+    /// Set (or clear) the sign-in cookie. Synchronous so Tauri `setup`
+    /// can restore it from the settings store without an async context.
+    pub fn set_cookie(&self, cookie: Option<String>) {
+        if let Ok(mut slot) = self.cookie.write() {
+            *slot = cookie;
+        }
+    }
+
+    /// Override visitorData (e.g. the value harvested with the cookie at
+    /// sign-in). Only used from async contexts; `setup` uses
+    /// [`Self::set_visitor_data_blocking`] instead.
+    pub async fn set_visitor_data(&self, visitor_data: Option<String>) {
+        *self.visitor_data.write().await = visitor_data;
+    }
+
+    /// Synchronous visitorData override for Tauri `setup` only: the
+    /// tokio `blocking_write` must never be called from an async context.
+    pub fn set_visitor_data_blocking(&self, visitor_data: Option<String>) {
+        *self.visitor_data.blocking_write() = visitor_data;
     }
 
     // ── visitor data ────────────────────────────────────────────────────
@@ -184,13 +219,26 @@ impl InnerTubeSession {
         body: Value,
     ) -> Result<Value, StreamError> {
         let url = format!("{API_URL_YOUTUBE_MUSIC}{endpoint}?prettyPrint=false");
+        self.post_to_url(&url, client, body).await
+    }
+
+    /// POST JSON to an absolute URL (same headers/retry as [`Self::post`]).
+    /// Used for endpoints outside the `youtubei/v1/` prefix, e.g.
+    /// `get_transcript`.
+    pub async fn post_to_url(
+        &self,
+        url: &str,
+        client: YouTubeClient,
+        body: Value,
+    ) -> Result<Value, StreamError> {
         let mut attempt = 0;
         let mut refreshed = false;
         loop {
             let visitor = self.visitor_data.read().await.clone();
-            let req = self
+            let cookie = self.cookie();
+            let mut req = self
                 .http
-                .post(&url)
+                .post(url)
                 .header("Content-Type", "application/json")
                 .header("X-Goog-Api-Format-Version", "1")
                 // Not a typo (Android comment): the Client-Name header
@@ -200,16 +248,29 @@ impl InnerTubeSession {
                 .header("X-Origin", ORIGIN_YOUTUBE_MUSIC)
                 .header("Referer", REFERER_YOUTUBE_MUSIC)
                 .header("User-Agent", client.user_agent);
-            let req = match &visitor {
-                Some(v) => req.header("X-Goog-Visitor-Id", v),
-                None => req,
-            };
+            if let Some(v) = &visitor {
+                req = req.header("X-Goog-Visitor-Id", v);
+            }
+            // Signed in: send the cookie + SAPISIDHASH, exactly as
+            // Android's `ytClient(setLogin = true)` does. Guest mode
+            // (cookie None) sends neither.
+            if let Some(c) = &cookie {
+                req = req.header("Cookie", c.clone());
+                if let Some(sapisid) = cookie_value(c, "SAPISID") {
+                    let ts = std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .map(|d| d.as_secs())
+                        .unwrap_or(0);
+                    let hash = sha1_hex(&format!("{ts} {sapisid} {ORIGIN_YOUTUBE_MUSIC}"));
+                    req = req.header("Authorization", format!("SAPISIDHASH {ts}_{hash}"));
+                }
+            }
             match req.json(&body).send().await {
                 Ok(resp) => {
                     let status = resp.status();
                     if status.is_success() {
                         return resp.json::<Value>().await.map_err(|e| {
-                            StreamError::Parse(format!("{endpoint} response JSON: {e}"))
+                            StreamError::Parse(format!("{url} response JSON: {e}"))
                         });
                     }
                     if (status == StatusCode::UNAUTHORIZED || status == StatusCode::FORBIDDEN)
@@ -241,25 +302,147 @@ impl InnerTubeSession {
         }
     }
 
+    /// GET a URL as parsed JSON (one attempt + 15s cap; no InnerTube
+    /// headers). Used for LrcLib, GitHub releases, and the Listen
+    /// Together room API.
+    pub async fn http_get_json(
+        &self,
+        url: &str,
+        extra_headers: &[(&str, &str)],
+    ) -> Result<Value, StreamError> {
+        let mut req = self
+            .http
+            .get(url)
+            .header("User-Agent", USER_AGENT_WEB)
+            .timeout(Duration::from_secs(15));
+        for (k, v) in extra_headers {
+            req = req.header(*k, *v);
+        }
+        let resp = req
+            .send()
+            .await
+            .map_err(|e| StreamError::Network(e.to_string()))?;
+        let status = resp.status();
+        if !status.is_success() {
+            return Err(StreamError::Http(status.as_u16()));
+        }
+        resp.json::<Value>()
+            .await
+            .map_err(|e| StreamError::Parse(format!("{url} response JSON: {e}")))
+    }
+
+    /// POST with an empty body and parse the JSON response (one attempt
+    /// + 15s cap). Used for the Listen Together room API, which mints a
+    /// room code from an empty POST (Android `allocateRoomCode`).
+    pub async fn http_post_empty(&self, url: &str) -> Result<Value, StreamError> {
+        let resp = self
+            .http
+            .post(url)
+            .header("User-Agent", USER_AGENT_WEB)
+            .timeout(Duration::from_secs(15))
+            .send()
+            .await
+            .map_err(|e| StreamError::Network(e.to_string()))?;
+        let status = resp.status();
+        if !status.is_success() {
+            return Err(StreamError::Http(status.as_u16()));
+        }
+        resp.json::<Value>()
+            .await
+            .map_err(|e| StreamError::Parse(format!("{url} response JSON: {e}")))
+    }
+
+    /// Stream a URL to a file (song downloads). Returns bytes written.
+    /// No cookies: googlevideo URLs are already signed (see
+    /// `validate_stream_url`).
+    ///
+    /// Each chunk has a 60s stall timeout (same value as the session
+    /// client's overall timeout); a mid-stream error deletes the
+    /// partial file instead of leaving a broken `.m4a` behind, and a
+    /// `Content-Length` mismatch is an error for the same reason.
+    pub async fn download_to_file(&self, url: &str, path: &Path) -> Result<u64, StreamError> {
+        let result = self.download_to_file_inner(url, path).await;
+        if result.is_err() {
+            // Best-effort cleanup of the partial download.
+            let _ = tokio::fs::remove_file(path).await;
+        }
+        result
+    }
+
+    async fn download_to_file_inner(
+        &self,
+        url: &str,
+        path: &Path,
+    ) -> Result<u64, StreamError> {
+        use tokio::io::AsyncWriteExt;
+        let mut resp = self
+            .http
+            .get(url)
+            .header("User-Agent", USER_AGENT_WEB)
+            .send()
+            .await
+            .map_err(|e| StreamError::Network(e.to_string()))?;
+        if !resp.status().is_success() {
+            return Err(StreamError::Http(resp.status().as_u16()));
+        }
+        let expected_len = resp.content_length();
+        let mut file = tokio::fs::File::create(path)
+            .await
+            .map_err(|e| StreamError::Network(format!("create download file: {e}")))?;
+        let mut total: u64 = 0;
+        loop {
+            let chunk = tokio::time::timeout(Duration::from_secs(60), resp.chunk())
+                .await
+                .map_err(|_| {
+                    StreamError::Network("download stalled: no data for 60s".to_string())
+                })?
+                .map_err(|e| StreamError::Network(e.to_string()))?;
+            match chunk {
+                Some(bytes) => {
+                    total += bytes.len() as u64;
+                    file.write_all(&bytes)
+                        .await
+                        .map_err(|e| StreamError::Network(format!("write download: {e}")))?;
+                }
+                None => break,
+            }
+        }
+        file.flush()
+            .await
+            .map_err(|e| StreamError::Network(format!("flush download: {e}")))?;
+        if let Some(expected) = expected_len {
+            if total != expected {
+                return Err(StreamError::Network(format!(
+                    "download incomplete: got {total} bytes, expected {expected}"
+                )));
+            }
+        }
+        Ok(total)
+    }
+
     // ── InnerTube endpoints (InnerTube.kt) ──────────────────────────────
 
     fn context(&self, client: YouTubeClient, visitor: Option<&str>) -> Value {
         client.context(visitor)
     }
 
-    pub async fn search_raw(&self, query: &str) -> Result<Value, StreamError> {
-        self.ensure_visitor_data().await;
-        let visitor = self.visitor_data().await;
-        let body = json!({
-            "context": self.context(WEB_REMIX, visitor.as_deref()),
-            "query": query,
-        });
-        self.post(WEB_REMIX, "search", body).await
-    }
+    // NOTE: plain `search_raw` (no params) was removed in 6.1.45 —
+    // `search_raw_params` below covers it with `params: None`.
 
     pub async fn browse_raw(
         &self,
         browse_id: Option<&str>,
+        continuation: Option<&str>,
+    ) -> Result<Value, StreamError> {
+        self.browse_raw_params(browse_id, None, continuation).await
+    }
+
+    /// Browse with an optional `params` string (charts page needs
+    /// `ggMGCgQIgAQ%3D`; related/mood endpoints carry their own params).
+    pub async fn browse_raw_params(
+        &self,
+        browse_id: Option<&str>,
+        params: Option<&str>,
         continuation: Option<&str>,
     ) -> Result<Value, StreamError> {
         self.ensure_visitor_data().await;
@@ -270,10 +453,80 @@ impl InnerTubeSession {
         if let Some(b) = browse_id {
             body["browseId"] = json!(b);
         }
+        if let Some(p) = params {
+            body["params"] = json!(p);
+        }
         if let Some(c) = continuation {
             body["continuation"] = json!(c);
         }
         self.post(WEB_REMIX, "browse", body).await
+    }
+
+    /// Search with an optional filter `params` string (Android
+    /// `SearchFilter` values, e.g. `FILTER_SONG`).
+    pub async fn search_raw_params(
+        &self,
+        query: &str,
+        params: Option<&str>,
+    ) -> Result<Value, StreamError> {
+        self.ensure_visitor_data().await;
+        let visitor = self.visitor_data().await;
+        let mut body = json!({
+            "context": self.context(WEB_REMIX, visitor.as_deref()),
+            "query": query,
+        });
+        if let Some(p) = params {
+            body["params"] = json!(p);
+        }
+        self.post(WEB_REMIX, "search", body).await
+    }
+
+    /// Raw `next` call for a video id (Android `YouTube.next`).
+    /// The response's tab 2 endpoint is the `related` browse endpoint.
+    pub async fn next_raw(&self, video_id: &str) -> Result<Value, StreamError> {
+        self.ensure_visitor_data().await;
+        let visitor = self.visitor_data().await;
+        let body = json!({
+            "context": self.context(WEB_REMIX, visitor.as_deref()),
+            "videoId": video_id,
+        });
+        self.post(WEB_REMIX, "next", body).await
+    }
+
+    /// `account/account_menu` with the sign-in cookie (Android
+    /// `InnerTube.accountMenu`). Fails without a valid cookie — this is
+    /// the sign-in validation call.
+    pub async fn account_menu_raw(&self) -> Result<Value, StreamError> {
+        self.ensure_visitor_data().await;
+        let visitor = self.visitor_data().await;
+        let body = json!({
+            "context": self.context(WEB_REMIX, visitor.as_deref()),
+        });
+        self.post(WEB_REMIX, "account/account_menu", body).await
+    }
+
+    /// Timed-text transcript for a video (Android `InnerTube.getTranscript`
+    /// / `YouTube.transcript`, the YouTube Subtitle lyrics fallback).
+    /// Params are base64 of `"\n\x0b" + videoId`. No API key is sent:
+    /// the youtubei endpoint does not need one (the key Android passes
+    /// is the public web client key; this port never guesses keys).
+    pub async fn transcript_raw(&self, video_id: &str) -> Result<Value, StreamError> {
+        let mut param_bytes = vec![b'\n', 11u8];
+        param_bytes.extend_from_slice(video_id.as_bytes());
+        let params = base64::Engine::encode(
+            &base64::engine::general_purpose::STANDARD,
+            &param_bytes,
+        );
+        let body = json!({
+            "context": WEB.context(None),
+            "params": params,
+        });
+        self.post_to_url(
+            "https://music.youtube.com/youtubei/v1/get_transcript",
+            WEB,
+            body,
+        )
+        .await
     }
 
     /// Raw `player` call for one client. `signature_timestamp` is only
@@ -456,4 +709,88 @@ fn retry_after_secs(resp: &reqwest::Response) -> Option<u64> {
         .get("retry-after")
         .and_then(|v| v.to_str().ok())
         .and_then(|s| s.parse().ok())
+}
+
+/// One `name=value` pair out of a `Cookie` header string.
+fn cookie_value<'a>(cookie: &'a str, name: &str) -> Option<&'a str> {
+    cookie.split(';').find_map(|part| {
+        let part = part.trim();
+        part.strip_prefix(&format!("{name}="))
+    })
+}
+
+/// SHA-1 hex digest (FIPS 180-1), hand-rolled so the SAPISIDHASH auth
+/// header needs no extra crate. Verified against the standard test
+/// vectors in the unit tests below.
+fn sha1_hex(input: &str) -> String {
+    let mut bytes = input.as_bytes().to_vec();
+    let bit_len = (bytes.len() as u64) * 8;
+    bytes.push(0x80);
+    while bytes.len() % 64 != 56 {
+        bytes.push(0);
+    }
+    bytes.extend_from_slice(&bit_len.to_be_bytes());
+
+    let mut h: [u32; 5] = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0];
+    for chunk in bytes.chunks_exact(64) {
+        let mut w = [0u32; 80];
+        for i in 0..16 {
+            w[i] = u32::from_be_bytes([
+                chunk[i * 4],
+                chunk[i * 4 + 1],
+                chunk[i * 4 + 2],
+                chunk[i * 4 + 3],
+            ]);
+        }
+        for i in 16..80 {
+            w[i] = (w[i - 3] ^ w[i - 8] ^ w[i - 14] ^ w[i - 16]).rotate_left(1);
+        }
+        let (mut a, mut b, mut c, mut d, mut e) = (h[0], h[1], h[2], h[3], h[4]);
+        for (i, &wi) in w.iter().enumerate() {
+            let (f, k) = match i {
+                0..=19 => ((b & c) | ((!b) & d), 0x5A827999u32),
+                20..=39 => (b ^ c ^ d, 0x6ED9EBA1),
+                40..=59 => ((b & c) | (b & d) | (c & d), 0x8F1BBCDC),
+                _ => (b ^ c ^ d, 0xCA62C1D6),
+            };
+            let tmp = a
+                .rotate_left(5)
+                .wrapping_add(f)
+                .wrapping_add(e)
+                .wrapping_add(k)
+                .wrapping_add(wi);
+            e = d;
+            d = c;
+            c = b.rotate_left(30);
+            b = a;
+            a = tmp;
+        }
+        h[0] = h[0].wrapping_add(a);
+        h[1] = h[1].wrapping_add(b);
+        h[2] = h[2].wrapping_add(c);
+        h[3] = h[3].wrapping_add(d);
+        h[4] = h[4].wrapping_add(e);
+    }
+    h.iter().map(|x| format!("{x:08x}")).collect()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::sha1_hex;
+
+    #[test]
+    fn sha1_known_vectors() {
+        assert_eq!(
+            sha1_hex(""),
+            "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+        );
+        assert_eq!(
+            sha1_hex("abc"),
+            "a9993e364706816aba3e25717850c26c9cd0d89d"
+        );
+        assert_eq!(
+            sha1_hex("The quick brown fox jumps over the lazy dog"),
+            "2fd4e1c67a2d28fced849ee1bb76e7391b93eb12"
+        );
+    }
 }

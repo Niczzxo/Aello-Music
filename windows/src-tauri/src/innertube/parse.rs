@@ -133,12 +133,74 @@ pub fn music_artworks(v: &Value) -> Vec<Artwork> {
         .unwrap_or_default()
 }
 
-/// Type labels YouTube prefixes to a subtitle's first segment in the
-/// unfiltered (guest) search shape, e.g.
-/// `Song • Guru Randhawa • …` / `Video • Channel • 55M views`.
-/// The filtered shape Android parses has no such prefix for songs, so
-/// this is only dropped when it is actually there: a single run with no
-/// navigation endpoint whose text is a known label.
+/// Text of a node that is either `{"runs": [...]}` or
+/// `{"simpleText": "..."}` (titles, subtitles, header straplines).
+pub fn text_of(v: &Value) -> Option<String> {
+    first_direct_run_text(v).or_else(|| {
+        v.get("simpleText")
+            .and_then(|t| t.as_str())
+            .map(|t| t.to_string())
+    })
+}
+
+/// `musicNavigationButtonRenderer` (Mood & Genres chip) →
+/// `(title, browseId, params)`. Port of
+/// `MoodAndGenres.fromMusicNavigationButtonRenderer`.
+pub fn nav_button_mood(v: &Value) -> Option<(String, String, String)> {
+    let title = v
+        .get("buttonText")
+        .and_then(text_of)
+        .filter(|t| !t.is_empty())?;
+    let endpoint = v.get("clickCommand")?.get("browseEndpoint")?;
+    let browse_id = endpoint
+        .get("browseId")
+        .and_then(|b| b.as_str())
+        .map(|b| b.to_string())?;
+    let params = endpoint
+        .get("params")
+        .and_then(|p| p.as_str())
+        .unwrap_or("")
+        .to_string();
+    Some((title, browse_id, params))
+}
+
+/// Title text of a `musicCarouselShelfRenderer` header.
+pub fn carousel_title(v: &Value) -> Option<String> {
+    get(
+        v,
+        &[
+            "header",
+            "musicCarouselShelfBasicHeaderRenderer",
+            "title",
+        ],
+    )
+    .and_then(text_of)
+}
+
+/// `moreContentButton` browse endpoint of a carousel shelf header:
+/// `(browseId, params)`.
+pub fn carousel_more_endpoint(v: &Value) -> Option<(String, Option<String>)> {
+    let endpoint = get(
+        v,
+        &[
+            "header",
+            "musicCarouselShelfBasicHeaderRenderer",
+            "moreContentButton",
+            "buttonRenderer",
+            "navigationEndpoint",
+            "browseEndpoint",
+        ],
+    )?;
+    let browse_id = endpoint
+        .get("browseId")
+        .and_then(|b| b.as_str())
+        .map(|b| b.to_string())?;
+    let params = endpoint
+        .get("params")
+        .and_then(|p| p.as_str())
+        .map(|p| p.to_string());
+    Some((browse_id, params))
+}
 const TYPE_LABELS: &[&str] = &[
     "Song", "Video", "Album", "Single", "EP", "Playlist", "Artist", "Podcast", "Episode",
     "Audiobook",
@@ -273,9 +335,8 @@ fn song_count(text: &str) -> Option<usize> {
 
 // ── musicResponsiveListItemRenderer → HomeItem (SearchPage.toYTItem) ───
 
-/// Port of `SearchPage.toYTItem`. Artist rows are intentionally
-/// skipped in v0.1.0: the shared `HomeItem` enum has no artist variant
-/// and there is no artist page to open one from (see `models.rs`).
+/// Port of `SearchPage.toYTItem`. Artist rows return
+/// `HomeItem::Artist` (6.1.45: the artist page exists now).
 pub fn parse_list_item(v: &Value) -> Option<HomeItem> {
     let nav = v.get("navigationEndpoint");
     let is_song = nav.is_none()
@@ -303,9 +364,8 @@ pub fn parse_list_item(v: &Value) -> Option<HomeItem> {
     // be classified as a song and only dropped because song_video_id
     // returns None.
     if is_artist {
-        // Artist rows are intentionally skipped in v0.1.0 (no artist
-        // page yet) — see the doc comment above.
-        None
+        let id = browse_id(v)?;
+        Some(HomeItem::Artist(Artist { id, name: title }))
     } else if is_song {
         let id = song_video_id(v)?;
         let artists = secondary
@@ -456,9 +516,8 @@ pub fn parse_two_row_item(v: &Value) -> Option<HomeItem> {
             song_count: None,
         }))
     } else if is_artist {
-        // Artist rows are intentionally skipped in v0.1.0 (no artist
-        // page yet) — see parse_list_item.
-        None
+        let id = browse_id(v)?;
+        Some(HomeItem::Artist(Artist { id, name: title }))
     } else {
         None
     }
