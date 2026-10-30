@@ -12,21 +12,17 @@
 //! device verdicts. Two things in particular need a real Windows run:
 //! (1) `GetForWindow` needs a WinRT apartment on the calling thread
 //! (Tauri's main thread, where `setup` runs, initializes COM for
-//! WebView2 — the usual place this works from); (2) the
-//! `ISystemMediaTransportControlsInterop` IID below is the one from
-//! Microsoft's `systemmediatransportcontrolsinterop.h` — the `windows`
-//! crate 0.62 does NOT ship this interop interface (only UWP's
-//! `GetForCurrentView`), so it is defined by hand here. If either is
-//! wrong, `SmtcManager::new` returns `Err`, `lib.rs` stores `None`,
-//! and the app runs without media controls instead of crashing startup.
+//! WebView2 — the usual place this works from); (2) the interop
+//! interface comes from the `windows` crate itself (see below). If
+//! either is wrong, `SmtcManager::new` returns `Err`, `lib.rs` stores
+//! `None`, and the app runs without media controls instead of crashing
+//! startup.
 
 #![cfg(windows)]
 
 use crate::player::PlaybackSnapshot;
-use tauri::{AppHandle, Manager};
-use windows::core::{
-    factory, interface, GUID, HRESULT, IInspectable, Interface, Ref, Type, HSTRING,
-};
+use tauri::{AppHandle, Emitter};
+use windows::core::{factory, Ref, HSTRING};
 use windows::Foundation::{TypedEventHandler, Uri};
 use windows::Media::{
     MediaPlaybackStatus, MediaPlaybackType, SystemMediaTransportControls,
@@ -34,21 +30,23 @@ use windows::Media::{
 };
 use windows::Storage::Streams::RandomAccessStreamReference;
 use windows::Win32::Foundation::HWND;
+use windows::Win32::System::WinRT::ISystemMediaTransportControlsInterop;
 
 /// `ISystemMediaTransportControlsInterop` — the Win32 (non-UWP) way to
-/// get an SMTC instance for a window. IID from
-/// `systemmediatransportcontrolsinterop.h`:
-/// `MIDL_INTERFACE("65A6F408-1693-4505-BC0D-9735DC0C1312")`.
-/// Not shipped by the `windows` crate, so it is defined here.
-#[interface("65A6F408-1693-4505-BC0D-9735DC0C1312")]
-unsafe trait ISystemMediaTransportControlsInterop: IInspectable {
-    fn GetForWindow(
-        &self,
-        appwindow: HWND,
-        riid: *const GUID,
-        mediacontrol: *mut *mut core::ffi::c_void,
-    ) -> HRESULT;
-}
+/// get an SMTC instance for a window — comes from the `windows` crate
+/// (`windows::Win32::System::WinRT`, feature `Win32_System_WinRT`):
+/// IID ddb0472d-c911-4a1f-86d9-dc3d71a95f5a, IInspectable-based, per
+/// systemmediatransportcontrolsinterop.h (confirmed against the SDK
+/// header via Mozilla's WindowsSMTCProvider.cpp).
+///
+/// Do NOT hand-define it with `#[interface]`: the macro cannot compile
+/// a trait deriving from IInspectable in windows 0.62 (it emits a
+/// reference to `IInspectable_Impl`, which does not exist in
+/// windows-core), and the IID previously written here by hand
+/// (65A6F408-...) was wrong — with it, the activation-factory
+/// QueryInterface would fail at runtime and SMTC would silently never
+/// start. That hand definition is what broke the Windows build
+/// (run 41137473016: E0433/E0405/E0425 in smtc.rs).
 
 /// Owns one SMTC instance for the main window.
 pub struct SmtcManager {
@@ -63,16 +61,8 @@ impl SmtcManager {
     pub fn new(app: AppHandle, hwnd: HWND) -> windows::core::Result<Self> {
         let interop: ISystemMediaTransportControlsInterop =
             factory::<SystemMediaTransportControls, ISystemMediaTransportControlsInterop>()?;
-        let mut abi: *mut core::ffi::c_void = std::ptr::null_mut();
-        unsafe {
-            interop.GetForWindow(
-                hwnd,
-                &SystemMediaTransportControls::IID,
-                &mut abi,
-            )?;
-        }
-        let smtc =
-            unsafe { SystemMediaTransportControls::from_abi(abi) }?;
+        let smtc: SystemMediaTransportControls =
+            unsafe { interop.GetForWindow(hwnd) }?;
         smtc.SetIsEnabled(true)?;
         smtc.SetIsPlayEnabled(true)?;
         smtc.SetIsPauseEnabled(true)?;
@@ -117,8 +107,11 @@ impl SmtcManager {
             .clone()
             .or_else(|| snapshot.current_song_id.clone())
             .unwrap_or_default();
-        updater.SetTitle(&HSTRING::from(title.as_str()))?;
-        updater.SetArtist(&HSTRING::from(
+        // Title/artist live on MusicProperties, not on the updater itself
+        // (the updater has no SetTitle/SetArtist — windows 0.62).
+        let music = updater.MusicProperties()?;
+        music.SetTitle(&HSTRING::from(title.as_str()))?;
+        music.SetArtist(&HSTRING::from(
             snapshot.current_artist.clone().unwrap_or_default().as_str(),
         ))?;
         if let Some(artwork) = snapshot.current_artwork.as_deref() {
