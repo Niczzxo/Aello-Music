@@ -66,8 +66,10 @@ pub async fn pick_local_files(app: tauri::AppHandle) -> Result<Vec<LocalFile>, S
         .dialog()
         .file()
         .add_filter(
+            // WebView2 cannot play Opus (GAP_TABLE #25), so .opus is
+            // deliberately not offered here.
             "Audio",
-            &["mp3", "m4a", "flac", "ogg", "opus", "wav", "aac"],
+            &["mp3", "m4a", "flac", "ogg", "wav", "aac"],
         )
         .set_title("Open audio files")
         .blocking_pick_files();

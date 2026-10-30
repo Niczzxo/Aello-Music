@@ -15,7 +15,7 @@
 //! call the endpoints itself — every backend call goes through a Tauri
 //! command in `lib.rs`, keeping the request path in Rust.
 
-use crate::models::{AlbumDetail, HomeItem, HomeSection, PlaylistDetail};
+use crate::models::{AlbumDetail, ArtistDetail, ExploreData, HomeItem, HomeSection, LyricLine, PlaylistDetail, Song};
 
 /// Errors surface to the frontend as plain strings so the UI can show the
 /// real reason instead of a silent failure.
@@ -27,18 +27,36 @@ pub type ServiceResult<T> = Result<T, String>;
 pub trait MusicService: Send + Sync {
     /// Home feed sections.
     async fn home_feed(&self) -> ServiceResult<Vec<HomeSection>>;
-    /// Search across songs, albums, and playlists. Artist rows are
-    /// intentionally not returned in v0.1.0 (there is no artist page
-    /// to open them from); searching an artist still returns their
-    /// songs.
-    async fn search(&self, query: &str) -> ServiceResult<Vec<HomeItem>>;
+    /// Search across songs, albums, playlists, and artists. `filter` is
+    /// "song" | "album" | "artist" | "playlist" (None = all).
+    async fn search(&self, query: &str, filter: Option<&str>) -> ServiceResult<Vec<HomeItem>>;
     /// A playlist and its songs.
     async fn playlist(&self, id: &str) -> ServiceResult<PlaylistDetail>;
     /// An album and its songs.
     async fn album(&self, id: &str) -> ServiceResult<AlbumDetail>;
+    /// An artist page: top songs, albums, singles, related artists.
+    async fn artist(&self, id: &str) -> ServiceResult<ArtistDetail>;
+    /// Charts / trending sections ("Top music videos" kept as its own).
+    async fn charts(&self) -> ServiceResult<Vec<HomeSection>>;
+    /// Explore page: sections + Mood & Genres chips.
+    async fn explore(&self) -> ServiceResult<ExploreData>;
+    /// Mood & Genres detail page for a mood's browse params.
+    async fn browse_mood(&self, params: &str) -> ServiceResult<Vec<HomeItem>>;
+    /// Related songs for a video (`next` → related endpoint → `related`).
+    async fn related_for_video(&self, video_id: &str) -> ServiceResult<Vec<Song>>;
+    /// Timed-text transcript lines for a video (lyrics fallback).
+    async fn transcript(&self, video_id: &str) -> ServiceResult<Vec<LyricLine>>;
+    /// Signed-in account display name; errors without a valid cookie.
+    async fn account_name(&self) -> ServiceResult<String>;
     /// Resolve a playable stream URL for a song. `Ok(None)` means the
     /// backend is reachable but has no playable stream for this song.
     /// `Err` carries the real reason (e.g. YouTube's playabilityStatus
-    /// reason) for the UI to show.
-    async fn resolve_stream(&self, song_id: &str) -> ServiceResult<Option<String>>;
+    /// reason) for the UI to show. `audio_quality` is the stored
+    /// setting ("auto" | "high" | "low"): low prefers itag 139,
+    /// auto/high prefer itag 140.
+    async fn resolve_stream(
+        &self,
+        song_id: &str,
+        audio_quality: &str,
+    ) -> ServiceResult<Option<String>>;
 }

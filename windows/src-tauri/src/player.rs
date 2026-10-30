@@ -12,10 +12,19 @@ use serde::{Deserialize, Serialize};
 use std::sync::Mutex;
 
 /// Point-in-time playback state. Field names serialize as camelCase.
+/// `current_title` / `current_artist` / `current_artwork` are 6.1.45
+/// additions for SMTC (Windows media controls); all `#[serde(default)]`
+/// so older frontend payloads still parse.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlaybackSnapshot {
     pub current_song_id: Option<String>,
+    #[serde(default)]
+    pub current_title: Option<String>,
+    #[serde(default)]
+    pub current_artist: Option<String>,
+    #[serde(default)]
+    pub current_artwork: Option<String>,
     pub queue: Vec<String>,
     pub position_seconds: f64,
     pub is_playing: bool,
@@ -28,6 +37,9 @@ impl Default for PlaybackSnapshot {
     fn default() -> Self {
         Self {
             current_song_id: None,
+            current_title: None,
+            current_artist: None,
+            current_artwork: None,
             queue: Vec::new(),
             position_seconds: 0.0,
             is_playing: false,

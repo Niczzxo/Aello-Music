@@ -23,11 +23,15 @@ pub mod session;
 pub use error::{StreamError, StreamUrl};
 pub use session::InnerTubeSession;
 
-use crate::models::{Album, AlbumDetail, HomeItem, HomeSection, Playlist, PlaylistDetail};
+use crate::models::{
+    Album, AlbumDetail, Artist, ArtistDetail, ExploreData, HomeItem, HomeSection, LyricLine,
+    MoodItem, Playlist, PlaylistDetail, Song,
+};
 use crate::music_service::{MusicService, ServiceResult};
 use parse::{
-    direct_runs, get, music_artworks, next_continuation, odd_elements, parse_album_song,
-    parse_list_item, parse_playlist_song, parse_two_row_item, shelf_continuation,
+    carousel_more_endpoint, carousel_title, direct_runs, get, music_artworks, nav_button_mood,
+    next_continuation, odd_elements, parse_album_song, parse_list_item, parse_playlist_song,
+    parse_two_row_item, shelf_continuation, text_of,
 };
 use serde_json::Value;
 
@@ -80,6 +84,21 @@ fn section_list_contents(response: &Value) -> Vec<Value> {
     Vec::new()
 }
 
+/// Android `SearchFilter` param values (`YouTube.kt:1479`). Only the
+/// four filters the contract exposes; anything else means "all".
+fn search_filter_params(filter: &str) -> Option<&'static str> {
+    match filter {
+        // Accept plurals too: the frontend search tabs send
+        // "songs" | "albums" | "artists" | "playlists".
+        "song" | "songs" => Some("EgWKAQIIAWoKEAkQBRAKEAMQBA%3D%3D"),
+        "album" | "albums" => Some("EgWKAQIYAWoKEAkQChAFEAMQBA%3D%3D"),
+        "artist" | "artists" => Some("EgWKAQIgAWoKEAkQChAFEAMQBA%3D%3D"),
+        // Featured playlists (Android FILTER_FEATURED_PLAYLIST).
+        "playlist" | "playlists" => Some("EgeKAQQoADgBagwQDhAKEAMQBRAJEAQ%3D"),
+        _ => None,
+    }
+}
+
 fn dedupe_songs(items: Vec<HomeItem>) -> Vec<HomeItem> {
     let mut seen = std::collections::HashSet::new();
     let mut out = Vec::new();
@@ -88,12 +107,85 @@ fn dedupe_songs(items: Vec<HomeItem>) -> Vec<HomeItem> {
             HomeItem::Song(s) => format!("s:{}", s.id),
             HomeItem::Album(a) => format!("a:{}", a.id),
             HomeItem::Playlist(p) => format!("p:{}", p.id),
+            HomeItem::Artist(a) => format!("r:{}", a.id),
         };
         if seen.insert(key) {
             out.push(item);
         }
     }
     out
+}
+
+/// Parse one `musicCarouselShelfRenderer` (or `gridRenderer`) content
+/// node into a section. Shared by home feed, charts, and explore so the
+/// three pages parse shelves identically.
+fn parse_carousel_section(content: &Value) -> Option<HomeSection> {
+    if let Some(shelf) = content.get("musicCarouselShelfRenderer") {
+        let title = carousel_title(shelf)?;
+        let items: Vec<HomeItem> = shelf
+            .get("contents")
+            .and_then(|c| c.as_array())
+            .map(|arr| {
+                let mut items: Vec<HomeItem> = arr
+                    .iter()
+                    .filter_map(|c| c.get("musicTwoRowItemRenderer"))
+                    .filter_map(parse_two_row_item)
+                    .collect();
+                // Deviation from Android: guest home serves the
+                // "Quick picks" shelf as musicResponsiveListItemRenderer
+                // rows, not two-row cards. Android's home parser drops
+                // that shelf entirely; include the rows so the feed
+                // is not missing its top section.
+                items.extend(
+                    arr.iter()
+                        .filter_map(|c| c.get("musicResponsiveListItemRenderer"))
+                        .filter_map(parse_list_item),
+                );
+                dedupe_songs(items)
+            })
+            .unwrap_or_default();
+        if items.is_empty() {
+            return None;
+        }
+        let subtitle = get(
+            shelf,
+            &[
+                "header",
+                "musicCarouselShelfBasicHeaderRenderer",
+                "strapline",
+            ],
+        )
+        .and_then(text_of);
+        return Some(HomeSection {
+            title: title.to_string(),
+            subtitle,
+            items,
+        });
+    }
+    if let Some(grid) = content.get("gridRenderer") {
+        let title = get(grid, &["header", "gridHeaderRenderer", "title"]).and_then(text_of)?;
+        let items: Vec<HomeItem> = grid
+            .get("items")
+            .and_then(|c| c.as_array())
+            .map(|arr| {
+                dedupe_songs(
+                    arr.iter()
+                        .filter_map(|c| c.get("musicTwoRowItemRenderer"))
+                        .filter_map(parse_two_row_item)
+                        .collect(),
+                )
+            })
+            .unwrap_or_default();
+        if items.is_empty() {
+            return None;
+        }
+        return Some(HomeSection {
+            title,
+            subtitle: None,
+            items,
+        });
+    }
+    None
 }
 
 /// Extract shelf items + next continuation token from a playlist-shelf
@@ -151,11 +243,52 @@ fn shelf_page(response: &Value, first_page: bool) -> (Vec<Value>, Option<String>
 }
 
 impl InnerTubeSession {
-    /// Search YouTube Music (WEB_REMIX). Merges every shelf on the first
-    /// results tab — songs, albums and playlists. Artists are skipped:
-    /// the shared `HomeItem` enum has no artist variant.
-    pub async fn search(&self, query: &str) -> Result<Vec<HomeItem>, StreamError> {
-        let response = self.search_raw(query).await?;
+    /// Search YouTube Music (WEB_REMIX). With a filter, the `params`
+    /// string is Android's `SearchFilter` value and results come from
+    /// the first `musicShelfRenderer` (Android `YouTube.search`); without
+    /// a filter every shelf on the first results tab is merged — songs,
+    /// albums, playlists, and artist rows.
+    pub async fn search(&self, query: &str, filter: Option<&str>) -> Result<Vec<HomeItem>, StreamError> {
+        let params = filter.and_then(search_filter_params);
+        let response = self.search_raw_params(query, params).await?;
+        if params.is_some() {
+            // Filtered shape: one musicShelfRenderer holds the rows.
+            let shelf_contents = get(
+                &response,
+                &[
+                    "contents",
+                    "tabbedSearchResultsRenderer",
+                    "tabs",
+                ],
+            )
+            .and_then(|t| t.as_array())
+            .and_then(|tabs| tabs.first())
+            .and_then(|tab| {
+                get(
+                    tab,
+                    &["tabRenderer", "content", "sectionListRenderer", "contents"],
+                )
+            })
+            .and_then(|c| c.as_array())
+            .and_then(|contents| {
+                contents.iter().find_map(|c| {
+                    c.get("musicShelfRenderer")
+                        .and_then(|s| s.get("contents"))
+                        .and_then(|c| c.as_array())
+                        .cloned()
+                })
+            });
+            if let Some(contents) = shelf_contents {
+                let items: Vec<HomeItem> = contents
+                    .iter()
+                    .filter_map(|c| c.get("musicResponsiveListItemRenderer"))
+                    .filter_map(parse_list_item)
+                    .collect();
+                return Ok(dedupe_songs(items));
+            }
+            // Fall through to the unfiltered parse if YouTube served a
+            // different shape than Android expects.
+        }
         let contents = get(
             &response,
             &[
@@ -187,84 +320,476 @@ impl InnerTubeSession {
     pub async fn home_feed(&self) -> Result<Vec<HomeSection>, StreamError> {
         let response = self.browse_raw(Some("FEmusic_home"), None).await?;
         let contents = section_list_contents(&response);
-        let mut sections = Vec::new();
-        for content in &contents {
-            let Some(shelf) = content.get("musicCarouselShelfRenderer") else {
-                continue;
-            };
-            let title = get(
-                shelf,
+        Ok(contents
+            .iter()
+            .filter_map(parse_carousel_section)
+            .collect())
+    }
+
+    /// Artist page (`YouTube.artist`, browseId). Sections are classified
+    /// by title into top songs / albums / singles / related artists;
+    /// unclassified all-song shelves fill top songs, unclassified
+    /// all-album shelves fill albums.
+    pub async fn artist(&self, browse_id: &str) -> Result<ArtistDetail, StreamError> {
+        let response = self.browse_raw(Some(browse_id), None).await?;
+        let header = ["musicImmersiveHeaderRenderer", "musicVisualHeaderRenderer"]
+            .iter()
+            .find_map(|k| get(&response, &["header", k]).cloned())
+            .or_else(|| get(&response, &["header", "musicDetailHeaderRenderer"]).cloned())
+            .or_else(|| get(&response, &["header", "musicHeaderRenderer"]).cloned());
+        let title = header
+            .as_ref()
+            .and_then(|h| h.get("title"))
+            .and_then(text_of)
+            .unwrap_or_default();
+        // NOTE: the header thumbnail exists but `Artist` carries no
+        // artwork field (contract shape), so it is not read here.
+        let monthly_listeners = header
+            .as_ref()
+            .and_then(|h| h.get("monthlyListenerCount"))
+            .and_then(text_of);
+        let subscriber_count = header.as_ref().and_then(|h| {
+            get(
+                h,
                 &[
-                    "header",
-                    "musicCarouselShelfBasicHeaderRenderer",
-                    "title",
+                    "subscriptionButton2",
+                    "subscribeButtonRenderer",
+                    "subscriberCountWithSubscribeText",
                 ],
             )
-            .and_then(|t| {
-                t.get("runs")
-                    .and_then(|r| r.as_array())
-                    .and_then(|a| a.first())
-                    .and_then(|r| r.get("text"))
-                    .and_then(|t| t.as_str())
+            .and_then(text_of)
+            .or_else(|| {
+                get(
+                    h,
+                    &[
+                        "subscriptionButton",
+                        "subscribeButtonRenderer",
+                        "longSubscriberCountText",
+                    ],
+                )
+                .and_then(text_of)
             })
             .or_else(|| {
-                // Some shelves carry a plain `title` object.
                 get(
-                    shelf,
-                    &["header", "musicCarouselShelfBasicHeaderRenderer", "title"],
+                    h,
+                    &[
+                        "subscriptionButton",
+                        "subscribeButtonRenderer",
+                        "shortSubscriberCountText",
+                    ],
                 )
-                .and_then(|t| t.get("simpleText"))
-                .and_then(|t| t.as_str())
-            });
-            let Some(title) = title else { continue };
-            let subtitle = get(
-                shelf,
-                &[
-                    "header",
-                    "musicCarouselShelfBasicHeaderRenderer",
-                    "strapline",
-                ],
-            )
-            .and_then(|s| {
-                s.get("runs")
-                    .and_then(|r| r.as_array())
-                    .and_then(|a| a.first())
-                    .and_then(|r| r.get("text"))
-                    .and_then(|t| t.as_str())
+                .and_then(text_of)
             })
-            .map(|t| t.to_string());
-            let items: Vec<HomeItem> = shelf
-                .get("contents")
-                .and_then(|c| c.as_array())
-                .map(|arr| {
-                    let mut items: Vec<HomeItem> = arr
-                        .iter()
-                        .filter_map(|c| c.get("musicTwoRowItemRenderer"))
-                        .filter_map(parse_two_row_item)
-                        .collect();
-                    // Deviation from Android: guest home serves the
-                    // "Quick picks" shelf as musicResponsiveListItemRenderer
-                    // rows, not two-row cards. Android's home parser drops
-                    // that shelf entirely; include the rows so the feed
-                    // is not missing its top section.
+        });
+        let desc_from = |d: &Value| -> Option<String> {
+            let s: String = direct_runs(d)
+                .iter()
+                .filter_map(|r| r.get("text").and_then(|t| t.as_str()))
+                .collect();
+            if s.is_empty() {
+                None
+            } else {
+                Some(s)
+            }
+        };
+        let description = section_list_contents(&response)
+            .iter()
+            .find_map(|c| c.get("musicDescriptionShelfRenderer"))
+            .and_then(|s| s.get("description"))
+            .and_then(desc_from)
+            .or_else(|| {
+                header
+                    .as_ref()
+                    .and_then(|h| h.get("description"))
+                    .and_then(desc_from)
+            });
+
+        let mut top_songs: Vec<Song> = Vec::new();
+        let mut albums: Vec<Album> = Vec::new();
+        let mut singles: Vec<Album> = Vec::new();
+        let mut related: Vec<Artist> = Vec::new();
+        for content in &section_list_contents(&response) {
+            let Some(section) = parse_carousel_section(content)
+                .or_else(|| {
+                    // musicShelfRenderer sections (top songs shelf).
+                    content.get("musicShelfRenderer").and_then(|shelf| {
+                        let title = shelf.get("title").and_then(text_of)?;
+                        let items: Vec<HomeItem> = shelf
+                            .get("contents")
+                            .and_then(|c| c.as_array())
+                            .map(|arr| {
+                                dedupe_songs(
+                                    arr.iter()
+                                        .filter_map(|c| {
+                                            c.get("musicResponsiveListItemRenderer")
+                                        })
+                                        .filter_map(parse_list_item)
+                                        .collect(),
+                                )
+                            })
+                            .unwrap_or_default();
+                        if items.is_empty() {
+                            return None;
+                        }
+                        Some(HomeSection {
+                            title,
+                            subtitle: None,
+                            items,
+                        })
+                    })
+                })
+            else {
+                continue;
+            };
+            let lower = section.title.to_lowercase();
+            let kinds: Vec<&str> = section
+                .items
+                .iter()
+                .map(|i| match i {
+                    HomeItem::Song(_) => "song",
+                    HomeItem::Album(_) => "album",
+                    HomeItem::Playlist(_) => "playlist",
+                    HomeItem::Artist(_) => "artist",
+                })
+                .collect();
+            let all_songs = !kinds.is_empty() && kinds.iter().all(|k| *k == "song");
+            let all_albums = !kinds.is_empty() && kinds.iter().all(|k| *k == "album");
+            let all_artists = !kinds.is_empty() && kinds.iter().all(|k| *k == "artist");
+            if all_artists
+                || lower.contains("related")
+                || lower.contains("similar")
+                || lower.contains("fans also like")
+            {
+                for item in section.items {
+                    if let HomeItem::Artist(a) = item {
+                        related.push(a);
+                    }
+                }
+            } else if lower.contains("single") {
+                for item in section.items {
+                    if let HomeItem::Album(a) = item {
+                        singles.push(a);
+                    }
+                }
+            } else if lower.contains("album") {
+                for item in section.items {
+                    if let HomeItem::Album(a) = item {
+                        albums.push(a);
+                    }
+                }
+            } else if lower.contains("video") {
+                // Artist videos are not in the contract model; skip.
+                continue;
+            } else if all_songs {
+                if top_songs.is_empty() {
+                    for item in section.items {
+                        if let HomeItem::Song(s) = item {
+                            top_songs.push(s);
+                        }
+                    }
+                }
+            } else if all_albums {
+                if albums.is_empty() {
+                    for item in section.items {
+                        if let HomeItem::Album(a) = item {
+                            albums.push(a);
+                        }
+                    }
+                }
+            }
+        }
+        Ok(ArtistDetail {
+            artist: Artist {
+                id: browse_id.to_string(),
+                name: title,
+            },
+            top_songs,
+            albums,
+            singles,
+            related,
+            monthly_listeners,
+            subscriber_count,
+            description,
+        })
+    }
+
+    /// Charts page (`FEmusic_charts` + `ggMGCgQIgAQ%3D`, Android
+    /// `YouTube.getChartsPage`). "Top music videos" is kept as its own
+    /// section, exactly as served.
+    pub async fn charts(&self) -> Result<Vec<HomeSection>, StreamError> {
+        let response = self
+            .browse_raw_params(Some("FEmusic_charts"), Some("ggMGCgQIgAQ%3D"), None)
+            .await?;
+        let contents = section_list_contents(&response);
+        Ok(contents
+            .iter()
+            .filter_map(parse_carousel_section)
+            .collect())
+    }
+
+    /// Explore page (`FEmusic_explore`, Android `YouTube.explore`):
+    /// carousel sections + Mood & Genres chips (nav-button shelves and
+    /// grid shelves both handled).
+    pub async fn explore(&self) -> Result<ExploreData, StreamError> {
+        let response = self.browse_raw(Some("FEmusic_explore"), None).await?;
+        let contents = section_list_contents(&response);
+        let sections: Vec<HomeSection> = contents
+            .iter()
+            .filter_map(parse_carousel_section)
+            .collect();
+        let mut moods: Vec<MoodItem> = Vec::new();
+        for content in &contents {
+            // Carousel shelf whose "more" button points at the moods page.
+            if let Some(shelf) = content.get("musicCarouselShelfRenderer") {
+                let is_moods = carousel_more_endpoint(shelf)
+                    .map(|(id, _)| id == "FEmusic_moods_and_genres")
+                    .unwrap_or(false);
+                if is_moods {
+                    if let Some(items) = shelf.get("contents").and_then(|c| c.as_array()) {
+                        for item in items {
+                            if let Some(btn) = item.get("musicNavigationButtonRenderer") {
+                                if let Some((title, id, params)) = nav_button_mood(btn) {
+                                    moods.push(MoodItem { id, title, params });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            // Grid shelf of nav buttons (MoodAndGenres page shape).
+            if let Some(grid) = content.get("gridRenderer") {
+                if let Some(items) = grid.get("items").and_then(|c| c.as_array()) {
+                    for item in items {
+                        if let Some(btn) = item.get("musicNavigationButtonRenderer") {
+                            if let Some((title, id, params)) = nav_button_mood(btn) {
+                                moods.push(MoodItem { id, title, params });
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Ok(ExploreData { sections, moods })
+    }
+
+    /// Mood & Genres detail page (Android `YouTube.browse`, as used by
+    /// `MoodAndGenresScreen` → `BrowseViewModel`): browse
+    /// `FEmusic_moods_and_genres` with the mood's params, flattening the
+    /// grid + carousel sections into items. The browseId is fixed: every
+    /// mood nav-button endpoint carries `FEmusic_moods_and_genres` (the
+    /// explore parser matches the moods shelf on exactly that id); the
+    /// params are what distinguish one mood from another. An empty or
+    /// unrecognized params value degrades to an empty list, never an
+    /// error (the moods list page itself has no playable items).
+    pub async fn browse_mood(&self, params: &str) -> Result<Vec<HomeItem>, StreamError> {
+        // Empty / unrecognized params degrade to an empty list, never
+        // an error (and never a wasted browse call). Network errors
+        // from a real call still return Err, as they should.
+        if params.trim().is_empty() {
+            return Ok(Vec::new());
+        }
+        let response = self
+            .browse_raw_params(Some("FEmusic_moods_and_genres"), Some(params), None)
+            .await?;
+        let contents = section_list_contents(&response);
+        let mut items: Vec<HomeItem> = Vec::new();
+        for content in &contents {
+            if let Some(grid) = content.get("gridRenderer") {
+                if let Some(arr) = grid.get("items").and_then(|c| c.as_array()) {
                     items.extend(
                         arr.iter()
-                            .filter_map(|c| c.get("musicResponsiveListItemRenderer"))
-                            .filter_map(parse_list_item),
+                            .filter_map(|c| c.get("musicTwoRowItemRenderer"))
+                            .filter_map(parse_two_row_item),
                     );
-                    dedupe_songs(items)
-                })
+                }
+            }
+            if let Some(shelf) = content.get("musicCarouselShelfRenderer") {
+                if let Some(arr) = shelf.get("contents").and_then(|c| c.as_array()) {
+                    items.extend(
+                        arr.iter()
+                            .filter_map(|c| c.get("musicTwoRowItemRenderer"))
+                            .filter_map(parse_two_row_item),
+                    );
+                }
+            }
+        }
+        Ok(dedupe_songs(items))
+    }
+
+    /// `next` for a video id → the `related` browse endpoint
+    /// (`browseId` + optional `params`), from tab 2 of the watch-next
+    /// response (Android `YouTube.next` → `NextResult.relatedEndpoint`).
+    pub async fn next_related_endpoint(
+        &self,
+        video_id: &str,
+    ) -> Result<(String, Option<String>), StreamError> {
+        let response = self.next_raw(video_id).await?;
+        let tabs = get(
+            &response,
+            &[
+                "contents",
+                "singleColumnMusicWatchNextResultsRenderer",
+                "tabbedRenderer",
+                "watchNextTabbedResultsRenderer",
+                "tabs",
+            ],
+        )
+        .and_then(|t| t.as_array())
+        .ok_or_else(|| {
+            StreamError::Parse("next response has no watch-next tabs".to_string())
+        })?;
+        let endpoint = tabs
+            .get(2)
+            .and_then(|t| get(t, &["tabRenderer", "endpoint", "browseEndpoint"]))
+            .ok_or_else(|| StreamError::Parse("next response has no related tab".to_string()))?;
+        let browse_id = endpoint
+            .get("browseId")
+            .and_then(|b| b.as_str())
+            .ok_or_else(|| StreamError::Parse("related endpoint has no browseId".to_string()))?
+            .to_string();
+        let params = endpoint
+            .get("params")
+            .and_then(|p| p.as_str())
+            .map(|p| p.to_string());
+        Ok((browse_id, params))
+    }
+
+    /// Related page for a browse endpoint (Android `YouTube.related`):
+    /// songs only, from carousel / shelf / item-section contents.
+    pub async fn related(
+        &self,
+        browse_id: &str,
+        params: Option<&str>,
+    ) -> Result<Vec<Song>, StreamError> {
+        let response = self.browse_raw_params(Some(browse_id), params, None).await?;
+        let mut contents = section_list_contents(&response);
+        if contents.is_empty() {
+            // `related` reads the top-level sectionListRenderer directly.
+            contents = get(&response, &["contents", "sectionListRenderer", "contents"])
+                .and_then(|c| c.as_array())
+                .cloned()
                 .unwrap_or_default();
-            if items.is_empty() {
+        }
+        let mut songs = Vec::new();
+        for content in &contents {
+            for key in ["musicCarouselShelfRenderer", "musicShelfRenderer", "itemSectionRenderer"]
+            {
+                let Some(node) = content.get(key) else {
+                    continue;
+                };
+                let Some(items) = node.get("contents").and_then(|c| c.as_array()) else {
+                    continue;
+                };
+                for item in items {
+                    if let Some(r) = item.get("musicResponsiveListItemRenderer") {
+                        if let Some(HomeItem::Song(s)) = parse_list_item(r) {
+                            songs.push(s);
+                        }
+                    } else if let Some(r) = item.get("musicTwoRowItemRenderer") {
+                        if let Some(HomeItem::Song(s)) = parse_two_row_item(r) {
+                            songs.push(s);
+                        }
+                    }
+                }
+            }
+        }
+        Ok(songs)
+    }
+
+    /// Timed-text transcript lines for a video (YouTube Subtitle lyrics
+    /// fallback). Cue groups → `startOffsetMs` + `simpleText`, with the
+    /// `♪` markers Android trims.
+    pub async fn transcript(&self, video_id: &str) -> Result<Vec<LyricLine>, StreamError> {
+        let response = self.transcript_raw(video_id).await?;
+        let cue_groups = get(
+            &response,
+            &[
+                "actions",
+            ],
+        )
+        .and_then(|a| a.as_array())
+        .and_then(|a| a.first())
+        .and_then(|act| {
+            get(
+                act,
+                &[
+                    "updateEngagementPanelAction",
+                    "content",
+                    "transcriptRenderer",
+                    "body",
+                    "transcriptBodyRenderer",
+                    "cueGroups",
+                ],
+            )
+        })
+        .and_then(|c| c.as_array())
+        .cloned()
+        .unwrap_or_default();
+        let mut lines = Vec::new();
+        for group in &cue_groups {
+            let Some(cue) = get(
+                group,
+                &[
+                    "transcriptCueGroupRenderer",
+                    "cues",
+                ],
+            )
+            .and_then(|c| c.as_array())
+            .and_then(|c| c.first())
+            .and_then(|c| c.get("transcriptCueRenderer")) else {
+                continue;
+            };
+            let time_ms = cue
+                .get("startOffsetMs")
+                .and_then(|t| t.as_i64())
+                .unwrap_or(0);
+            let text = cue
+                .get("cue")
+                .and_then(|c| c.get("simpleText"))
+                .and_then(|t| t.as_str())
+                .unwrap_or("")
+                .trim_matches('♪')
+                .trim()
+                .to_string();
+            if text.is_empty() {
                 continue;
             }
-            sections.push(HomeSection {
-                title: title.to_string(),
-                subtitle,
-                items,
-            });
+            lines.push(LyricLine { time_ms, text });
         }
-        Ok(sections)
+        Ok(lines)
+    }
+
+    /// Signed-in account display name via `account_menu` (Android
+    /// `YouTube.accountInfo`). Errors when there is no valid cookie —
+    /// this is the sign-in validation call.
+    pub async fn account_name(&self) -> Result<String, StreamError> {
+        let response = self.account_menu_raw().await?;
+        let name = response
+            .get("actions")
+            .and_then(|a| a.as_array())
+            .and_then(|a| a.first())
+            .and_then(|act| {
+                get(
+                    act,
+                    &[
+                        "openPopupAction",
+                        "popup",
+                        "multiPageMenuRenderer",
+                        "header",
+                        "activeAccountHeaderRenderer",
+                        "accountName",
+                    ],
+                )
+            })
+            .and_then(text_of)
+            .filter(|s| !s.is_empty())
+            .ok_or_else(|| {
+                StreamError::Parse(
+                    "account menu has no active account (cookie invalid or signed out)"
+                        .to_string(),
+                )
+            })?;
+        Ok(name)
     }
 
     /// A playlist (`VL{id}` browse) and its songs. Mixes (`RD…`) take
@@ -544,8 +1069,12 @@ impl InnerTubeSession {
     }
 
     /// Resolve a playable stream URL for a song (see `resolve`).
-    pub async fn resolve_stream(&self, video_id: &str) -> Result<StreamUrl, StreamError> {
-        resolve::resolve_stream(self, video_id).await
+    pub async fn resolve_stream(
+        &self,
+        video_id: &str,
+        audio_quality: &str,
+    ) -> Result<StreamUrl, StreamError> {
+        resolve::resolve_stream(self, video_id, audio_quality).await
     }
 }
 
@@ -554,8 +1083,8 @@ impl MusicService for InnerTubeSession {
         self.home_feed().await.map_err(|e| e.to_string())
     }
 
-    async fn search(&self, query: &str) -> ServiceResult<Vec<HomeItem>> {
-        self.search(query).await.map_err(|e| e.to_string())
+    async fn search(&self, query: &str, filter: Option<&str>) -> ServiceResult<Vec<HomeItem>> {
+        self.search(query, filter).await.map_err(|e| e.to_string())
     }
 
     async fn playlist(&self, id: &str) -> ServiceResult<PlaylistDetail> {
@@ -566,8 +1095,47 @@ impl MusicService for InnerTubeSession {
         self.album(id).await.map_err(|e| e.to_string())
     }
 
-    async fn resolve_stream(&self, song_id: &str) -> ServiceResult<Option<String>> {
-        match self.resolve_stream(song_id).await {
+    async fn artist(&self, id: &str) -> ServiceResult<ArtistDetail> {
+        self.artist(id).await.map_err(|e| e.to_string())
+    }
+
+    async fn charts(&self) -> ServiceResult<Vec<HomeSection>> {
+        self.charts().await.map_err(|e| e.to_string())
+    }
+
+    async fn explore(&self) -> ServiceResult<ExploreData> {
+        self.explore().await.map_err(|e| e.to_string())
+    }
+
+    async fn browse_mood(&self, params: &str) -> ServiceResult<Vec<HomeItem>> {
+        self.browse_mood(params).await.map_err(|e| e.to_string())
+    }
+
+    /// Related songs for a video: `next` → related endpoint → `related`.
+    async fn related_for_video(&self, video_id: &str) -> ServiceResult<Vec<Song>> {
+        let (browse_id, params) = self
+            .next_related_endpoint(video_id)
+            .await
+            .map_err(|e| e.to_string())?;
+        self.related(&browse_id, params.as_deref())
+            .await
+            .map_err(|e| e.to_string())
+    }
+
+    async fn transcript(&self, video_id: &str) -> ServiceResult<Vec<LyricLine>> {
+        self.transcript(video_id).await.map_err(|e| e.to_string())
+    }
+
+    async fn account_name(&self) -> ServiceResult<String> {
+        self.account_name().await.map_err(|e| e.to_string())
+    }
+
+    async fn resolve_stream(
+        &self,
+        song_id: &str,
+        audio_quality: &str,
+    ) -> ServiceResult<Option<String>> {
+        match self.resolve_stream(song_id, audio_quality).await {
             Ok(url) => Ok(Some(url.url)),
             Err(e) => Err(e.to_string()),
         }
