@@ -3,6 +3,7 @@
   <h3>An open-source music player for Android</h3>
 
   <p>
+    <a href="https://aello-music.vercel.app">Website</a> ·
     <a href="https://github.com/Niczzxo/Aello-Music/releases/latest">Download the latest release</a>
   </p>
   <p>Current version: 6.1.40. Works on Android 8.0 and above.</p>
@@ -117,7 +118,9 @@ rebrand and do not show the current app.
 
 Get the latest APK from the
 [releases page](https://github.com/Niczzxo/Aello-Music/releases/latest)
-and install it on your phone. New releases install over previous ones,
+and install it on your phone. You can also get it from the
+[Aello website](https://aello-music.vercel.app), which always points to
+the latest release. New releases install over previous ones,
 so your library, downloads and settings stay in place. The app is
 distributed as a GitHub release APK only.
 
