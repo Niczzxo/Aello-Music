@@ -16,54 +16,241 @@
 <div class="app">
   <aside class="sidebar">
     <div class="brand">
-      <span class="brand-mark" aria-hidden="true">A</span>
+      <img src="img/logo.png" class="brand-mark-img" alt="">
       <div class="brand-text">
         <strong>Aello</strong>
         <small>Sound in Motion</small>
       </div>
     </div>
     <nav class="nav" aria-label="Sections">
-      <button class="nav-item active" type="button" data-view="home">Music</button>
-      <button class="nav-item" type="button" data-view="library">Library</button>
-      <button class="nav-item" type="button" data-view="settings">Settings</button>
+      <button class="nav-item active" type="button" data-view="home" aria-current="page">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        <span>Home</span>
+      </button>
+      <button class="nav-item" type="button" data-view="search">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <span>Search</span>
+      </button>
+      <button class="nav-item" type="button" data-view="library">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m16 6 4 14"/><path d="M12 6v14"/><path d="M8 8v12"/><path d="M4 4v16"/></svg>
+        <span>Library</span>
+      </button>
+      <button class="nav-item" type="button" data-view="trending">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+        <span>Trending</span>
+      </button>
+      <button class="nav-item" type="button" data-view="together">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+        <span>Listen Together</span>
+      </button>
+      <button class="nav-item" type="button" data-view="settings">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>
+        <span>Settings</span>
+      </button>
     </nav>
     <div class="sidebar-foot">
-      <button class="nav-item" type="button" data-view="about">About</button>
+      <button class="nav-item" type="button" data-view="about">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/></svg>
+        <span>About</span>
+      </button>
     </div>
   </aside>
 
   <main class="content">
     <header class="topbar">
-      <input id="search-input" type="search" placeholder="Search songs, albums, playlists" aria-label="Search">
-      <button id="search-btn" type="button">Search</button>
+      <div class="topbar-search">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        <input id="search-input" type="search" placeholder="Search songs, albums, artists, playlists" aria-label="Search">
+      </div>
+      <button id="search-btn" type="button" class="btn-primary">Search</button>
       <span id="account-state" class="account-state">Not signed in</span>
     </header>
 
-    <section id="view-home" class="view" aria-label="Music">
-      <h1>Music</h1>
+    <section id="view-home" class="view" aria-label="Home">
+      <p class="eyebrow" id="home-greeting-eyebrow">Evening chill</p>
+      <h1 id="home-greeting">Good evening</h1>
+      <p class="view-sub">Unwind with your favorite vibes</p>
       <p id="home-status" class="status" role="status">Loading…</p>
       <div id="home-sections"></div>
+    </section>
+
+    <section id="view-search" class="view" hidden aria-label="Search">
+      <h1>Search</h1>
+      <div id="search-tabs" class="segmented" role="tablist" aria-label="Search categories">
+        <button type="button" class="segment-tab active" role="tab" aria-selected="true" data-search-tab="all">All</button>
+        <button type="button" class="segment-tab" role="tab" aria-selected="false" data-search-tab="songs">Songs</button>
+        <button type="button" class="segment-tab" role="tab" aria-selected="false" data-search-tab="albums">Albums</button>
+        <button type="button" class="segment-tab" role="tab" aria-selected="false" data-search-tab="artists">Artists</button>
+        <button type="button" class="segment-tab" role="tab" aria-selected="false" data-search-tab="playlists">Playlists</button>
+      </div>
+      <div id="search-results"></div>
+      <div class="search-moods-block">
+        <h2>Moods &amp; moments</h2>
+        <div id="search-moods" class="mood-grid"></div>
+      </div>
+      <div class="search-history-block">
+        <div class="row-head">
+          <h2>Recent searches</h2>
+          <button id="search-history-clear" type="button" class="btn-ghost">Clear history</button>
+        </div>
+        <ul id="search-history" class="history-list"></ul>
+      </div>
+    </section>
+
+    <section id="view-trending" class="view" hidden aria-label="Trending">
+      <h1>Trending</h1>
+      <p id="trending-status" class="status" role="status">Loading…</p>
+      <div id="trending-sections"></div>
+    </section>
+
+    <section id="view-artist" class="view view-detail" hidden aria-label="Artist">
+      <button id="artist-back" type="button" class="back-btn" data-view="home">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        <span>Back</span>
+      </button>
+      <header id="artist-header" class="detail-header">
+        <img id="artist-art" class="detail-art" alt="" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
+        <div class="detail-info">
+          <p class="eyebrow">Artist</p>
+          <h1 id="artist-name">Artist</h1>
+          <p id="artist-meta" class="muted">—</p>
+          <div class="detail-actions">
+            <button id="artist-play" type="button" class="btn-play" aria-label="Play artist">
+              <svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+              <span>Play</span>
+            </button>
+            <button id="artist-shuffle" type="button" class="btn-ghost">
+              <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.6-8.6c.8-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg>
+              <span>Shuffle</span>
+            </button>
+            <button id="artist-subscribe" type="button" class="btn-ghost">Subscribe</button>
+          </div>
+        </div>
+      </header>
+      <h2>Top songs</h2>
+      <div id="artist-songs"></div>
+      <h2>Albums</h2>
+      <div id="artist-albums"></div>
+      <h2>Related artists</h2>
+      <div id="artist-related"></div>
+    </section>
+
+    <section id="view-together" class="view" hidden aria-label="Listen Together">
+      <h1>Listen Together</h1>
+      <p class="view-sub">Listen in sync with friends in a shared room. Chat, suggest songs, and hand over control.</p>
+      <div class="lt-setup card">
+        <label class="field">Display name
+          <input id="lt-username" type="text" placeholder="Your display name" autocomplete="off">
+        </label>
+        <label class="field">Server
+          <input id="lt-server" type="text" placeholder="wss://devilmi-vivi-music-listen-together.hf.space" autocomplete="off" spellcheck="false">
+        </label>
+        <div class="lt-actions">
+          <button id="lt-create" type="button" class="btn-primary">Create room</button>
+          <span class="muted">or join with a code</span>
+          <input id="lt-join-code" type="text" placeholder="Room code" autocomplete="off" spellcheck="false" aria-label="Room code">
+          <button id="lt-join" type="button" class="btn-ghost">Join</button>
+        </div>
+        <p id="lt-status" class="status" role="status"></p>
+      </div>
+      <div id="lt-room" class="lt-room" hidden>
+        <div class="card lt-room-head">
+          <div>
+            <p class="eyebrow">Room</p>
+            <p class="lt-code"><code id="lt-room-code">—</code></p>
+          </div>
+          <label class="field">Who can control playback
+            <select id="lt-control-mode">
+              <option value="owner" selected>Room owner only</option>
+              <option value="everyone">Everyone</option>
+            </select>
+          </label>
+          <button id="lt-leave" type="button" class="btn-danger">Leave room</button>
+        </div>
+        <div class="lt-grid">
+          <div class="card">
+            <h2>Members</h2>
+            <ul id="lt-members" class="member-list"></ul>
+          </div>
+          <div class="card lt-chat">
+            <h2>Chat</h2>
+            <div id="lt-chat-log" class="chat-log" role="log" aria-live="polite"></div>
+            <div class="chat-input-row">
+              <input id="lt-chat-input" type="text" placeholder="Write a message…" aria-label="Chat message" autocomplete="off">
+              <button id="lt-chat-send" type="button" class="btn-primary" aria-label="Send message">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+              </button>
+            </div>
+            <button id="lt-suggest" type="button" class="btn-ghost">Suggest current song</button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section id="view-library" class="view" hidden aria-label="Library">
       <h1>Library</h1>
       <div class="segments" role="group" aria-label="Library segments">
-        <button type="button" class="segment active" data-segment="playlists">Playlists</button>
-        <button type="button" class="segment" data-segment="albums">Albums</button>
-        <button type="button" class="segment" data-segment="artists">Artists</button>
-        <button type="button" class="segment" data-segment="songs">Songs</button>
-        <button type="button" class="segment" data-segment="downloads">Downloads</button>
+        <button type="button" class="segment chip active" data-segment="playlists">Playlists</button>
+        <button type="button" class="segment chip" data-segment="albums">Albums</button>
+        <button type="button" class="segment chip" data-segment="artists">Artists</button>
+        <button type="button" class="segment chip" data-segment="songs">Songs</button>
+        <button type="button" class="segment chip" data-segment="downloads">Downloads</button>
+        <button type="button" class="segment chip" data-segment="liked">Liked</button>
+        <button type="button" class="segment chip" data-segment="history">History</button>
       </div>
       <div class="library-toolbar">
-        <button id="library-open-files" type="button">Open audio files…</button>
-        <span class="muted">Local files play from this computer and last for this session only.</span>
+        <button id="library-open-files" type="button" class="btn-ghost">Open audio files…</button>
+        <span class="muted">Local files play from this computer.</span>
       </div>
-      <div id="library-list"></div>
+      <!-- Auto-playlist cards: static placeholder content, replaced by JS at runtime. -->
+      <div id="library-list">
+        <div class="auto-grid">
+          <article class="auto-card auto-liked">
+            <svg class="icon auto-icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            <button type="button" class="auto-play" aria-label="Play Liked"><svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg></button>
+            <b>Liked</b><small>Playlist</small>
+          </article>
+          <article class="auto-card auto-downloaded">
+            <svg class="icon auto-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg>
+            <button type="button" class="auto-play" aria-label="Play Downloaded"><svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg></button>
+            <b>Downloaded</b><small>Playlist</small>
+          </article>
+          <article class="auto-card auto-top50">
+            <svg class="icon auto-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            <button type="button" class="auto-play" aria-label="Play My top 50"><svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg></button>
+            <b>My top 50</b><small>Playlist</small>
+          </article>
+          <article class="auto-card auto-local">
+            <svg class="icon auto-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.2 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></svg>
+            <button type="button" class="auto-play" aria-label="Play Local"><svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg></button>
+            <b>Local</b><small>Playlist</small>
+          </article>
+        </div>
+      </div>
     </section>
 
     <section id="view-settings" class="view" hidden aria-label="Settings">
       <h1>Settings</h1>
       <form id="settings-form">
+        <fieldset>
+          <legend>Account</legend>
+          <div id="account-block">
+            <p class="muted">Not signed in. Sign in with Google to sync your liked songs, library, and playlists.</p>
+            <div class="row-actions">
+              <button id="account-signin" type="button" class="btn-primary">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
+                <span>Sign in with Google</span>
+              </button>
+              <button id="account-signout" type="button" class="btn-ghost">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" x2="9" y1="12" y2="12"/></svg>
+                <span>Sign out</span>
+              </button>
+            </div>
+            <label class="field">Channel
+              <select id="account-channel" hidden></select>
+            </label>
+          </div>
+        </fieldset>
         <fieldset>
           <legend>Accent color</legend>
           <label><input type="radio" name="accent" value="aello-red" checked> Aello Red (default)</label>
@@ -83,81 +270,342 @@
         </fieldset>
         <fieldset>
           <legend>Playback</legend>
+          <label>Audio quality
+            <select id="setting-quality" name="quality">
+              <option value="auto" selected>Auto</option>
+              <option value="high">High</option>
+              <option value="low">Low</option>
+            </select>
+          </label>
           <label>Volume
             <input id="setting-volume" type="range" min="0" max="1" step="0.01" value="0.8">
           </label>
-          <label><input id="setting-updates" type="checkbox" checked> Check for updates on startup (planned — no updater yet)</label>
+          <label><input id="setting-crossfade" type="checkbox"> Crossfade between songs</label>
+          <label>Crossfade duration (seconds)
+            <input id="setting-crossfade-duration" type="range" min="1" max="10" step="1" value="5">
+          </label>
+          <label><input id="setting-persistent-queue" type="checkbox" checked> Keep queue between restarts</label>
+          <label><input id="setting-auto-download-like" type="checkbox"> Download songs automatically when liked</label>
+          <label><input id="setting-updates" type="checkbox" checked> Check for updates on startup</label>
+        </fieldset>
+        <fieldset>
+          <legend>Listen Together</legend>
+          <label>Server
+            <select id="setting-listen-together-server" name="listen-together-server">
+              <option value="global" selected>Global (default)</option>
+              <option value="usa">USA</option>
+              <option value="custom">Custom</option>
+            </select>
+          </label>
+          <label class="field">Custom server
+            <input id="setting-lt-custom-server" type="text" placeholder="wss://your-server.example" autocomplete="off" spellcheck="false">
+          </label>
+        </fieldset>
+        <fieldset>
+          <legend>Updates</legend>
+          <div class="row-actions">
+            <button id="settings-check-updates" type="button" class="btn-ghost">Check for updates now</button>
+            <p class="status" id="settings-update-status" role="status"></p>
+          </div>
         </fieldset>
         <p class="status" id="settings-status" role="status"></p>
-        <p class="muted">Download folder (planned): <span id="download-dir-display">Loading…</span></p>
-        <button type="submit">Save settings</button>
+        <p class="muted">Download folder: <span id="download-dir-display">Loading…</span></p>
+        <button type="submit" class="btn-primary">Save settings</button>
       </form>
     </section>
 
-    <section id="view-player" class="view" hidden aria-label="Now playing">
-      <button type="button" class="back-btn" data-view="home">← Back</button>
+    <section id="view-player" class="view view-detail" hidden aria-label="Now playing">
+      <button type="button" class="back-btn" data-view="home">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>
+        <span>Back</span>
+      </button>
       <div class="full-player">
-        <div id="fp-artwork" class="fp-artwork" aria-hidden="true">A</div>
-        <h2 id="fp-title">Nothing playing</h2>
-        <p id="fp-artist" class="muted">Pick a song to start listening.</p>
-        <input id="fp-progress" type="range" min="0" max="100" step="0.1" value="0" aria-label="Seek">
-        <p class="muted"><span id="fp-current-time">0:00</span> / <span id="fp-duration">0:00</span></p>
-        <div class="fp-controls">
-          <button id="fp-prev" type="button">Previous</button>
-          <button id="fp-play" type="button">Play</button>
-          <button id="fp-next" type="button">Next</button>
-          <button id="fp-mute" type="button">Mute</button>
+        <div class="fp-main">
+          <div id="fp-artwork" class="fp-artwork" aria-hidden="true">A</div>
+          <div class="fp-info">
+            <h2 id="fp-title">Nothing playing</h2>
+            <p id="fp-artist" class="muted">Pick a song to start listening.</p>
+            <input id="fp-progress" type="range" min="0" max="100" step="0.1" value="0" aria-label="Seek">
+            <p class="fp-times muted"><span id="fp-current-time">0:00</span> / <span id="fp-duration">0:00</span></p>
+            <div class="fp-controls">
+              <button id="fp-shuffle" type="button" class="icon-btn" aria-label="Shuffle" aria-pressed="false">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.6-8.6c.8-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg>
+              </button>
+              <button id="fp-prev" type="button" class="icon-btn" aria-label="Previous">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" x2="5" y1="19" y2="5"/></svg>
+              </button>
+              <button id="fp-play" type="button" class="play-btn" aria-label="Play or pause">
+                <svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+              </button>
+              <button id="fp-next" type="button" class="icon-btn" aria-label="Next">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg>
+              </button>
+              <button id="fp-repeat" type="button" class="icon-btn repeat-btn" aria-label="Repeat mode" data-repeat="off">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
+                <span class="repeat-label">Off</span>
+              </button>
+            </div>
+            <div class="fp-actions">
+              <button id="fp-like" type="button" class="icon-btn" aria-label="Like this song" aria-pressed="false">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+              </button>
+              <button id="fp-download" type="button" class="icon-btn" aria-label="Download this song">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+              </button>
+              <button id="fp-speed" type="button" class="icon-btn speed-btn" aria-label="Playback speed">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+                <span class="speed-label">1×</span>
+              </button>
+              <button id="fp-sleep" type="button" class="icon-btn" aria-label="Sleep timer" title="Sleep timer">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+              </button>
+              <button id="fp-mute" type="button" class="icon-btn" aria-label="Mute or unmute">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+              </button>
+              <button id="fp-eq-toggle" type="button" class="icon-btn" aria-label="Equalizer" aria-pressed="false">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+              </button>
+              <button id="fp-lyrics-toggle" type="button" class="icon-btn" aria-label="Lyrics" aria-pressed="false">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+              </button>
+            </div>
+          </div>
         </div>
+
+        <div class="fp-panels">
+          <div id="lyrics-panel" class="panel lyrics-panel">
+            <div class="panel-head">
+              <h3>Lyrics</h3>
+              <span id="lyrics-provider" class="muted caption">—</span>
+            </div>
+            <div id="lyrics-lines" class="lyrics-lines" tabindex="0" aria-label="Synced lyrics"></div>
+            <div class="lyrics-controls">
+              <label id="lyrics-offset-label" for="lyrics-offset">Sync offset: 0 ms</label>
+              <input id="lyrics-offset" type="range" min="-5000" max="5000" step="100" value="0" aria-label="Lyrics sync offset in milliseconds">
+              <button id="lyrics-scroll-current" type="button" class="btn-ghost">Scroll to current line</button>
+            </div>
+            <p id="lyrics-status" class="status" role="status"></p>
+          </div>
+
+          <div id="eq-panel" class="panel eq-panel">
+            <div class="panel-head">
+              <h3>Equalizer</h3>
+              <label class="check-inline"><input id="eq-enhance" type="checkbox" checked> Sound Enhance</label>
+            </div>
+            <div class="eq-presets-row">
+              <label class="field">Preset
+                <select id="eq-presets">
+                  <option value="flat">Flat</option>
+                  <option value="enhance" selected>Sound Enhance</option>
+                  <option value="bass">Bass Boost</option>
+                  <option value="treble">Treble Boost</option>
+                  <option value="vocal">Vocal</option>
+                  <option value="custom">Custom</option>
+                </select>
+              </label>
+              <button id="eq-save-preset" type="button" class="btn-ghost">Save preset</button>
+              <button id="eq-delete-preset" type="button" class="btn-ghost">Delete preset</button>
+            </div>
+            <p id="eq-live-note" class="status" role="status" hidden>Live (unsaved) — this curve is playing but not saved. Save it as a preset to keep it.</p>
+            <div id="eq-bands" class="eq-bands">
+              <div class="eq-band">
+                <span class="eq-band-label">80 Hz</span>
+                <input class="eq-gain" data-band="0" type="range" min="-12" max="12" step="0.5" value="3" aria-label="80 Hz gain in decibels">
+                <span class="eq-gain-value">+3.0 dB</span>
+                <input class="eq-freq" data-band="0" type="number" min="20" max="16000" step="1" value="80" aria-label="80 Hz frequency">
+                <select class="eq-type" data-band="0" aria-label="80 Hz filter type">
+                  <option value="lowshelf" selected>Low shelf</option>
+                  <option value="peaking">Peaking</option>
+                  <option value="highshelf">High shelf</option>
+                </select>
+              </div>
+              <div class="eq-band">
+                <span class="eq-band-label">300 Hz</span>
+                <input class="eq-gain" data-band="1" type="range" min="-12" max="12" step="0.5" value="1" aria-label="300 Hz gain in decibels">
+                <span class="eq-gain-value">+1.0 dB</span>
+                <input class="eq-freq" data-band="1" type="number" min="20" max="16000" step="1" value="300" aria-label="300 Hz frequency">
+                <select class="eq-type" data-band="1" aria-label="300 Hz filter type">
+                  <option value="lowshelf">Low shelf</option>
+                  <option value="peaking" selected>Peaking</option>
+                  <option value="highshelf">High shelf</option>
+                </select>
+              </div>
+              <div class="eq-band">
+                <span class="eq-band-label">1000 Hz</span>
+                <input class="eq-gain" data-band="2" type="range" min="-12" max="12" step="0.5" value="0" aria-label="1000 Hz gain in decibels">
+                <span class="eq-gain-value">0.0 dB</span>
+                <input class="eq-freq" data-band="2" type="number" min="20" max="16000" step="1" value="1000" aria-label="1000 Hz frequency">
+                <select class="eq-type" data-band="2" aria-label="1000 Hz filter type">
+                  <option value="lowshelf">Low shelf</option>
+                  <option value="peaking" selected>Peaking</option>
+                  <option value="highshelf">High shelf</option>
+                </select>
+              </div>
+              <div class="eq-band">
+                <span class="eq-band-label">3000 Hz</span>
+                <input class="eq-gain" data-band="3" type="range" min="-12" max="12" step="0.5" value="2" aria-label="3000 Hz gain in decibels">
+                <span class="eq-gain-value">+2.0 dB</span>
+                <input class="eq-freq" data-band="3" type="number" min="20" max="16000" step="1" value="3000" aria-label="3000 Hz frequency">
+                <select class="eq-type" data-band="3" aria-label="3000 Hz filter type">
+                  <option value="lowshelf">Low shelf</option>
+                  <option value="peaking" selected>Peaking</option>
+                  <option value="highshelf">High shelf</option>
+                </select>
+              </div>
+              <div class="eq-band">
+                <span class="eq-band-label">8000 Hz</span>
+                <input class="eq-gain" data-band="4" type="range" min="-12" max="12" step="0.5" value="1.5" aria-label="8000 Hz gain in decibels">
+                <span class="eq-gain-value">+1.5 dB</span>
+                <input class="eq-freq" data-band="4" type="number" min="20" max="16000" step="1" value="8000" aria-label="8000 Hz frequency">
+                <select class="eq-type" data-band="4" aria-label="8000 Hz filter type">
+                  <option value="lowshelf">Low shelf</option>
+                  <option value="peaking">Peaking</option>
+                  <option value="highshelf" selected>High shelf</option>
+                </select>
+              </div>
+            </div>
+            <label class="field eq-preamp-row">Preamp
+              <input id="eq-preamp" type="range" min="-12" max="12" step="0.5" value="-3" aria-label="Preamp in decibels">
+              <span class="eq-gain-value">−3.0 dB</span>
+            </label>
+            <button id="eq-reset" type="button" class="btn-ghost">Reset equalizer</button>
+          </div>
+        </div>
+
         <h3>Queue</h3>
         <ul id="fp-queue" class="queue"></ul>
-        <h3>Lyrics</h3>
-        <p class="muted">Synced lyrics are planned for a later phase and are not available in v0.1.0.</p>
       </div>
     </section>
 
     <section id="view-about" class="view" hidden aria-label="About">
-      <h1>About Aello</h1>
-      <p><strong>Aello</strong> — Sound in Motion.</p>
-      <p>Version 0.1.0 · Windows desktop (unsigned preview build).</p>
-      <p>Developer: Niczzxo</p>
-      <p>
-        Aello is open-source software under the GPL-3.0 license, based on the
-        open-source BeatWave and PulseWave projects. This Windows version is
-        a fresh implementation for desktop; it is not affiliated with
-        YouTube, Google, or Spotify.
-      </p>
-      <p class="muted">
-        No account is signed in. Account sign-in, downloads, lyrics, the
-        equalizer, Listen Together, and Cast are planned for later phases.
-      </p>
+      <div class="about-card card">
+        <img src="img/logo.png" class="brand-mark-img brand-mark-img-lg" alt="">
+        <h1>About Aello</h1>
+        <p><strong>Aello</strong> — Sound in Motion.</p>
+        <p>Version 6.1.45 · Windows desktop (unsigned build).</p>
+        <p>Developer: Niczzxo</p>
+        <p>
+          Aello is open-source software under the GPL-3.0 license, based on the
+          open-source BeatWave and PulseWave projects. This Windows version is
+          a fresh implementation for desktop; it is not affiliated with
+          YouTube, Google, or any other streaming service.
+        </p>
+        <p class="muted">
+          Cast is not available on Windows — there is no Cast SDK for this
+          desktop stack. Everything else in this build — account sign-in,
+          downloads, synced lyrics, the equalizer, Listen Together, and the
+          sleep timer — runs on the desktop.
+        </p>
+      </div>
     </section>
   </main>
 
-  <footer class="player-bar">
+  <aside id="queue-panel" class="queue-panel" hidden aria-label="Play queue">
+    <div class="queue-panel-head">
+      <h2>Queue</h2>
+      <div class="row-actions">
+        <button id="queue-shuffle-play" type="button" class="btn-ghost">Shuffle play</button>
+        <button id="queue-clear" type="button" class="btn-ghost">Clear</button>
+      </div>
+    </div>
+    <ul id="queue-list" class="queue"></ul>
+  </aside>
+
+  <footer class="player-bar" aria-label="Player">
     <div class="pb-track">
       <span id="pb-artwork" class="pb-artwork" aria-hidden="true">A</span>
       <div class="pb-meta">
         <strong id="pb-title">Nothing playing</strong>
         <small id="pb-artist" class="muted">—</small>
       </div>
+      <button id="pb-like" type="button" class="icon-btn" aria-label="Like this song" aria-pressed="false">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+      </button>
     </div>
     <div class="pb-controls">
-      <button id="pb-prev" type="button" aria-label="Previous">⏮</button>
-      <button id="pb-play" type="button" aria-label="Play or pause">▶</button>
-      <button id="pb-next" type="button" aria-label="Next">⏭</button>
-      <span id="pb-current-time">0:00</span>
+      <button id="pb-shuffle" type="button" class="icon-btn" aria-label="Shuffle" aria-pressed="false">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 18h1.4c1.3 0 2.5-.6 3.3-1.7l6.6-8.6c.8-1.1 2-1.7 3.3-1.7H22"/><path d="m18 2 4 4-4 4"/><path d="M2 6h1.9c1.5 0 2.9.9 3.6 2.2"/><path d="M22 18h-5.9c-1.3 0-2.6-.7-3.3-1.8l-.5-.8"/><path d="m18 14 4 4-4 4"/></svg>
+      </button>
+      <button id="pb-prev" type="button" class="icon-btn" aria-label="Previous">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="19 20 9 12 19 4 19 20"/><line x1="5" x2="5" y1="19" y2="5"/></svg>
+      </button>
+      <button id="pb-play" type="button" class="play-btn play-btn-sm" aria-label="Play or pause">
+        <svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>
+      </button>
+      <button id="pb-next" type="button" class="icon-btn" aria-label="Next">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></svg>
+      </button>
+      <button id="pb-repeat" type="button" class="icon-btn repeat-btn" aria-label="Repeat mode" data-repeat="off">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m17 2 4 4-4 4"/><path d="M3 11v-1a4 4 0 0 1 4-4h14"/><path d="m7 22-4-4 4-4"/><path d="M21 13v1a4 4 0 0 1-4 4H3"/></svg>
+        <span class="repeat-label">Off</span>
+      </button>
+    </div>
+    <div class="pb-progress-wrap">
+      <span id="pb-current-time" class="time">0:00</span>
       <input id="pb-progress" type="range" min="0" max="100" step="0.1" value="0" aria-label="Seek">
-      <span id="pb-duration">0:00</span>
+      <span id="pb-duration" class="time">0:00</span>
+    </div>
+    <div class="pb-actions">
+      <button id="pb-download" type="button" class="icon-btn" aria-label="Download this song">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+      </button>
+      <button id="pb-speed" type="button" class="icon-btn speed-btn" aria-label="Playback speed">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+        <span class="speed-label">1×</span>
+      </button>
+      <button id="pb-sleep" type="button" class="icon-btn" aria-label="Sleep timer" title="Sleep timer">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+      </button>
+      <button id="pb-lyrics-toggle" type="button" class="icon-btn" aria-label="Lyrics" aria-pressed="false">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
+      </button>
+      <button id="pb-eq-toggle" type="button" class="icon-btn" aria-label="Equalizer" aria-pressed="false">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg>
+      </button>
+      <button id="pb-queue-toggle" type="button" class="icon-btn" aria-label="Show queue" aria-pressed="false">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" x2="21" y1="6" y2="6"/><line x1="8" x2="21" y1="12" y2="12"/><line x1="8" x2="21" y1="18" y2="18"/><line x1="3" x2="3.01" y1="6" y2="6"/><line x1="3" x2="3.01" y1="12" y2="12"/><line x1="3" x2="3.01" y1="18" y2="18"/></svg>
+      </button>
     </div>
     <div class="pb-side">
-      <button id="pb-mute" type="button" aria-label="Mute or unmute">🔊</button>
-      <button id="pb-open-files" type="button">Open files</button>
-      <label>Volume <input id="pb-volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume"></label>
-      <button id="pb-expand" type="button" data-view="player">Full player</button>
+      <button id="pb-mute" type="button" class="icon-btn" aria-label="Mute or unmute">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+      </button>
+      <input id="pb-volume" type="range" min="0" max="1" step="0.01" value="0.8" aria-label="Volume">
+      <button id="pb-open-files" type="button" class="btn-ghost">Open files</button>
+      <button id="pb-expand" type="button" class="icon-btn" data-view="player" aria-label="Open full player">
+        <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+      </button>
     </div>
     <p id="pb-status" class="pb-status" role="status"></p>
   </footer>
 </div>
+
+<dialog id="sleep-dialog" class="modal" aria-labelledby="sleep-title">
+  <h2 id="sleep-title">Sleep timer</h2>
+  <p class="muted">Playback stops when the timer ends. Volume fades out over the final minute.</p>
+  <div id="sleep-options" class="sleep-options">
+    <button type="button" data-minutes="15">15 minutes</button>
+    <button type="button" data-minutes="30">30 minutes</button>
+    <button type="button" data-minutes="45">45 minutes</button>
+    <button type="button" data-minutes="60">60 minutes</button>
+    <button type="button" data-minutes="90">90 minutes</button>
+    <button type="button" data-minutes="-1">End of song</button>
+  </div>
+  <p id="sleep-status" class="status" role="status"></p>
+  <button id="sleep-cancel" type="button" class="btn-ghost">Cancel</button>
+</dialog>
+
+<dialog id="update-dialog" class="modal" aria-labelledby="update-title">
+  <img src="img/logo.png" class="brand-mark-img brand-mark-img-lg" alt="">
+  <h2 id="update-title">Update available</h2>
+  <p id="update-version" class="muted">—</p>
+  <p id="update-notes"></p>
+  <div class="row-actions">
+    <button id="update-download" type="button" class="btn-primary">Download update</button>
+    <button id="update-later" type="button" class="btn-ghost">Later</button>
+  </div>
+  <p id="update-status" class="status" role="status"></p>
+</dialog>
 
 <audio id="audio" preload="metadata"></audio>
 
