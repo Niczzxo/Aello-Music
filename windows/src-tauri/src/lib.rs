@@ -36,22 +36,22 @@ pub struct AppState {
 
 #[tauri::command]
 async fn get_home_feed(state: State<'_, AppState>) -> Result<Vec<HomeSection>, String> {
-    state.music.home_feed().await.map_err(|e| e.to_string())
+    MusicService::home_feed(&state.music).await
 }
 
 #[tauri::command]
 async fn search_music(state: State<'_, AppState>, query: String) -> Result<Vec<HomeItem>, String> {
-    state.music.search(&query).await.map_err(|e| e.to_string())
+    MusicService::search(&state.music, &query).await
 }
 
 #[tauri::command]
 async fn get_playlist(state: State<'_, AppState>, id: String) -> Result<PlaylistDetail, String> {
-    state.music.playlist(&id).await.map_err(|e| e.to_string())
+    MusicService::playlist(&state.music, &id).await
 }
 
 #[tauri::command]
 async fn get_album(state: State<'_, AppState>, id: String) -> Result<AlbumDetail, String> {
-    state.music.album(&id).await.map_err(|e| e.to_string())
+    MusicService::album(&state.music, &id).await
 }
 
 #[tauri::command]
@@ -59,11 +59,10 @@ async fn resolve_stream(
     state: State<'_, AppState>,
     song_id: String,
 ) -> Result<Option<String>, String> {
-    state
-        .music
-        .resolve_stream(&song_id)
-        .await
-        .map_err(|e| e.to_string())
+    // Call the MusicService trait method explicitly: the inherent
+    // `InnerTubeSession::resolve_stream` returns `StreamUrl`, while the
+    // trait contract (and this command) return `Option<String>`.
+    MusicService::resolve_stream(&state.music, &song_id).await
 }
 
 #[tauri::command]
