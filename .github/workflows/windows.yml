@@ -1,7 +1,16 @@
 # Aello for Windows — release build (consolidated repo: Niczzxo/Aello-Music).
 # Windows source lives in windows/; Android source lives at the repo root.
-# Trigger: publish a release on tag windows-vX.Y.Z (e.g. windows-v0.1.0).
-# The workflow then creates release X.Y.Z with the unsigned NSIS installer.
+#
+# UNIFIED RELEASE MODEL (2026-10-30, user order): phone and PC share ONE
+# version and ONE release, tag vX.Y.Z, carrying APK + EXE + the two auto
+# source zips (like release 0.1.0, which carried both binaries).
+#
+# Trigger: push tag windows-vX.Y.Z (e.g. windows-v6.1.45) AFTER the
+# Android release vX.Y.Z already exists (the parent sequences it first:
+# Android release first, then the windows-vX.Y.Z trigger).
+#
+# This workflow builds the unsigned NSIS installer and uploads it to the
+# EXISTING release vX.Y.Z — it never creates a release of its own.
 # Android tags (v6.1.x) never trigger this workflow.
 name: Release Aello Windows
 
@@ -32,14 +41,34 @@ jobs:
         with:
           workspaces: './windows/src-tauri -> target'
 
-      - name: Build and publish
+      # Guard: the unified release vX.Y.Z (Android) must already exist.
+      # If it does not, fail here — tauri-action would otherwise CREATE
+      # a Windows-only release vX.Y.Z, breaking the one-release model.
+      - name: Check the unified release exists
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${GITHUB_REF_NAME#windows-v}"
+          echo "Windows trigger tag: $GITHUB_REF_NAME (version $VERSION)"
+          gh release view "v$VERSION" --json tagName --jq .tagName
+          echo "Unified release v$VERSION exists - uploading the EXE to it."
+
+      - name: Build and upload to the unified release
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           projectPath: windows
-          tagName: __VERSION__
-          releaseName: 'Aello v__VERSION__ for Windows'
+          # __VERSION__ is replaced by tauri-action with the version from
+          # windows/src-tauri/tauri.conf.json (6.1.45). The tag v6.1.45
+          # already exists (Android release), so the action finds it and
+          # uploads the EXE to it instead of creating a release.
+          # releaseName is only used if no release exists for the tag -
+          # the guard step above makes that unreachable. releaseDraft
+          # must stay false: the Android release is published, not a draft.
+          tagName: v__VERSION__
+          releaseName: 'Aello v__VERSION__'
           releaseBody: 'See the release notes below.'
           releaseDraft: false
           prerelease: false
