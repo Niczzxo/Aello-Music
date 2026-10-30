@@ -1,0 +1,46 @@
+# Aello for Windows — release build (consolidated repo: Niczzxo/Aello-Music).
+# Windows source lives in windows/; Android source lives at the repo root.
+# Trigger: publish a release on tag windows-vX.Y.Z (e.g. windows-v0.1.0).
+# The workflow then creates release X.Y.Z with the unsigned NSIS installer.
+# Android tags (v6.1.x) never trigger this workflow.
+name: Release Aello Windows
+
+on:
+  push:
+    tags:
+      - 'windows-v*'
+
+jobs:
+  release:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Rust cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: './windows/src-tauri -> target'
+
+      - name: Build and publish
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          projectPath: windows
+          tagName: __VERSION__
+          releaseName: 'Aello v__VERSION__ for Windows'
+          releaseBody: 'See the release notes below.'
+          releaseDraft: false
+          prerelease: false
+          args: --no-sign
