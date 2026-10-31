@@ -52,9 +52,11 @@ never invent data.
 | `lt_create_room` | `username: String` | `{ roomCode: String }` | POST `{server}/api/rooms` (server from settings, default `https://devilmi-vivi-music-listen-together.hf.space`); empty body; returns `{room_code}`. The WebSocket itself runs in frontend JS. |
 | `open_update_download` | `url: String` | `()` | Opens the URL in the system browser (opener plugin or `open` crate — pick what builds; if neither is available, return Err and the UI shows the link). |
 | `signin_start` | — | `{ authUrl: String }` | Returns the Google ServiceLogin URL (continue=music.youtube.com) for the login WebView window. |
-| `signin_finish` | `cookie: String, visitorData: Option<String>` | `{ accountName: String }` | Validates the cookie by calling InnerTube with it (a `browse` that requires auth); stores cookie + visitorData in the Rust settings store (NEVER in JS storage); returns the account display name. Rejects on a blank/invalid cookie. |
-| `signin_status` | — | `{ signedIn: bool, accountName: Option<String> }` | |
-| `sign_out` | — | `()` | Clears cookie + visitorData locally. |
+| `signin_poll_capture` | — | `{ status: "not-signed-in" \| "window-gone" \| "signed-in" \| "needs-channel" \| "validation-failed", accountName?, avatarUrl?, channels?, message? }` | One auto-capture poll: reads the login window's WebView2 cookies via `ICoreWebView2CookieManager` (including HttpOnly SAPISID — `document.cookie` is never used) and, once SAPISID appears, validates via `account_menu` and stores cookie + visitorData + account info in the Rust settings store (NEVER in JS storage). The cookie never crosses into JS. `window-gone` = user closed the login window; `needs-channel` = account has >1 channel, frontend shows the picker. |
+| `signin_choose_channel` | `dataSyncId: String` | `{ accountName, avatarUrl, channels, needsChannelChoice: false }` | Applies the picked channel's identity (`context.user.onBehalfOfUser`), re-validates the account name with it, persists the choice. Rejects an id that isn't one of the channels stored at sign-in. |
+| `signin_finish` | `cookie: String, visitorData: Option<String>` | `{ accountName, avatarUrl, channels, needsChannelChoice }` | Same validation path as `signin_poll_capture` (shared `finish_signin`); kept as a command for completeness — the frontend no longer passes cookies through JS. Rejects on a blank/invalid cookie. |
+| `signin_status` | — | `{ signedIn: bool, accountName?, avatarUrl?, channelName?, dataSyncId?, channels: [] }` | Stored auth state only — no network call. |
+| `sign_out` | — | `()` | Clears cookie + visitorData + channel identity locally and deletes the WebView2 cookies (best-effort, never fails sign-out) so a re-sign-in prompts again. |
 
 ## Settings additions (extend `AppSettings`, keep old fields)
 
