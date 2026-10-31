@@ -22,6 +22,32 @@
   --entity-color: #fb2831;
   --entity-fallback: #1c1c1e;
 
+  /* Glass system (one system, shared everywhere — no one-off blurs).
+     Blur is applied ONLY to floating/overlay surfaces (player pill,
+     queue panel, dialogs, sidebar, search bar, segmented control);
+     in-flow cards/panels use --surface-glass (translucent, no blur)
+     so long lists keep scrolling at 60fps. Blur radii stay 12–20px
+     except the two floating pills at 24px; the blur value itself is
+     never animated. */
+  --glass-blur-sm: 12px;
+  --glass-blur: 16px;
+  --glass-blur-lg: 24px;
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  --surface-glass: rgba(24, 24, 27, 0.78);
+  --shadow-glass: 0 20px 25px rgba(0, 0, 0, 0.35);
+  --shadow-lift: 0 12px 24px rgba(0, 0, 0, 0.35);
+
+  /* Motion system (quick-reference §7: transform/opacity only, exit
+     faster than enter, spring only for entrances, stagger capped).
+     Durations are chosen by distance/complexity, not one value. */
+  --motion-fast: 160ms;
+  --motion-base: 220ms;
+  --motion-med: 320ms;
+  --motion-slow: 480ms;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-exit: cubic-bezier(0.4, 0, 1, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+
   /* Shapes — four corners, no more */
   --radius-art: 12px;
   --radius-control: 12px;
@@ -56,6 +82,10 @@ html[data-appearance="light"] {
   --glass-elevated: rgba(0, 0, 0, 0.10);
   --glass-border: rgba(0, 0, 0, 0.12);
   --line: rgba(0, 0, 0, 0.10);
+  --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  --surface-glass: rgba(255, 255, 255, 0.82);
+  --shadow-glass: 0 20px 25px rgba(0, 0, 0, 0.18);
+  --shadow-lift: 0 12px 24px rgba(0, 0, 0, 0.18);
 }
 
 @media (prefers-color-scheme: light) {
@@ -70,6 +100,10 @@ html[data-appearance="light"] {
     --glass-elevated: rgba(0, 0, 0, 0.10);
     --glass-border: rgba(0, 0, 0, 0.12);
     --line: rgba(0, 0, 0, 0.10);
+    --glass-highlight: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+    --surface-glass: rgba(255, 255, 255, 0.82);
+    --shadow-glass: 0 20px 25px rgba(0, 0, 0, 0.18);
+    --shadow-lift: 0 12px 24px rgba(0, 0, 0, 0.18);
   }
 }
 
@@ -96,14 +130,16 @@ button {
   border-radius: var(--radius-control);
   padding: 8px 16px;
   cursor: pointer;
-  transition: border-color 200ms ease, background 200ms ease, opacity 200ms ease;
+  transition: border-color var(--motion-base) ease, background var(--motion-base) ease, opacity var(--motion-base) ease, transform var(--motion-fast) var(--ease-out), box-shadow var(--motion-base) ease;
 }
 button:hover { border-color: var(--glass-border); }
+button:active { transform: scale(0.97); }
 button:focus-visible, input:focus-visible, select:focus-visible, [tabindex]:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 button:disabled { opacity: 0.4; cursor: default; }
+button:disabled:active { transform: none; }
 
 h1 {
   font-family: var(--font-display);
@@ -159,8 +195,11 @@ p { margin: 0 0 8px; }
 }
 
 .sidebar {
-  background: var(--bg-elevated);
-  border-right: 1px solid var(--line);
+  background: var(--surface-glass);
+  border-right: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
   padding: var(--gutter) 14px;
   display: flex;
   flex-direction: column;
@@ -201,11 +240,16 @@ p { margin: 0 0 8px; }
   font-size: 15px;
   line-height: 20px;
   color: var(--text);
+  transition: background var(--motion-base) ease, color var(--motion-base) ease, transform var(--motion-fast) var(--ease-out);
 }
-.nav-item .icon { width: 20px; height: 20px; color: var(--muted); transition: color 200ms ease; }
+.nav-item .icon { width: 20px; height: 20px; color: var(--muted); transition: color var(--motion-base) ease, transform var(--motion-fast) var(--ease-out); }
 .nav-item:hover { background: var(--glass); }
 .nav-item:hover .icon { color: var(--text); }
-.nav-item.active { background: rgba(251, 40, 49, 0.14); color: #fff; }
+.nav-item:active { transform: scale(0.98); }
+.nav-item.active { background: rgba(251, 40, 49, 0.14); color: var(--text); }
+/* Active text is the theme text color, not hardcoded white: on the
+   light theme the red-tinted active background is pale and white
+   text on it fails contrast (screenshot catch, 2026-10-31). */
 .nav-item.active .icon { color: var(--accent); }
 .sidebar-foot { margin-top: auto; }
 
@@ -227,10 +271,18 @@ p { margin: 0 0 8px; }
   display: flex;
   align-items: center;
   gap: 8px;
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--surface-glass);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight);
   border-radius: 999px;
   padding: 2px 8px 2px 16px;
+  backdrop-filter: blur(var(--glass-blur-sm));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
+  transition: border-color var(--motion-base) ease, box-shadow var(--motion-base) ease;
+}
+.topbar-search:focus-within {
+  border-color: var(--accent);
+  box-shadow: var(--glass-highlight), 0 0 0 3px rgba(251, 40, 49, 0.25);
 }
 .topbar-search .icon { width: 18px; height: 18px; color: var(--muted); }
 .topbar-search input[type="search"] {
@@ -241,21 +293,94 @@ p { margin: 0 0 8px; }
   outline: none;
   min-width: 0;
 }
+/* The pill itself carries the focus ring (focus-within above), so the
+   inner input must not draw a second one. */
+.topbar-search input[type="search"]:focus-visible { outline: none; }
 .account-state {
   margin-left: auto;
   background: var(--glass);
   border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight);
   border-radius: 999px;
   padding: 8px 16px;
   color: var(--text);
   font-size: 13px;
   font-weight: 600;
   white-space: nowrap;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  transition: background var(--motion-base) ease, border-color var(--motion-base) ease;
 }
 
+/* Account photo from the `account_menu` response (Settings → Account). */
+.account-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--glass-border);
+  flex: none;
+}
+
+/* ---------- Account block (Settings → Account) ---------- */
+.account-identity {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 16px;
+}
+.account-identity-text { min-width: 0; flex: 1; }
+.account-name {
+  margin: 0 0 2px;
+  font-weight: 700;
+  font-size: 15px;
+  line-height: 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Sign-in flow status: one line under the account name, with a state
+   dot (color is never the only signal — the text always says the
+   state). States: idle, waiting (login window open), capturing
+   (cookies being validated), success, needs-channel, cancelled, error. */
+.signin-status {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 400;
+}
+.signin-status::before {
+  content: "";
+  width: 8px;
+  height: 8px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--muted);
+  transform: translateY(-1px);
+  transition: background var(--motion-base) ease;
+}
+.signin-status[data-state="waiting"]::before,
+.signin-status[data-state="capturing"]::before {
+  background: #f59e0b;
+  animation: status-pulse 1.2s ease-in-out infinite;
+}
+.signin-status[data-state="success"]::before { background: var(--success); }
+.signin-status[data-state="needs-channel"]::before { background: var(--accent); }
+.signin-status[data-state="cancelled"]::before { background: var(--muted); }
+.signin-status[data-state="error"]::before { background: #ef4444; }
+.signin-status[data-state="error"] { color: #f87171; }
+.channel-picker select { width: 100%; }
+
 .view[hidden] { display: none; }
+/* View transition: fade + slight rise on every navigation (the
+   animation re-runs each time `hidden` flips). Fill `backwards` so
+   the finished state is the element's own styles — hover transforms
+   inside the view are never overridden by a lingering fill. */
+.view:not([hidden]) { animation: view-in var(--motion-med) var(--ease-out) backwards; }
 
 /* Per-entity color: detail pages are ONE uniform color from the artwork.
    JS sets --entity-color on :root (document.documentElement); default is
@@ -286,12 +411,13 @@ p { margin: 0 0 8px; }
 .btn-ghost {
   background: var(--glass);
   border-color: var(--glass-border);
+  box-shadow: var(--glass-highlight);
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(var(--glass-blur-sm));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
 }
 .btn-ghost .icon { width: 18px; height: 18px; }
 
@@ -316,6 +442,7 @@ p { margin: 0 0 8px; }
   color: var(--text);
 }
 .icon-btn:hover { background: var(--glass); border-color: transparent; }
+.icon-btn:active { transform: scale(0.92); }
 .icon-btn[aria-pressed="true"] { color: var(--accent); background: rgba(251, 40, 49, 0.12); }
 
 .play-btn {
@@ -330,9 +457,10 @@ p { margin: 0 0 8px; }
   border: 1px solid var(--accent);
   border-radius: 50%;
   color: #fff;
-  transition: transform 200ms ease, opacity 200ms ease;
+  transition: transform var(--motion-base) var(--ease-spring), opacity var(--motion-base) ease, box-shadow var(--motion-base) ease;
 }
-.play-btn:hover { opacity: 0.92; border-color: var(--accent); transform: scale(1.04); }
+.play-btn:hover { opacity: 0.92; border-color: var(--accent); transform: scale(1.04); box-shadow: 0 8px 20px rgba(251, 40, 49, 0.35); }
+.play-btn:active { transform: scale(0.97); }
 .play-btn .icon { width: 26px; height: 26px; }
 .play-btn-sm { width: 48px; height: 48px; }
 .play-btn-sm .icon { width: 22px; height: 22px; }
@@ -376,20 +504,23 @@ p { margin: 0 0 8px; }
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
+  transition: border-color var(--motion-base) ease, color var(--motion-base) ease, background var(--motion-base) ease, transform var(--motion-fast) var(--ease-out);
 }
 .chip:hover { border-color: var(--accent); }
+.chip:active { transform: scale(0.97); }
 .chip.active { border-color: var(--accent); color: var(--accent); }
 
 .segmented {
   display: inline-flex;
   background: var(--glass);
   border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight);
   border-radius: 999px;
   padding: 4px;
   gap: 2px;
   margin-bottom: var(--section-gap);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
 }
 .segment-tab {
   background: transparent;
@@ -399,8 +530,10 @@ p { margin: 0 0 8px; }
   font-weight: 600;
   font-size: 14px;
   color: var(--muted);
+  transition: background var(--motion-base) ease, color var(--motion-base) ease, transform var(--motion-fast) var(--ease-out);
 }
 .segment-tab:hover { color: var(--text); border-color: transparent; }
+.segment-tab:active { transform: scale(0.97); }
 .segment-tab.active { background: var(--glass-elevated); color: var(--accent); }
 
 .segments { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px; }
@@ -431,7 +564,10 @@ p { margin: 0 0 8px; }
   font-weight: 700;
   font-size: 13px;
   white-space: nowrap;
+  transition: opacity var(--motion-base) ease, transform var(--motion-fast) var(--ease-out);
 }
+.play-all:hover { opacity: 0.85; border-color: transparent; }
+.play-all:active { transform: scale(0.96); }
 .play-all .icon { width: 14px; height: 14px; }
 
 .card-row {
@@ -440,15 +576,22 @@ p { margin: 0 0 8px; }
   gap: var(--gap);
 }
 .card {
-  background: var(--card);
-  border: 1px solid var(--line);
+  /* Glass surface WITHOUT backdrop-filter: cards repeat in long
+     grids, and per-card blur would cost scroll frames for a blur
+     nobody can see over the uniform page background. The
+     translucency still reads as glass over the tinted detail pages. */
+  background: var(--surface-glass);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight);
   border-radius: var(--radius-card);
   padding: 16px;
   text-align: left;
   cursor: pointer;
-  transition: border-color 200ms ease, transform 200ms ease;
+  transition: border-color var(--motion-base) ease, transform var(--motion-base) var(--ease-out), box-shadow var(--motion-base) ease;
 }
-.card:hover { border-color: var(--accent); }
+.card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--glass-highlight), var(--shadow-lift); }
+.card:active { transform: translateY(0) scale(0.99); }
+.card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .card-art {
   height: 140px;
   border-radius: var(--radius-art);
@@ -516,7 +659,9 @@ p { margin: 0 0 8px; }
   cursor: pointer;
   transition: transform 200ms ease;
 }
-.auto-card:hover { transform: translateY(-2px); }
+.auto-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-lift); }
+.auto-card:active { transform: translateY(0) scale(0.98); }
+.auto-card:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
 .auto-card b { font-size: 15px; line-height: 20px; position: absolute; left: 16px; bottom: 36px; }
 .auto-card small { font-size: 13px; line-height: 18px; opacity: 0.85; position: absolute; left: 16px; bottom: 16px; }
 .auto-icon { width: 56px; height: 56px; margin-bottom: 28px; }
@@ -654,9 +799,10 @@ p { margin: 0 0 8px; }
 /* ---------- Settings ---------- */
 #settings-form { max-width: 720px; }
 #settings-form fieldset {
-  border: 1px solid var(--line);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-card);
-  background: var(--card);
+  background: var(--surface-glass);
+  box-shadow: var(--glass-highlight);
   padding: 20px;
   margin: 0 0 16px;
 }
@@ -707,8 +853,13 @@ p { margin: 0 0 8px; }
 
 .fp-panels { display: grid; grid-template-columns: 1fr 1fr; gap: var(--gap); align-items: start; }
 .panel {
-  background: var(--card);
-  border: 1px solid var(--line);
+  /* Glass surface, no blur (same reason as .card): panels repeat
+     down long pages; translucency + border + highlight carry the
+     glass read, and over the tinted player/artist pages the entity
+     color shows through. */
+  background: var(--surface-glass);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight);
   border-radius: var(--radius-card);
   padding: 20px;
 }
@@ -743,6 +894,34 @@ p { margin: 0 0 8px; }
 }
 .lyric-line:hover { opacity: 0.75; border-color: transparent; }
 .lyric-line.current { opacity: 1; font-weight: 800; font-size: 21px; }
+/* Lyrics styles (audit #35, styles only): Fade dims non-current
+ * lines; Glow lights the current line. No motion — the polish pass
+ * owns animation. */
+.lyrics-lines.lyrics-style-fade .lyric-line:not(.current) { opacity: 0.45; }
+.lyrics-lines.lyrics-style-glow .lyric-line.current { text-shadow: 0 0 14px var(--accent); }
+
+/* Home chips (audit #1) + loading skeletons (R4). Skeletons shimmer
+ * with a slow gradient sweep (GSAP skeleton guidance: gradient
+ * background-position sweep, 1.4s loop, one synced wave per group);
+ * the sweep is background-position only — no layout work. */
+.home-chips { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 16px; }
+.skeleton-block { margin-bottom: 28px; }
+.skeleton-line {
+  background: linear-gradient(100deg, var(--card-2) 40%, var(--glass-elevated) 50%, var(--card-2) 60%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 6px;
+}
+.skeleton-title { width: 180px; height: 22px; margin-bottom: 12px; }
+.skeleton-row { display: flex; gap: 16px; }
+.skeleton-card {
+  flex: 1;
+  height: 140px;
+  background: linear-gradient(100deg, var(--card-2) 40%, var(--glass-elevated) 50%, var(--card-2) 60%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: var(--radius-art);
+}
 .lyrics-controls { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
 .lyrics-controls label { font-size: 13px; color: var(--muted); }
 .lyrics-controls input[type="range"] { flex: 1; min-width: 140px; }
@@ -819,13 +998,14 @@ p { margin: 0 0 8px; }
   background: var(--glass);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(var(--glass-blur-lg)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--glass-blur-lg)) saturate(1.4);
+  box-shadow: var(--glass-highlight), var(--shadow-glass);
   display: flex;
   gap: 16px;
   align-items: center;
   padding: 10px 18px;
+  animation: player-in var(--motion-slow) var(--ease-out) backwards;
 }
 .pb-track { display: flex; gap: 12px; align-items: center; min-width: 0; flex: 0 1 260px; }
 .pb-artwork {
@@ -862,13 +1042,16 @@ p { margin: 0 0 8px; }
   left: 50%;
   transform: translateX(-50%);
   margin: 0;
-  background: var(--card-2);
-  border: 1px solid var(--line);
+  background: var(--surface-glass);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight);
   border-radius: 999px;
   padding: 6px 16px;
   font-size: 12px;
   white-space: nowrap;
-  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(var(--glass-blur-sm));
+  -webkit-backdrop-filter: blur(var(--glass-blur-sm));
+  animation: status-in var(--motion-base) var(--ease-out) backwards;
 }
 .pb-status:empty { display: none; }
 
@@ -887,10 +1070,11 @@ input[type="range"] { accent-color: var(--accent); cursor: pointer; }
   background: var(--glass);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-lg);
-  backdrop-filter: blur(24px) saturate(1.4);
-  -webkit-backdrop-filter: blur(24px) saturate(1.4);
-  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(var(--glass-blur-lg)) saturate(1.4);
+  -webkit-backdrop-filter: blur(var(--glass-blur-lg)) saturate(1.4);
+  box-shadow: var(--glass-highlight), var(--shadow-glass);
   padding: 20px;
+  animation: panel-in var(--motion-base) var(--ease-out) backwards;
 }
 .queue-panel[hidden] { display: none; }
 .queue-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
@@ -910,6 +1094,7 @@ input[type="range"] { accent-color: var(--accent); cursor: pointer; }
   border-radius: var(--radius-control);
   cursor: pointer;
   font-size: 14px;
+  transition: background var(--motion-base) ease;
 }
 .history-list li:hover { background: var(--card); }
 .history-list .icon { width: 18px; height: 18px; color: var(--muted); }
@@ -920,8 +1105,9 @@ input[type="range"] { accent-color: var(--accent); cursor: pointer; }
   margin-bottom: 28px;
 }
 .mood-card {
-  background: var(--card);
-  border: 1px solid var(--line);
+  background: var(--surface-glass);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight);
   border-radius: var(--radius-card);
   min-height: 84px;
   display: flex;
@@ -930,8 +1116,11 @@ input[type="range"] { accent-color: var(--accent); cursor: pointer; }
   font-weight: 700;
   font-size: 15px;
   text-align: left;
+  transition: border-color var(--motion-base) ease, transform var(--motion-base) var(--ease-out), box-shadow var(--motion-base) ease;
 }
-.mood-card:hover { border-color: var(--accent); }
+.mood-card:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: var(--glass-highlight), var(--shadow-lift); }
+.mood-card:active { transform: translateY(0) scale(0.99); }
+.mood-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
 /* ---------- About ---------- */
 .about-card { max-width: 640px; padding: 28px; }
@@ -939,16 +1128,21 @@ input[type="range"] { accent-color: var(--accent); cursor: pointer; }
 
 /* ---------- Dialogs (dark, card #1B1B30 per design system) ---------- */
 dialog.modal {
-  background: #1b1b30;
+  background: rgba(27, 27, 48, 0.88);
   color: var(--text);
   border: 1px solid var(--glass-border);
+  box-shadow: var(--glass-highlight), var(--shadow-glass);
   border-radius: var(--radius-lg);
   padding: 28px;
   max-width: 480px;
   width: calc(100vw - 48px);
-  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(20px) saturate(1.3);
+  -webkit-backdrop-filter: blur(20px) saturate(1.3);
 }
-dialog.modal::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(4px); }
+dialog.modal[open] { animation: dialog-in var(--motion-base) var(--ease-out) backwards; }
+dialog.modal[open]::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); animation: backdrop-in var(--motion-base) ease backwards; }
+dialog.modal.closing { animation: dialog-out 140ms var(--ease-exit) both; }
+dialog.modal.closing::backdrop { background: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); animation: backdrop-out 140ms var(--ease-exit) both; }
 dialog.modal h2 { margin-top: 0; }
 .sleep-options {
   display: grid;
@@ -959,7 +1153,162 @@ dialog.modal h2 { margin-top: 0; }
 .sleep-options button { padding: 10px 8px; font-size: 14px; }
 .sleep-options button[aria-pressed="true"] { background: var(--accent); border-color: var(--accent); color: #fff; }
 
+/* ---------- Motion system (keyframes) ----------
+   All motion is transform/opacity-only (quick-reference §7). Exit
+   animations are ~60–70% of enter durations. Stagger is capped:
+   nth-child delays stop at 7 × 40ms = 280ms so the last visible item
+   never lags the first by more than ~300ms total. Fill mode is
+   `backwards` so finished animations never override hover states. */
+@keyframes view-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes item-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes dialog-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes dialog-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(4px) scale(0.98); }
+}
+@keyframes backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes backdrop-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+@keyframes panel-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes player-in {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes status-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(6px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
+}
+@keyframes status-pulse {
+  0%, 100% { opacity: 1; transform: translateY(-1px) scale(1); }
+  50% { opacity: 0.45; transform: translateY(-1px) scale(0.8); }
+}
+@keyframes boot-ring-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes boot-logo-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+/* List entrance stagger (capped at 8 items, 40ms steps). Applies to
+   freshly rendered rows only — the animation runs once per insert
+   and `backwards` fill leaves the rows' own styles in charge after. */
+.card-row > *,
+.auto-grid > *,
+.mood-grid > * { animation: item-in 280ms var(--ease-out) backwards; }
+.card-row > *:nth-child(2), .auto-grid > *:nth-child(2), .mood-grid > *:nth-child(2) { animation-delay: 40ms; }
+.card-row > *:nth-child(3), .auto-grid > *:nth-child(3), .mood-grid > *:nth-child(3) { animation-delay: 80ms; }
+.card-row > *:nth-child(4), .auto-grid > *:nth-child(4), .mood-grid > *:nth-child(4) { animation-delay: 120ms; }
+.card-row > *:nth-child(5), .auto-grid > *:nth-child(5), .mood-grid > *:nth-child(5) { animation-delay: 160ms; }
+.card-row > *:nth-child(6), .auto-grid > *:nth-child(6), .mood-grid > *:nth-child(6) { animation-delay: 200ms; }
+.card-row > *:nth-child(7), .auto-grid > *:nth-child(7), .mood-grid > *:nth-child(7) { animation-delay: 240ms; }
+.card-row > *:nth-child(n+8), .auto-grid > *:nth-child(n+8), .mood-grid > *:nth-child(n+8) { animation-delay: 280ms; }
+.track-list > li, .history-list > li, .queue > li { animation: item-in 240ms var(--ease-out) backwards; }
+.track-list > li:nth-child(2), .history-list > li:nth-child(2), .queue > li:nth-child(2) { animation-delay: 30ms; }
+.track-list > li:nth-child(3), .history-list > li:nth-child(3), .queue > li:nth-child(3) { animation-delay: 60ms; }
+.track-list > li:nth-child(4), .history-list > li:nth-child(4), .queue > li:nth-child(4) { animation-delay: 90ms; }
+.track-list > li:nth-child(5), .history-list > li:nth-child(5), .queue > li:nth-child(5) { animation-delay: 120ms; }
+.track-list > li:nth-child(6), .history-list > li:nth-child(6), .queue > li:nth-child(6) { animation-delay: 150ms; }
+.track-list > li:nth-child(7), .history-list > li:nth-child(7), .queue > li:nth-child(7) { animation-delay: 180ms; }
+.track-list > li:nth-child(n+8), .history-list > li:nth-child(n+8), .queue > li:nth-child(n+8) { animation-delay: 210ms; }
+
+/* ---------- Boot loader ----------
+   Circular logo with a breathing scale + a spinning ring around it,
+   on the page background (never a black screen — MASTER.md rule).
+   JS adds .done once the shell is ready; a 5s inline fallback in
+   index.html covers the case where app.js fails to load. */
+.boot-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  transition: opacity var(--motion-med) ease;
+}
+.boot-loader.done { opacity: 0; pointer-events: none; }
+.boot-logo { position: relative; width: 96px; height: 96px; }
+.boot-logo img {
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  object-fit: cover;
+  display: block;
+  animation: boot-logo-breathe 1.6s ease-in-out infinite;
+}
+.boot-ring {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--accent);
+  border-right-color: rgba(251, 40, 49, 0.35);
+  animation: boot-ring-spin 1.2s linear infinite;
+}
+.boot-text {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.01em;
+}
+
 /* ---------- Responsive ---------- */
+/* The player bar's fixed content is ~1072px wide, but the pill only
+   has ~975px at 1280w and ~895px at the 1200w default — measured
+   overflow 97px / 177px (screenshot probe, 2026-10-31). Tighten gaps
+   and shrinkable widths below 1400px so every control stays visible;
+   below 900px the bar wraps to two rows as before. */
+@media (max-width: 1400px) {
+  .player-bar { gap: 10px; padding: 10px 14px; }
+  .pb-track { flex-basis: 200px; }
+  .pb-controls { gap: 2px; }
+  .pb-progress-wrap { min-width: 120px; }
+  .pb-side { gap: 6px; }
+  .pb-side input[type="range"] { width: 64px; }
+}
+/* At the 1200w default a further ~63px is still clipped: shrink the
+   track meta and the bar's icon buttons (play button untouched). */
+@media (max-width: 1280px) {
+  .pb-track { flex-basis: 160px; }
+  .player-bar .icon-btn { width: 36px; height: 36px; }
+}
+/* Below 1100px even the squeezed single row overflows (~71px at
+   1100w), so the bar wraps to two rows (progress full-width) and the
+   content reserves room for the taller pill. */
+@media (max-width: 1100px) {
+  .player-bar { flex-wrap: wrap; gap: 8px; padding: 12px 16px; }
+  .pb-progress-wrap { flex: 1 1 100%; order: 5; }
+  .content { padding-bottom: 190px; }
+  /* The wrapped bar is ~140px tall, so the queue panel must sit
+     above it instead of overlapping it. */
+  .queue-panel { bottom: calc(var(--gutter) + 150px); }
+}
 @media (max-width: 1180px) {
   .pb-side input[type="range"] { width: 64px; }
   .fp-panels { grid-template-columns: 1fr; }
@@ -984,4 +1333,9 @@ dialog.modal h2 { margin-top: 0; }
 
 @media (prefers-reduced-motion: reduce) {
   * { transition: none !important; animation: none !important; }
+  /* Static skeletons (no gradient sweep) and an instantly-hidden
+     boot loader when motion is reduced. */
+  .skeleton-line, .skeleton-card { background: var(--card-2); }
+  .boot-loader { display: none; }
+  html { scroll-behavior: auto; }
 }

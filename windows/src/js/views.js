@@ -68,8 +68,24 @@ window.AelloViews = (() => {
 
   function cardHtml(item) {
     const url = artworkUrl(item);
+    // R3: reserve the art box (CSS .card-art has a fixed height) and
+    // lazy-load thumbnails, so a long page does not shift layout or
+    // start every thumbnail at once. Width/height come from the
+    // artwork when YouTube served them.
+    let dims = "";
+    if (item && Array.isArray(item.artwork) && item.artwork.length > 0) {
+      const best = item.artwork[item.artwork.length - 1];
+      if (best && best.width && best.height) {
+        dims =
+          ' width="' + best.width + '" height="' + best.height + '"';
+      }
+    }
     const art = url
-      ? '<img src="' + escapeHtml(url) + '" alt="">'
+      ? '<img src="' +
+        escapeHtml(url) +
+        '" alt="" loading="lazy" decoding="async"' +
+        dims +
+        ">"
       : escapeHtml((item.title || "?").slice(0, 1).toUpperCase());
     const sub =
       item.kind === "song"
@@ -118,12 +134,39 @@ window.AelloViews = (() => {
     return !!(window.AelloApi && window.AelloApi.outsideApp);
   }
 
-  function sectionHtml(section) {
+  // Sections rendered most recently on Home (for per-section Play-all
+  // and load-more appends). Index-aligned with the section blocks.
+  let lastHomeSections = [];
+  let lastHomeContinuation = null;
+
+  function getSectionSongs(index) {
+    const section = lastHomeSections[index];
+    if (!section || !Array.isArray(section.items)) return [];
+    return section.items.filter((item) => item.kind === "song");
+  }
+
+  function sectionHtml(section, index) {
     const cards = (section.items || []).map(cardHtml).join("");
+    const songs = (section.items || []).filter((item) => item.kind === "song");
+    // Per-section Play-all (audit #1): only when the section holds
+    // playable songs. The button carries the section index; app.js
+    // resolves the songs via getSectionSongs.
+    const playAll =
+      songs.length > 0
+        ? '<button type="button" class="play-all" data-play-section="' +
+          index +
+          '" aria-label="Play all in ' +
+          escapeHtml(section.title || "this section") +
+          '">' +
+          '<svg class="icon" viewBox="0 0 24 24" fill="currentColor" stroke="none" aria-hidden="true"><polygon points="6 3 20 12 6 21 6 3"/></svg>' +
+          "<span>Play all</span></button>"
+        : "";
     return (
-      '<div class="section-block"><h2>' +
+      '<div class="section-block"><div class="section-head"><h2>' +
       escapeHtml(section.title) +
       "</h2>" +
+      playAll +
+      "</div>" +
       (section.subtitle
         ? '<p class="section-sub">' + escapeHtml(section.subtitle) + "</p>"
         : "") +
@@ -133,11 +176,87 @@ window.AelloViews = (() => {
     );
   }
 
-  function renderHome(sections, statusEl, dailySongs) {
+  // R2: render section HTML in chunks — the first section paints
+  // immediately, the rest append on animation frames instead of one
+  // giant innerHTML rebuild blocking the UI thread.
+  function renderSectionsChunked(host, sections, onDone) {
+    const parts = sections.map((section, index) => sectionHtml(section, index));
+    if (parts.length === 0) {
+      host.innerHTML = "";
+      if (typeof onDone === "function") onDone();
+      return;
+    }
+    host.innerHTML = parts[0];
+    let next = 1;
+    const appendMore = () => {
+      if (next >= parts.length) {
+        if (typeof onDone === "function") onDone();
+        return;
+      }
+      host.insertAdjacentHTML("beforeend", parts[next]);
+      next += 1;
+      if (next < parts.length) requestAnimationFrame(appendMore);
+      else if (typeof onDone === "function") onDone();
+    };
+    if (parts.length > 1) requestAnimationFrame(appendMore);
+    else if (typeof onDone === "function") onDone();
+  }
+
+  // Home chips (audit #1, Android HomePage.chips): "All" + one chip
+  // per server chip. Rendered into #home-chips; app.js refetches the
+  // feed with the tapped chip's params.
+  function renderChips(chips, activeParams) {
+    const host = document.getElementById("home-chips");
+    if (!host) return;
+    const list = Array.isArray(chips) ? chips : [];
+    let html =
+      '<button type="button" class="chip' +
+      (activeParams == null ? " active" : "") +
+      '" data-chip-params="">All</button>';
+    list.forEach((chip) => {
+      const params = chip && chip.params != null ? chip.params : "";
+      const active =
+        activeParams != null && chip && chip.params === activeParams;
+      html +=
+        '<button type="button" class="chip' +
+        (active ? " active" : "") +
+        '" data-chip-params="' +
+        escapeHtml(params) +
+        '">' +
+        escapeHtml((chip && chip.title) || "Chip") +
+        "</button>";
+    });
+    host.innerHTML = html;
+  }
+
+  // Static loading skeleton (R4): grey blocks while Home loads, so a
+  // slow network shows structure instead of a blank page. The shimmer
+  // sweep lives in styles.css (.skeleton-line / .skeleton-card).
+  function renderHomeSkeleton() {
+    const host = document.getElementById("home-sections");
+    if (!host) return;
+    host.innerHTML =
+      '<div class="skeleton-block"><div class="skeleton-line skeleton-title"></div>' +
+      '<div class="skeleton-row"><span class="skeleton-card"></span><span class="skeleton-card"></span><span class="skeleton-card"></span><span class="skeleton-card"></span></div></div>' +
+      '<div class="skeleton-block"><div class="skeleton-line skeleton-title"></div>' +
+      '<div class="skeleton-row"><span class="skeleton-card"></span><span class="skeleton-card"></span><span class="skeleton-card"></span><span class="skeleton-card"></span></div></div>';
+  }
+
+  // `feed` is the HomeFeed page { chips, sections, continuation } (or
+  // a legacy plain section array). `dailySongs` is Daily Discover;
+  // `personal` is { quickPicks, keepListening, forgottenFavorites,
+  // speedDial } — a personal section renders only when it has real
+  // items (audit #3: no fake data). `activeChipParams` marks the
+  // selected chip (null = All).
+  function renderHome(feed, statusEl, dailySongs, personal, activeChipParams) {
     const host = document.getElementById("home-sections");
     // Prune the registry: ids from earlier renders must not resolve
     // via findItem after the list is replaced.
     registry.clear();
+    const feedObj =
+      feed && typeof feed === "object" && !Array.isArray(feed)
+        ? feed
+        : { chips: [], sections: Array.isArray(feed) ? feed : [], continuation: null };
     const all = [];
     if (Array.isArray(dailySongs) && dailySongs.length > 0) {
       // Daily Discover is pinned first (Android: first section).
@@ -148,7 +267,28 @@ window.AelloViews = (() => {
       };
       all.push(daily);
     }
-    if (Array.isArray(sections)) all.push(...sections);
+    // Personal sections (audit #3): only the ones with real items.
+    if (personal && typeof personal === "object") {
+      const personalSections = [
+        { title: "Quick Picks", items: personal.quickPicks, subtitle: "Picked for you" },
+        { title: "Keep Listening", items: personal.keepListening, subtitle: "Jump back in" },
+        { title: "Forgotten Favorites", items: personal.forgottenFavorites, subtitle: "Songs you loved" },
+        { title: "Speed Dial", items: personal.speedDial, subtitle: "Your pinned songs" },
+      ];
+      personalSections.forEach((section) => {
+        if (Array.isArray(section.items) && section.items.length > 0) {
+          all.push({
+            title: section.title,
+            subtitle: section.subtitle,
+            items: section.items.map((song) => ({ ...song, kind: "song" })),
+          });
+        }
+      });
+    }
+    if (Array.isArray(feedObj.sections)) all.push(...feedObj.sections);
+    renderChips(feedObj.chips, activeChipParams);
+    lastHomeSections = all;
+    lastHomeContinuation = feedObj.continuation || null;
     if (all.length === 0) {
       if (statusEl) {
         statusEl.textContent = isPreview()
@@ -160,7 +300,49 @@ window.AelloViews = (() => {
     }
     if (statusEl) statusEl.textContent = "";
     all.forEach(registerSection);
-    if (host) host.innerHTML = all.map(sectionHtml).join("");
+    if (host) {
+      renderSectionsChunked(host, all, () => {
+        // Home load-more (audit #1): appends the next page of feed
+        // sections when YouTube served a continuation.
+        if (lastHomeContinuation) {
+          host.insertAdjacentHTML(
+            "beforeend",
+            '<button type="button" class="btn-ghost" data-home-more>Load more</button>',
+          );
+        }
+      });
+    }
+  }
+
+  // Append a home continuation page's sections (load-more). Returns
+  // true when more pages may exist.
+  function appendHomeSections(feed) {
+    const host = document.getElementById("home-sections");
+    if (!host || !feed || !Array.isArray(feed.sections)) return false;
+    const more = document.querySelector("[data-home-more]");
+    if (more) more.remove();
+    const start = lastHomeSections.length;
+    feed.sections.forEach((section) => {
+      lastHomeSections.push(section);
+      registerSection(section);
+    });
+    const parts = feed.sections.map((section, i) =>
+      sectionHtml(section, start + i),
+    );
+    parts.forEach((part) => host.insertAdjacentHTML("beforeend", part));
+    lastHomeContinuation = feed.continuation || null;
+    if (lastHomeContinuation) {
+      host.insertAdjacentHTML(
+        "beforeend",
+        '<button type="button" class="btn-ghost" data-home-more>Load more</button>',
+      );
+      return true;
+    }
+    return false;
+  }
+
+  function getHomeContinuation() {
+    return lastHomeContinuation;
   }
 
   function renderSearchResults(items, query, statusEl) {
@@ -183,6 +365,7 @@ window.AelloViews = (() => {
   // ---- Search view (tabs + history) --------------------------------------
   let activeSearchTab = "all";
   let searchHistoryList = [];
+  let lastSearchContinuation = null;
 
   function normalizeSearchItem(item) {
     if (!item) return null;
@@ -194,11 +377,12 @@ window.AelloViews = (() => {
     };
   }
 
-  function renderSearchView(items, query, filter, history) {
+  function renderSearchView(items, query, filter, history, continuation) {
     const host = document.getElementById("search-results");
     const historyHost = document.getElementById("search-history");
     activeSearchTab = filter || "all";
     searchHistoryList = Array.isArray(history) ? history : [];
+    lastSearchContinuation = continuation || null;
     document.querySelectorAll("[data-search-tab]").forEach((button) => {
       button.classList.toggle("active", button.dataset.searchTab === activeSearchTab);
       button.setAttribute(
@@ -238,10 +422,69 @@ window.AelloViews = (() => {
       const songs = normalized.filter((entry) => entry.kind === "song");
       registry.set(item.id, { item, queue: songs });
     });
+    // R2: cards in chunks of 40 so a big result page paints first and
+    // fills in, instead of one giant innerHTML rebuild. The Load more
+    // button (audit #5) is appended after the last chunk.
+    const CHUNK = 40;
+    const appendLoadMore = () => {
+      if (lastSearchContinuation) {
+        host.insertAdjacentHTML(
+          "beforeend",
+          '<button type="button" class="btn-ghost" data-search-more>Load more</button>',
+        );
+      }
+    };
     host.innerHTML =
       '<div class="card-row">' +
-      normalized.map(cardHtml).join("") +
+      normalized.slice(0, CHUNK).map(cardHtml).join("") +
       "</div>";
+    let next = CHUNK;
+    const appendMore = () => {
+      if (next >= normalized.length) {
+        appendLoadMore();
+        return;
+      }
+      const row = host.querySelector(".card-row");
+      if (row) {
+        row.insertAdjacentHTML(
+          "beforeend",
+          normalized.slice(next, next + CHUNK).map(cardHtml).join(""),
+        );
+      }
+      next += CHUNK;
+      if (next < normalized.length) requestAnimationFrame(appendMore);
+      else appendLoadMore();
+    };
+    if (normalized.length > CHUNK) requestAnimationFrame(appendMore);
+    else appendLoadMore();
+  }
+
+  function getSearchContinuation() {
+    return lastSearchContinuation;
+  }
+
+  // Append a search continuation page's items to the current results.
+  function appendSearchResults(items, continuation) {
+    const host = document.getElementById("search-results");
+    if (!host || !Array.isArray(items)) return;
+    const more = host.querySelector("[data-search-more]");
+    if (more) more.remove();
+    const normalized = items.map(normalizeSearchItem).filter(Boolean);
+    normalized.forEach((item) => {
+      const songs = normalized.filter((entry) => entry.kind === "song");
+      registry.set(item.id, { item, queue: songs });
+    });
+    const row = host.querySelector(".card-row");
+    const html = normalized.map(cardHtml).join("");
+    if (row) row.insertAdjacentHTML("beforeend", html);
+    else host.insertAdjacentHTML("beforeend", '<div class="card-row">' + html + "</div>");
+    lastSearchContinuation = continuation || null;
+    if (lastSearchContinuation) {
+      host.insertAdjacentHTML(
+        "beforeend",
+        '<button type="button" class="btn-ghost" data-search-more>Load more</button>',
+      );
+    }
   }
 
   function getActiveSearchTab() {
@@ -290,6 +533,7 @@ window.AelloViews = (() => {
 
   // ---- Artist page ------------------------------------------------------------
   let artistSongs = [];
+  let artistId = null;
 
   function getArtistSongs() {
     return artistSongs.slice();
@@ -303,6 +547,7 @@ window.AelloViews = (() => {
     }
     if (statusEl) statusEl.textContent = "";
     const artist = detail.artist;
+    artistId = artist.id || null;
     const art = document.getElementById("artist-art");
     const artUrl = artworkUrl(artist);
     if (art) {
@@ -384,28 +629,58 @@ window.AelloViews = (() => {
     if (view && artUrl) applyEntityColor(artUrl, view);
   }
 
+  // Songs of the detail page currently open (playlist/album), for
+  // the header actions below. Cleared when Home re-renders.
+  let detailSongs = [];
+  let detailInfo = null;
+
+  function getDetailSongs() {
+    return detailSongs.slice();
+  }
+
+  function getDetailInfo() {
+    return detailInfo;
+  }
+
+  function getArtistId() {
+    return artistId;
+  }
+
   function renderDetail(detail, isAlbum, statusEl, onBack) {
     const songs = detail.songs;
     const info = isAlbum ? detail.album : detail.playlist;
+    detailSongs = Array.isArray(songs) ? songs.slice() : [];
+    detailInfo = info
+      ? { id: info.id, title: info.title, isAlbum: !!isAlbum }
+      : null;
     renderHome(
       [
         {
-          title: info.title,
-          subtitle: info.description || null,
+          title: info ? info.title : "Details",
+          subtitle: info && info.description ? info.description : null,
           items: songs.map((song) => ({ ...song, kind: "song" })),
         },
       ],
       statusEl,
     );
     // renderHome replaces the home feed with this detail, so add a
-    // Back button (same style as the artist page's) that restores it.
+    // Back button (same style as the artist page's) that restores it,
+    // plus the detail header actions (audit #8/#9: play-all, shuffle,
+    // like-all, download-all, copy link — the APK detail headers).
     const host = document.getElementById("home-sections");
     if (host) {
       host.insertAdjacentHTML(
         "afterbegin",
         '<button type="button" class="back-btn" id="detail-back">' +
           '<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m12 19-7-7 7-7"/><path d="M19 12H5"/></svg>' +
-          "<span>Back</span></button>",
+          "<span>Back</span></button>" +
+          '<div class="detail-actions" role="group" aria-label="Playlist actions">' +
+          '<button type="button" class="btn-primary" data-detail-action="play-all">Play all</button>' +
+          '<button type="button" class="btn-ghost" data-detail-action="shuffle">Shuffle</button>' +
+          '<button type="button" class="btn-ghost" data-detail-action="like-all">Like all</button>' +
+          '<button type="button" class="btn-ghost" data-detail-action="download-all">Download all</button>' +
+          '<button type="button" class="btn-ghost" data-detail-action="copy-link">Copy link</button>' +
+          "</div>",
       );
       const back = document.getElementById("detail-back");
       if (back && typeof onBack === "function") {
@@ -523,25 +798,52 @@ window.AelloViews = (() => {
     }
 
     if (segment === "songs") {
-      if (songs.length === 0) {
+      // Synced YouTube library songs first (online, playable), then
+      // local files from this computer. Both lists are real; neither
+      // is invented.
+      const librarySongs = Array.isArray(library.librarySongs)
+        ? library.librarySongs
+        : [];
+      if (songs.length === 0 && librarySongs.length === 0) {
         host.innerHTML =
-          '<p class="empty">No local songs yet. Use “Open audio files…” above to pick audio files from this computer. Local files are kept for this session only and are not saved to disk.</p>';
+          '<p class="empty">No songs yet. Use “Open audio files…” above to pick audio files from this computer, or sign in and sync your YouTube library in Settings. Picked local files are remembered on this computer.</p>';
         return;
       }
-      host.innerHTML =
-        '<ul class="track-list">' +
-        songs
-          .map(
-            (song, index) =>
-              '<li><button type="button" class="track" data-local-index="' +
-              index +
-              '">' +
-              escapeHtml(song.title || "Untitled") +
-              ' <span class="muted">— Local file</span></button></li>',
-          )
-          .join("") +
-        "</ul>" +
-        '<p class="muted">Local files are kept for this session only and are not saved to disk.</p>';
+      let html = "";
+      if (librarySongs.length > 0) {
+        html +=
+          '<h3>From YouTube</h3><ul class="track-list">' +
+          librarySongs
+            .map(
+              (song) =>
+                '<li><button type="button" class="track" data-library-song-id="' +
+                escapeHtml(song.id) +
+                '">' +
+                escapeHtml(song.title || "Untitled") +
+                ' <span class="muted">— ' +
+                escapeHtml(artistNames(song) || "") +
+                "</span></button></li>",
+            )
+            .join("") +
+          "</ul>";
+      }
+      if (songs.length > 0) {
+        html +=
+          '<h3>Local files</h3><ul class="track-list">' +
+          songs
+            .map(
+              (song, index) =>
+                '<li><button type="button" class="track" data-local-index="' +
+                index +
+                '">' +
+                escapeHtml(song.title || "Untitled") +
+                ' <span class="muted">— Local file</span></button></li>',
+            )
+            .join("") +
+          "</ul>" +
+          '<p class="muted">Picked local files are remembered on this computer; a file that was moved or deleted since then will not play.</p>';
+      }
+      host.innerHTML = html;
       return;
     }
 
@@ -565,7 +867,10 @@ window.AelloViews = (() => {
                 ? " · " + Math.round(row.sizeBytes / 1024) + " KB"
                 : "") +
               "</span></button>" +
-              '<span class="queue-actions"><button type="button" data-download-action="remove" data-download-id="' +
+              '<span class="queue-actions"><button type="button" data-download-action="export" data-download-id="' +
+              escapeHtml(row.songId) +
+              '" aria-label="Export download">Export</button>' +
+              '<button type="button" data-download-action="remove" data-download-id="' +
               escapeHtml(row.songId) +
               '" aria-label="Remove download">Remove</button></span></li>',
           )
@@ -610,27 +915,101 @@ window.AelloViews = (() => {
       let html = "";
       if (history.length === 0) {
         html = '<p class="empty">' + escapeHtml(LIBRARY_EMPTY.history) + "</p>";
+        host.innerHTML = html;
       } else {
-        html =
-          '<ul class="track-list">' +
-          history
-            .map(
-              (entry) =>
-                '<li><button type="button" class="track" data-history-song-id="' +
-                escapeHtml(entry.songId) +
-                '">' +
-                escapeHtml(entry.title || "Untitled") +
-                ' <span class="muted">— ' +
-                escapeHtml(artistNames(entry)) +
-                (entry.playCount > 1 ? " · played " + entry.playCount + "×" : "") +
-                "</span></button></li>",
-            )
-            .join("") +
+        // Wrapped (audit #61): year-in-review summary from the same
+        // history + stats the Stats screen already uses — total plays,
+        // distinct songs, top song, top artist. No invented data.
+        const totalPlays = history.reduce(
+          (sum, entry) => sum + (entry.playCount || 1),
+          0,
+        );
+        const topSong = history.reduce((best, entry) =>
+          (entry.playCount || 1) > (best.playCount || 1) ? entry : best,
+        );
+        const artistPlays = {};
+        history.forEach((entry) => {
+          (entry.artists || []).forEach((artist) => {
+            if (artist && artist.name) {
+              artistPlays[artist.name] =
+                (artistPlays[artist.name] || 0) + (entry.playCount || 1);
+            }
+          });
+        });
+        const topArtists = Object.entries(artistPlays)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5);
+        const topArtist = topArtists.length > 0 ? topArtists[0] : null;
+        html +=
+          '<div class="card"><h3>Your Wrapped</h3><p>' +
+          totalPlays +
+          (totalPlays === 1 ? " play" : " plays") +
+          " · " +
+          history.length +
+          (history.length === 1 ? " song" : " songs") +
+          "</p>" +
+          (topSong
+            ? "<p>Top song: " + escapeHtml(topSong.title || "Untitled") + "</p>"
+            : "") +
+          (topArtist
+            ? "<p>Top artist: " +
+              escapeHtml(topArtist[0]) +
+              " (" +
+              topArtist[1] +
+              (topArtist[1] === 1 ? " play" : " plays") +
+              ")</p>"
+            : "") +
+          "</div>";
+        if (topArtists.length > 0) {
+          html +=
+            '<h3>Top artists</h3><ol class="stats-list">' +
+            topArtists
+              .map(
+                (entry) =>
+                  "<li>" +
+                  escapeHtml(entry[0]) +
+                  ' <span class="muted">— ' +
+                  entry[1] +
+                  (entry[1] === 1 ? " play" : " plays") +
+                  "</span></li>",
+              )
+              .join("") +
+            "</ol>";
+        }
+        // R2: history can hold 500 rows — render in chunks of 100.
+        const rows = history.map(
+          (entry) =>
+            '<li><button type="button" class="track" data-history-song-id="' +
+            escapeHtml(entry.songId) +
+            '">' +
+            escapeHtml(entry.title || "Untitled") +
+            ' <span class="muted">— ' +
+            escapeHtml(artistNames(entry)) +
+            (entry.playCount > 1 ? " · played " + entry.playCount + "×" : "") +
+            "</span></button></li>",
+        );
+        const CHUNK = 100;
+        html +=
+          '<h3>History</h3><ul class="track-list">' +
+          rows.slice(0, CHUNK).join("") +
           "</ul>" +
           '<button type="button" data-history-action="clear">Clear history</button>';
+        host.innerHTML = html;
+        let next = CHUNK;
+        const list = host.querySelector(".track-list");
+        const appendMore = () => {
+          if (!list || next >= rows.length) return;
+          list.insertAdjacentHTML(
+            "beforeend",
+            rows.slice(next, next + CHUNK).join(""),
+          );
+          next += CHUNK;
+          if (next < rows.length) requestAnimationFrame(appendMore);
+        };
+        if (rows.length > CHUNK) requestAnimationFrame(appendMore);
       }
       if (stats.length > 0) {
-        html +=
+        host.innerHTML +=
           '<h3>Most played</h3><ol class="stats-list">' +
           stats
             .slice(0, 10)
@@ -647,7 +1026,6 @@ window.AelloViews = (() => {
             .join("") +
           "</ol>";
       }
-      host.innerHTML = html;
       return;
     }
 
@@ -802,20 +1180,74 @@ window.AelloViews = (() => {
       ),
       ltServer,
       ltUsername: base.ltUsername || "",
+      // Preserved, never edited by the form: the update-check failure
+      // flag is set by the update check itself, and the LT control
+      // mode is set by the Listen Together room.
+      lastUpdateCheckFailed: !!base.lastUpdateCheckFailed,
+      ltControlMode:
+        base.ltControlMode === "everyone" ? "everyone" : "owner",
     };
   }
 
-  function setAccountState(signedIn, accountName) {
+  // Avatar comes from the `account_menu` response only — never a
+  // guessed URL. When signed out the avatar is hidden and the state
+  // reads "Not signed in — guest mode."
+  function setAccountState(signedIn, accountName, avatarUrl) {
     const el = document.getElementById("account-state");
     if (el) {
       el.textContent = signedIn
         ? "Signed in as " + (accountName || "your account") + "."
         : "Not signed in — guest mode.";
     }
+    const nameEl = document.getElementById("account-name");
+    if (nameEl) {
+      nameEl.textContent = signedIn
+        ? accountName || "Your account"
+        : "Not signed in";
+    }
+    const avatar = document.getElementById("account-avatar");
+    if (avatar) {
+      if (signedIn && avatarUrl) {
+        avatar.src = avatarUrl;
+        avatar.hidden = false;
+      } else {
+        avatar.removeAttribute("src");
+        avatar.hidden = true;
+      }
+    }
     const signin = document.getElementById("account-signin");
     const signout = document.getElementById("account-signout");
     if (signin) signin.hidden = !!signedIn;
     if (signout) signout.hidden = !signedIn;
+  }
+
+  // Channel picker (Settings → Account). Shown only when the account
+  // has more than one channel; `selectedDataSyncId` marks the active
+  // one. With 0–1 channels the whole row stays hidden.
+  function setAccountChannels(channels, selectedDataSyncId) {
+    const select = document.getElementById("account-channel");
+    if (!select) return;
+    const list = Array.isArray(channels) ? channels : [];
+    select.innerHTML = "";
+    for (const channel of list) {
+      if (!channel || !channel.dataSyncId) continue;
+      const option = document.createElement("option");
+      option.value = channel.dataSyncId;
+      option.textContent =
+        channel.channelHandle && channel.channelHandle !== channel.name
+          ? channel.name + " (" + channel.channelHandle + ")"
+          : channel.name;
+      if (channel.dataSyncId === selectedDataSyncId) option.selected = true;
+      select.appendChild(option);
+    }
+    // The label wraps the select; hide the whole row when there is
+    // nothing to pick. When no channel was picked yet (fresh
+    // multi-channel sign-in), select the first option visually but
+    // leave the actual choice to the user — the change event only
+    // fires on a real pick.
+    const row = select.parentElement;
+    if (row) row.hidden = list.length <= 1;
+    select.hidden = list.length <= 1;
   }
 
   // ---- Lyrics (Android LyricsUtils / Lyrics.kt §7) ------------------------------
@@ -909,6 +1341,7 @@ window.AelloViews = (() => {
     const statusEl = document.getElementById("lyrics-status");
     const offsetEl = document.getElementById("lyrics-offset");
     const offsetLabel = document.getElementById("lyrics-offset-label");
+    applyLyricsStyle(getLyricsStyle());
     lyricsSongId = song ? song.id : null;
     lyricsOffsetMs = lyricsSongId ? getLyricsOffset(lyricsSongId) : 0;
     lyricsAutoScroll = true;
@@ -1166,6 +1599,16 @@ window.AelloViews = (() => {
     if (enhanceEl) {
       enhanceEl.checked = settings.soundEnhanceEnabled !== false;
     }
+    // 8D + normalization checkboxes mirror the player prefs.
+    const playerApi = window.AelloPlayer;
+    const eightD = document.getElementById("eq-8d");
+    if (eightD && playerApi && typeof playerApi.is8d === "function") {
+      eightD.checked = playerApi.is8d();
+    }
+    const normalizeEl = document.getElementById("eq-normalize");
+    if (normalizeEl && playerApi && typeof playerApi.isNormalization === "function") {
+      normalizeEl.checked = playerApi.isNormalization();
+    }
     const presetsEl = document.getElementById("eq-presets");
     if (presetsEl) {
       const custom = Array.isArray(settings.eqProfiles)
@@ -1298,7 +1741,96 @@ window.AelloViews = (() => {
     return true;
   }
 
-  // ---- Update dialog ------------------------------------------------------------
+  // Parse an APO / Peace equalizer text export (audit #37) into the
+  // panel's band model: `Preamp: -3 dB` + `Filter N: ON PK Fc 1000 Hz
+  // Gain 2 dB Q 1` lines (PK → peaking, LS → lowshelf, HS →
+  // highshelf). Returns null when no filter line parses. The panel
+  // and player graph hold 5 bands — extra filters are dropped, and
+  // the import reports that honestly via the returned `dropped`.
+  function parseApo(text) {
+    if (typeof text !== "string" || text.length === 0) return null;
+    let preampDb = 0;
+    const bands = [];
+    text.split(/\r?\n/).forEach((rawLine) => {
+      const line = rawLine.trim();
+      if (!line) return;
+      const preamp = line.match(/^Preamp:\s*([+-]?\d+(?:\.\d+)?)\s*dB/i);
+      if (preamp) {
+        preampDb = parseFloat(preamp[1]) || 0;
+        return;
+      }
+      const filter = line.match(
+        /^Filter\s*\d+:\s*ON\s+(PK|LS|HS)\s+Fc\s+([\d.]+)\s*Hz\s+Gain\s+([+-]?[\d.]+)\s*dB(?:\s+Q\s+([\d.]+))?/i,
+      );
+      if (!filter) return;
+      bands.push({
+        freqHz: parseFloat(filter[2]) || 1000,
+        gainDb: parseFloat(filter[3]) || 0,
+        q: filter[4] ? parseFloat(filter[4]) || 1 : 1,
+        kind:
+          filter[1].toUpperCase() === "LS"
+            ? "lowshelf"
+            : filter[1].toUpperCase() === "HS"
+              ? "highshelf"
+              : "peaking",
+      });
+    });
+    if (bands.length === 0) return null;
+    return {
+      bands: bands.slice(0, 5),
+      preampDb,
+      dropped: Math.max(0, bands.length - 5),
+    };
+  }
+
+  // Write a curve into the EQ panel's inputs (used by APO import).
+  function applyEqCurveToPanel(bands, preampDb) {
+    const bandsHost = document.getElementById("eq-bands");
+    if (!bandsHost) return false;
+    for (let i = 0; i < 5; i++) {
+      const band = (bands || [])[i];
+      const freq = bandsHost.querySelector('.eq-freq[data-band="' + i + '"]');
+      const gain = bandsHost.querySelector('.eq-gain[data-band="' + i + '"]');
+      const type = bandsHost.querySelector('.eq-type[data-band="' + i + '"]');
+      if (freq) freq.value = band ? band.freqHz : 1000;
+      if (gain) gain.value = band ? band.gainDb : 0;
+      if (type) type.value = band ? band.kind : "peaking";
+      lastEqQs[i] = band && typeof band.q === "number" ? band.q : 1;
+    }
+    const preampEl = document.getElementById("eq-preamp");
+    if (preampEl) preampEl.value = typeof preampDb === "number" ? preampDb : 0;
+    return true;
+  }
+
+  // Lyrics styles (audit #35, styles only — no translation key here):
+  // Default / Fade (non-current lines dim) / Glow (current line
+  // glows). Persisted per device; the polish pass owns any motion.
+  const LYRICS_STYLE_KEY = "aello.lyricsStyle.v1";
+  function getLyricsStyle() {
+    try {
+      const stored = localStorage.getItem(LYRICS_STYLE_KEY);
+      if (stored === "fade" || stored === "glow") return stored;
+    } catch {
+      /* Storage unavailable. */
+    }
+    return "default";
+  }
+
+  function applyLyricsStyle(style) {
+    const value = style === "fade" || style === "glow" ? style : "default";
+    try {
+      localStorage.setItem(LYRICS_STYLE_KEY, value);
+    } catch {
+      /* Style stays in memory for this session. */
+    }
+    const host = document.getElementById("lyrics-lines");
+    if (host) {
+      host.classList.remove("lyrics-style-fade", "lyrics-style-glow");
+      if (value !== "default") host.classList.add("lyrics-style-" + value);
+    }
+    const select = document.getElementById("lyrics-style");
+    if (select) select.value = value;
+  }
   function showUpdateDialog(info) {
     const dialog = document.getElementById("update-dialog");
     if (!dialog) return;
@@ -1323,6 +1855,7 @@ window.AelloViews = (() => {
     // never shows it. Clear `hidden` first (a hidden dialog stays
     // hidden even with showModal in some browsers).
     dialog.hidden = false;
+    dialog.classList.remove("closing");
     if (!dialog.open) {
       try {
         dialog.showModal();
@@ -1335,7 +1868,21 @@ window.AelloViews = (() => {
   function hideUpdateDialog() {
     const dialog = document.getElementById("update-dialog");
     if (!dialog) return;
-    if (dialog.open) dialog.close();
+    // Animated exit (dialog-out, 140ms — faster than enter), same as
+    // the sleep dialog in app.js. Reduced motion closes at once.
+    if (dialog.open) {
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!reduced && !dialog.classList.contains("closing")) {
+        dialog.classList.add("closing");
+        setTimeout(() => {
+          dialog.classList.remove("closing");
+          if (dialog.open) dialog.close();
+          dialog.hidden = true;
+        }, 150);
+        return;
+      }
+      dialog.close();
+    }
     dialog.hidden = true;
   }
 
@@ -1365,6 +1912,9 @@ window.AelloViews = (() => {
       modeEl.value = controlMode || "owner";
       modeEl.disabled = !isHost;
     }
+    // Only the host can extend the room (audit #42.4).
+    const extendBtn = document.getElementById("lt-extend");
+    if (extendBtn) extendBtn.hidden = !isHost;
   }
 
   function hideLtRoom() {
@@ -1376,7 +1926,10 @@ window.AelloViews = (() => {
     if (members) members.innerHTML = "";
   }
 
-  function renderLtMembers(users, hostId, myUserId, pending) {
+  // `isHost` gates the host actions (audit #42.3): kick, transfer
+  // host, block. Blocked users never appear as pending again — the
+  // host auto-rejects them (Android 6.1.45 auto-join rule).
+  function renderLtMembers(users, hostId, myUserId, pending, isHost) {
     const host = document.getElementById("lt-members");
     if (!host) return;
     let html = "";
@@ -1395,12 +1948,30 @@ window.AelloViews = (() => {
         "</span></li>";
     });
     (users || []).forEach((user) => {
+      const other = isHost && user.user_id !== myUserId;
       html +=
         "<li>" +
         escapeHtml(user.username || "Guest") +
         (user.user_id === hostId ? ' <span class="muted">(host)</span>' : "") +
         (user.user_id === myUserId ? ' <span class="muted">(you)</span>' : "") +
         (user.is_connected === false ? ' <span class="muted">(away)</span>' : "") +
+        (other
+          ? '<span class="queue-actions">' +
+            '<button type="button" data-lt-kick="' +
+            escapeHtml(user.user_id) +
+            '">Kick</button>' +
+            '<button type="button" data-lt-transfer="' +
+            escapeHtml(user.user_id) +
+            '" data-lt-transfer-name="' +
+            escapeHtml(user.username || "Guest") +
+            '">Make host</button>' +
+            '<button type="button" data-lt-block="' +
+            escapeHtml(user.user_id) +
+            '" data-lt-block-name="' +
+            escapeHtml(user.username || "Guest") +
+            '">Block</button>' +
+            "</span>"
+          : "") +
         "</li>";
     });
     host.innerHTML = html || '<li class="empty">No members yet.</li>';
@@ -1925,19 +2496,30 @@ window.AelloViews = (() => {
     formatTime,
     findItem,
     renderHome,
+    renderHomeSkeleton,
+    renderChips,
+    appendHomeSections,
+    getHomeContinuation,
+    getSectionSongs,
     renderSearchResults,
     renderSearchView,
+    appendSearchResults,
+    getSearchContinuation,
     renderMoods,
     getActiveSearchTab,
     renderTrending,
     renderArtist,
     getArtistSongs,
+    getArtistId,
     renderDetail,
+    getDetailSongs,
+    getDetailInfo,
     renderLibrary,
     applyTheme,
     fillSettingsForm,
     readSettingsForm,
     setAccountState,
+    setAccountChannels,
     updateNowPlaying,
     // Lyrics
     parseLrc,
@@ -1954,8 +2536,13 @@ window.AelloViews = (() => {
     renderEqPanel,
     readEqPanel,
     applyEqPreset,
+    parseApo,
+    applyEqCurveToPanel,
     updateEqLiveNote,
     EQ_PRESETS,
+    // Lyrics styles
+    applyLyricsStyle,
+    getLyricsStyle,
     // Update / sleep dialogs
     showUpdateDialog,
     hideUpdateDialog,

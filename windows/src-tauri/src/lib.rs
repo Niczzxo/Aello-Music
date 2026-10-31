@@ -24,6 +24,7 @@ mod models;
 mod music_service;
 mod player;
 mod settings;
+mod signin_capture;
 #[cfg(windows)]
 mod smtc;
 mod update;
@@ -31,16 +32,19 @@ mod update;
 use innertube::InnerTubeSession;
 use library::{now_iso, LibraryStore};
 use models::{
-    Artist, ArtistDetail, DownloadedSong, ExploreData, HomeItem, HomeSection, LibraryData,
-    LibraryPlaylist, LyricsResult, Song, UpdateInfo,
+    AccountChannel, Artist, ArtistDetail, DownloadedSong, ExploreData, HomeFeed, HomeItem,
+    HomeSection, LibraryData, LibraryPlaylist, LyricsResult, PersonalSections, SearchPage, Song,
+    SyncReport, UpdateInfo,
 };
 use music_service::MusicService;
 use player::{PlaybackSnapshot, PlayerSession};
 use serde::Serialize;
 use settings::{AppSettings, SettingsStore};
+use signin_capture::CaptureOutcome;
 use std::sync::Mutex;
 use std::time::{SystemTime, UNIX_EPOCH};
 use tauri::{Manager, State};
+use tauri_plugin_dialog::DialogExt;
 
 /// Shared state managed by Tauri and handed to commands.
 pub struct AppState {
@@ -80,8 +84,20 @@ fn shuffle<T>(items: &mut [T]) {
 // ── catalogue ───────────────────────────────────────────────────────────
 
 #[tauri::command]
-async fn get_home_feed(state: State<'_, AppState>) -> Result<Vec<HomeSection>, String> {
-    MusicService::home_feed(&state.music).await
+async fn get_home_feed(
+    state: State<'_, AppState>,
+    params: Option<String>,
+) -> Result<HomeFeed, String> {
+    MusicService::home_feed(&state.music, params.as_deref()).await
+}
+
+/// Next home page from a continuation token (audit #1 load-more).
+#[tauri::command]
+async fn get_home_feed_more(
+    state: State<'_, AppState>,
+    continuation: String,
+) -> Result<HomeFeed, String> {
+    MusicService::home_feed_more(&state.music, &continuation).await
 }
 
 #[tauri::command]
@@ -89,8 +105,35 @@ async fn search_music(
     state: State<'_, AppState>,
     query: String,
     filter: Option<String>,
-) -> Result<Vec<HomeItem>, String> {
+) -> Result<SearchPage, String> {
     MusicService::search(&state.music, &query, filter.as_deref()).await
+}
+
+/// Next search page from a continuation token (audit #5).
+#[tauri::command]
+async fn search_music_more(
+    state: State<'_, AppState>,
+    continuation: String,
+) -> Result<SearchPage, String> {
+    MusicService::search_more(&state.music, &continuation).await
+}
+
+/// Related songs for one video (radio / autoplay, audit #28). The
+/// frontend calls this when the queue runs out.
+#[tauri::command]
+async fn get_related(state: State<'_, AppState>, video_id: String) -> Result<Vec<Song>, String> {
+    MusicService::related_for_video(&state.music, &video_id).await
+}
+
+/// Home personal sections from the local library store (audit #3):
+/// Quick Picks / Keep Listening / Forgotten Favorites / Speed Dial.
+#[tauri::command]
+fn get_home_personal(state: State<'_, AppState>) -> Result<PersonalSections, String> {
+    state
+        .library
+        .lock()
+        .map_err(|_| "library lock poisoned".to_string())
+        .map(|store| store.personal_sections())
 }
 
 #[tauri::command]
@@ -141,6 +184,19 @@ async fn resolve_stream(
     MusicService::resolve_stream(&state.music, &song_id, &audio_quality).await
 }
 
+/// Related songs for one seed, or empty when there is no seed / the
+/// fetch fails. Daily Discover runs up to 3 of these in parallel
+/// (R1: the old sequential `for seed` loop was 6 round trips in
+/// series on the Home load path).
+async fn related_or_empty(music: &InnerTubeSession, seed: Option<String>) -> Vec<Song> {
+    match seed {
+        Some(id) => MusicService::related_for_video(music, &id)
+            .await
+            .unwrap_or_default(),
+        None => Vec::new(),
+    }
+}
+
 /// Daily Discover (Android `HomeViewModel.getDailyDiscover`): 3 random
 /// seeds from liked ∪ recent ∪ most-played → `next`/`related`, 6 songs
 /// per seed. Keep-last-good: an empty fetch returns the previous list;
@@ -155,16 +211,19 @@ async fn get_daily_discover(state: State<'_, AppState>) -> Result<Vec<Song>, Str
         .unwrap_or_default();
     shuffle(&mut seeds);
     seeds.truncate(3);
-
+    // Per-seed fetches run in parallel (R1), not in series.
+    let (r0, r1, r2) = tokio::join!(
+        related_or_empty(&state.music, seeds.get(0).cloned()),
+        related_or_empty(&state.music, seeds.get(1).cloned()),
+        related_or_empty(&state.music, seeds.get(2).cloned()),
+    );
     let mut songs: Vec<Song> = Vec::new();
     let mut seen = std::collections::HashSet::new();
-    for seed in &seeds {
-        let Ok(mut related) = MusicService::related_for_video(&state.music, seed).await else {
-            continue;
-        };
+    for (i, mut related) in [r0, r1, r2].into_iter().enumerate() {
+        let seed = seeds.get(i);
         shuffle(&mut related);
         for song in related.into_iter().take(6) {
-            if song.id != *seed && seen.insert(song.id.clone()) {
+            if Some(&song.id) != seed && seen.insert(song.id.clone()) {
                 songs.push(song);
             }
         }
@@ -184,8 +243,9 @@ async fn get_daily_discover(state: State<'_, AppState>) -> Result<Vec<Song>, Str
     }
     // No-history fallback: top songs search, shuffled, 25.
     match MusicService::search(&state.music, "top songs", Some("song")).await {
-        Ok(items) => {
-            let mut top: Vec<Song> = items
+        Ok(page) => {
+            let mut top: Vec<Song> = page
+                .items
                 .into_iter()
                 .filter_map(|i| match i {
                     HomeItem::Song(s) => Some(s),
@@ -350,8 +410,11 @@ async fn like_song(
         .lock()
         .map_err(|_| "library lock poisoned".to_string())?
         .set_liked(&song, liked)?;
-    // Auto-download on like: best-effort background task — it must never
-    // fail the like itself.
+    // Auto-download on like + YouTube like push: best-effort
+    // background tasks — they must never fail the like itself. The
+    // remote push (Android `SyncUtils.likeSong` → `YouTube.likeVideo`)
+    // only runs when signed in; a failed push keeps the local like
+    // and is reported by the next sync, never by failing this call.
     if liked {
         let auto = state
             .settings
@@ -360,13 +423,147 @@ async fn like_song(
             .unwrap_or(false);
         if auto {
             let app2 = app.clone();
+            let song2 = song.clone();
             tauri::async_runtime::spawn(async move {
                 let state2 = app2.state::<AppState>();
-                let _ = download_song_inner(&app2, &state2, &song).await;
+                let _ = download_song_inner(&app2, &state2, &song2).await;
             });
         }
     }
+    {
+        let app2 = app.clone();
+        let song2 = song.clone();
+        tauri::async_runtime::spawn(async move {
+            let state2 = app2.state::<AppState>();
+            let signed_in = state2
+                .settings
+                .lock()
+                .map(|s| s.auth().cookie.is_some())
+                .unwrap_or(false);
+            if signed_in {
+                let _ = MusicService::like_video(&state2.music, &song2.id, liked).await;
+            }
+        });
+    }
     Ok(())
+}
+
+/// Pin / unpin a song on the Speed Dial (audit #18, max 27).
+/// Returns true when the song is pinned afterwards.
+#[tauri::command]
+fn toggle_speed_dial(state: State<'_, AppState>, song: Song) -> Result<bool, String> {
+    state
+        .library
+        .lock()
+        .map_err(|_| "library lock poisoned".to_string())?
+        .toggle_speed_dial(&song)
+}
+
+/// Full library backup as JSON (audit #17).
+#[tauri::command]
+fn export_library(state: State<'_, AppState>) -> Result<String, String> {
+    state
+        .library
+        .lock()
+        .map_err(|_| "library lock poisoned".to_string())?
+        .export_library_json()
+}
+
+/// Restore a library backup (audit #17). Replaces the whole store.
+#[tauri::command]
+fn import_library(state: State<'_, AppState>, backup_json: String) -> Result<(), String> {
+    state
+        .library
+        .lock()
+        .map_err(|_| "library lock poisoned".to_string())?
+        .import_library_json(&backup_json)
+}
+
+/// Import a CSV playlist (audit #17): lines of
+/// `videoId,title,artist,…`.
+#[tauri::command]
+fn import_csv_playlist(
+    state: State<'_, AppState>,
+    name: String,
+    csv: String,
+) -> Result<LibraryPlaylist, String> {
+    state
+        .library
+        .lock()
+        .map_err(|_| "library lock poisoned".to_string())?
+        .import_csv_playlist(&name, &csv)
+}
+
+/// Remove every download row AND its file (audit #50 storage).
+#[tauri::command]
+fn clear_downloads(state: State<'_, AppState>) -> Result<usize, String> {
+    state
+        .library
+        .lock()
+        .map_err(|_| "library lock poisoned".to_string())?
+        .clear_downloads()
+}
+
+/// Copy a downloaded song to a folder the user picks (audit #41 song
+/// export). Returns the destination path, or None when the user
+/// cancels the folder picker.
+#[tauri::command]
+fn export_song(
+    app: tauri::AppHandle,
+    state: State<'_, AppState>,
+    song_id: String,
+) -> Result<Option<String>, String> {
+    let row = state
+        .library
+        .lock()
+        .map_err(|_| "library lock poisoned".to_string())?
+        .find_download(&song_id)
+        .ok_or_else(|| "That song is not downloaded yet.".to_string())?;
+    let source = std::path::PathBuf::from(&row.path);
+    let file_name = source
+        .file_name()
+        .map(|n| n.to_string_lossy().into_owned())
+        .unwrap_or_else(|| format!("{song_id}.m4a"));
+    let dest_dir = app
+        .dialog()
+        .file()
+        .set_title("Choose a folder to export the song to")
+        .blocking_pick_folder();
+    let Some(dest_dir) = dest_dir else {
+        return Ok(None);
+    };
+    let dest_dir = match dest_dir {
+        tauri_plugin_dialog::FilePath::Path(path) => path,
+        tauri_plugin_dialog::FilePath::Url(url) => url
+            .to_file_path()
+            .map_err(|_| "That folder could not be used.".to_string())?,
+    };
+    let dest = dest_dir.join(&file_name);
+    std::fs::copy(&source, &dest).map_err(|e| e.to_string())?;
+    Ok(Some(dest.to_string_lossy().into_owned()))
+}
+
+/// Subscribe / unsubscribe an artist on YouTube (audit #7; Android
+/// `YouTube.subscribeChannel` → `subscription/subscribe`). Requires a
+/// signed-in account — otherwise the honest error below.
+#[tauri::command]
+async fn subscribe_artist(
+    state: State<'_, AppState>,
+    channel_id: String,
+    subscribe: bool,
+) -> Result<(), String> {
+    let signed_in = state
+        .settings
+        .lock()
+        .map_err(|_| "settings lock poisoned".to_string())
+        .map(|s| s.auth().cookie.is_some())
+        .unwrap_or(false);
+    if !signed_in {
+        return Err(
+            "Subscribing needs a signed-in account — sign in with Google first.".to_string(),
+        );
+    }
+    MusicService::subscribe_channel(&state.music, &channel_id, subscribe).await
 }
 
 #[tauri::command]
@@ -445,6 +642,150 @@ fn get_stats(state: State<'_, AppState>) -> Result<Vec<models::HistoryEntry>, St
         .map(|store| store.most_played(25))
 }
 
+/// YouTube two-way sync, pull side (audit #45; Android
+/// `SyncUtils.executeFullSync`, same endpoints, same order).
+///
+/// Additive only, by design: remote liked songs and library songs are
+/// merged INTO the local store, and remote saved playlists are
+/// imported as local playlists. Nothing local is deleted, and nothing
+/// local is uploaded by a sync run (likes are pushed at tap time, in
+/// `like_song`). A step that fails is recorded in `errors` and the
+/// other steps still run — a partial sync reports what did land.
+///
+/// NOT synced (no local store exists for them yet — see the audit
+/// update): subscriptions (no subscribed-artists store), liked /
+/// uploaded albums (no albums store), uploaded songs (uploads have no
+/// store; the `FEmusic_library_privately_owned_tracks` tab path exists
+/// in `library_page` but is untested live).
+#[tauri::command]
+async fn sync_youtube(state: State<'_, AppState>) -> Result<SyncReport, String> {
+    let signed_in = state
+        .settings
+        .lock()
+        .map_err(|_| "settings lock poisoned".to_string())
+        .map(|s| s.auth().cookie.is_some())
+        .unwrap_or(false);
+    if !signed_in {
+        return Err("Sign in with Google first — sync needs your YouTube account.".to_string());
+    }
+    let mut report = SyncReport {
+        liked_added: 0,
+        library_added: 0,
+        playlists_added: 0,
+        errors: Vec::new(),
+    };
+    // 1. Liked songs: the "LM" playlist (Android
+    // `executeSyncLikedSongs` → `YouTube.playlist("LM")`).
+    match MusicService::playlist(&state.music, "LM").await {
+        Ok(detail) => {
+            let added = state
+                .library
+                .lock()
+                .map_err(|_| "library lock poisoned".to_string())?
+                .add_liked_songs(&detail.songs)?;
+            report.liked_added = added;
+        }
+        Err(e) => report.errors.push(format!("Liked songs: {e}")),
+    }
+    // 2. Library songs: `FEmusic_liked_videos` (Android
+    // `executeSyncLibrarySongs`), following continuations (cap 3 extra
+    // pages — a huge library still syncs its first pages).
+    match MusicService::library_page(&state.music, "FEmusic_liked_videos", 0).await {
+        Ok(mut page) => {
+            let mut songs: Vec<Song> = Vec::new();
+            let mut pages = 0;
+            loop {
+                for item in page.items {
+                    if let HomeItem::Song(song) = item {
+                        songs.push(song);
+                    }
+                }
+                let Some(token) = page.continuation else {
+                    break;
+                };
+                if pages >= 3 {
+                    break;
+                }
+                pages += 1;
+                match MusicService::library_page_more(&state.music, &token).await {
+                    Ok(next) => page = next,
+                    Err(e) => {
+                        report.errors.push(format!("Library songs (page {}): {e}", pages + 1));
+                        break;
+                    }
+                }
+            }
+            let added = state
+                .library
+                .lock()
+                .map_err(|_| "library lock poisoned".to_string())?
+                .add_library_songs(&songs)?;
+            report.library_added = added;
+        }
+        Err(e) => report.errors.push(format!("Library songs: {e}")),
+    }
+    // 3. Saved playlists: `FEmusic_liked_playlists` (Android
+    // `executeSyncSavedPlaylists`). "LM" (Liked Music) and "SE" are
+    // skipped, exactly as Android does. Each new playlist's songs are
+    // fetched (cap 10 playlists per run, to bound sync time).
+    match MusicService::library_page(&state.music, "FEmusic_liked_playlists", 0).await {
+        Ok(page) => {
+            let mut fetched = 0;
+            for item in page.items {
+                let HomeItem::Playlist(playlist) = item else {
+                    continue;
+                };
+                if playlist.id == "LM" || playlist.id == "SE" {
+                    continue;
+                }
+                // Skip playlists already imported (by browse id).
+                let already = state
+                    .library
+                    .lock()
+                    .map_err(|_| "library lock poisoned".to_string())
+                    .map(|store| {
+                        store
+                            .library_data()
+                            .playlists
+                            .iter()
+                            .any(|p| p.browse_id.as_deref() == Some(playlist.id.as_str()))
+                    })
+                    .unwrap_or(false);
+                if already {
+                    continue;
+                }
+                if fetched >= 10 {
+                    report
+                        .errors
+                        .push("Saved playlists: stopped after 10 — run sync again for the rest.".to_string());
+                    break;
+                }
+                fetched += 1;
+                match MusicService::playlist(&state.music, &playlist.id).await {
+                    Ok(detail) => {
+                        let song_ids: Vec<String> =
+                            detail.songs.iter().map(|s| s.id.clone()).collect();
+                        let created = state
+                            .library
+                            .lock()
+                            .map_err(|_| "library lock poisoned".to_string())?
+                            .import_synced_playlist(&detail.playlist.title, &playlist.id, &song_ids)?;
+                        if created.is_some() {
+                            report.playlists_added += 1;
+                        }
+                    }
+                    Err(e) => report.errors.push(format!(
+                        "Playlist “{}”: {e}",
+                        playlist.title
+                    )),
+                }
+            }
+        }
+        Err(e) => report.errors.push(format!("Saved playlists: {e}")),
+    }
+    Ok(report)
+}
+
 // ── settings / player ───────────────────────────────────────────────────
 
 #[tauri::command]
@@ -501,7 +842,14 @@ fn download_dir(app: tauri::AppHandle) -> Result<String, String> {
 
 #[tauri::command]
 async fn check_for_update(state: State<'_, AppState>) -> Result<UpdateInfo, String> {
-    Ok(update::check_for_update(&state.music).await)
+    let info = update::check_for_update(&state.music).await;
+    // Android 6.1.45 persisted failure flag: a failed check sets it,
+    // a conclusive one clears it, so Settings can show "Can't check
+    // for updates" instead of looking up-to-date.
+    if let Ok(mut store) = state.settings.lock() {
+        let _ = store.set_last_update_check_failed(info.error.is_some());
+    }
+    Ok(info)
 }
 
 /// Open a URL in the system browser (the update download link). Uses
@@ -570,7 +918,15 @@ async fn lt_create_room(state: State<'_, AppState>, username: String) -> Result<
     Ok(LtRoom { room_code })
 }
 
-// ── Google sign-in (cookie harvest, no OAuth) ───────────────────────────
+// ── Google sign-in (automatic cookie capture, no OAuth) ─────────────
+// Flow (Android `LoginScreen.kt` parity): the main window opens a
+// second Tauri window ("aello-signin") at the Google ServiceLogin URL;
+// the frontend polls `signin_poll_capture`, which reads the login
+// WebView2's cookies via `ICoreWebView2CookieManager` — including the
+// HttpOnly SAPISID `document.cookie` can never see — and, the moment
+// SAPISID appears, validates the cookie via `account_menu` and stores
+// it in the Rust settings store. No manual paste anywhere: the cookie
+// never crosses into JS at all.
 
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -578,10 +934,18 @@ struct AuthUrl {
     auth_url: String,
 }
 
+/// A completed (or channel-pending) sign-in: the validated account
+/// name, the avatar URL from the `account_menu` response (if any), and
+/// the account's channels. `needs_channel_choice` is true only when
+/// the account has more than one channel — the frontend then shows the
+/// channel picker and calls `signin_choose_channel`.
 #[derive(Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 struct AccountName {
     account_name: String,
+    avatar_url: Option<String>,
+    channels: Vec<AccountChannel>,
+    needs_channel_choice: bool,
 }
 
 #[derive(Debug, Serialize)]
@@ -589,6 +953,23 @@ struct AccountName {
 struct SigninStatus {
     signed_in: bool,
     account_name: Option<String>,
+    avatar_url: Option<String>,
+    channel_name: Option<String>,
+    data_sync_id: Option<String>,
+    channels: Vec<AccountChannel>,
+}
+
+/// One poll of the login window, for the frontend's ~2s loop.
+#[derive(Debug, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct SigninPoll {
+    /// `not-signed-in` | `window-gone` | `signed-in` |
+    /// `needs-channel` | `validation-failed`
+    status: &'static str,
+    account_name: Option<String>,
+    avatar_url: Option<String>,
+    channels: Vec<AccountChannel>,
+    message: Option<String>,
 }
 
 /// The Google ServiceLogin URL for the login WebView window — the exact
@@ -602,11 +983,12 @@ fn signin_start() -> Result<AuthUrl, String> {
 }
 
 /// Validate a harvested cookie by calling InnerTube `account_menu` with
-/// it, then store cookie + visitorData in the Rust settings store
-/// (NEVER in JS storage). Rejects a blank or invalid cookie.
-#[tauri::command]
-async fn signin_finish(
-    state: State<'_, AppState>,
+/// it, then store cookie + visitorData + account info in the Rust
+/// settings store (NEVER in JS storage). Rejects a blank or invalid
+/// cookie. The channel list is best-effort: a failed lookup means an
+/// empty list (single-channel account), never a failed sign-in.
+async fn finish_signin(
+    state: &State<'_, AppState>,
     cookie: String,
     visitor_data: Option<String>,
 ) -> Result<AccountName, String> {
@@ -620,14 +1002,29 @@ async fn signin_finish(
             state.music.set_visitor_data(Some(vd.clone())).await;
         }
     }
-    match MusicService::account_name(&state.music).await {
-        Ok(name) => {
+    match state.music.account_info().await {
+        Ok((name, avatar_url)) => {
+            // Channel list: best-effort (Android treats an empty list
+            // as legitimate). A lookup failure must not fail sign-in.
+            let channels = state.music.account_channels().await.unwrap_or_default();
+            let needs_channel_choice = channels.len() > 1;
             state
                 .settings
                 .lock()
                 .map_err(|_| "settings lock poisoned".to_string())?
-                .set_auth(cookie, visitor_data, name.clone())?;
-            Ok(AccountName { account_name: name })
+                .set_auth(
+                    cookie,
+                    visitor_data,
+                    name.clone(),
+                    avatar_url.clone(),
+                    channels.clone(),
+                )?;
+            Ok(AccountName {
+                account_name: name,
+                avatar_url,
+                channels,
+                needs_channel_choice,
+            })
         }
         Err(e) => {
             // Invalid cookie: do not keep it anywhere — clear the
@@ -646,6 +1043,116 @@ async fn signin_finish(
     }
 }
 
+/// Validate a harvested cookie (same path as `signin_poll_capture`
+/// uses after auto-capture). Kept as a command for completeness; the
+/// frontend no longer passes cookies through JS.
+#[tauri::command]
+async fn signin_finish(
+    state: State<'_, AppState>,
+    cookie: String,
+    visitor_data: Option<String>,
+) -> Result<AccountName, String> {
+    finish_signin(&state, cookie, visitor_data).await
+}
+
+/// One auto-capture poll of the login window's WebView2 cookies.
+/// Returns `not-signed-in` while the user is still on the Google pages,
+/// `window-gone` when the login window was closed (frontend stops
+/// polling), and `signed-in` / `needs-channel` once the SAPISID cookie
+/// was captured AND validated. `validation-failed` means SAPISID was
+/// captured but `account_menu` rejected it — the frontend stops polling
+/// and asks the user to try again.
+#[tauri::command]
+async fn signin_poll_capture(
+    app: tauri::AppHandle,
+    state: State<'_, AppState>,
+) -> Result<SigninPoll, String> {
+    let none = |status: &'static str| SigninPoll {
+        status,
+        account_name: None,
+        avatar_url: None,
+        channels: Vec::new(),
+        message: None,
+    };
+    match signin_capture::capture_signin_cookie(&app, "aello-signin").await? {
+        CaptureOutcome::NotSignedIn => Ok(none("not-signed-in")),
+        CaptureOutcome::WindowGone => Ok(none("window-gone")),
+        CaptureOutcome::SignedIn(cookie) => match finish_signin(&state, cookie, None).await {
+            Ok(done) => Ok(SigninPoll {
+                status: if done.needs_channel_choice {
+                    "needs-channel"
+                } else {
+                    "signed-in"
+                },
+                account_name: Some(done.account_name),
+                avatar_url: done.avatar_url,
+                channels: done.channels,
+                message: None,
+            }),
+            Err(e) => Ok(SigninPoll {
+                status: "validation-failed",
+                account_name: None,
+                avatar_url: None,
+                channels: Vec::new(),
+                message: Some(e),
+            }),
+        },
+    }
+}
+
+/// Finish a multi-channel sign-in: apply the picked channel's identity
+/// (`dataSyncId`) to the session, re-validate the account name with
+/// that identity, and persist the choice. The id must be one of the
+/// channels stored at sign-in — an arbitrary value is rejected.
+/// Returns the account name for the picked channel.
+#[tauri::command]
+async fn signin_choose_channel(
+    state: State<'_, AppState>,
+    data_sync_id: String,
+) -> Result<AccountName, String> {
+    let data_sync_id = data_sync_id.trim().to_string();
+    let channel = state
+        .settings
+        .lock()
+        .map_err(|_| "settings lock poisoned".to_string())?
+        .auth()
+        .channels
+        .iter()
+        .find(|c| c.data_sync_id.as_deref() == Some(data_sync_id.as_str()))
+        .cloned()
+        .ok_or_else(|| "Unknown channel: sign in again to refresh the channel list".to_string())?;
+    state.music.set_data_sync_id(Some(data_sync_id.clone()));
+    match state.music.account_info().await {
+        Ok((name, avatar_url)) => {
+            let channels = state
+                .settings
+                .lock()
+                .map_err(|_| "settings lock poisoned".to_string())?
+                .auth()
+                .channels
+                .clone();
+            state
+                .settings
+                .lock()
+                .map_err(|_| "settings lock poisoned".to_string())?
+                .set_channel(data_sync_id, channel.name.clone(), name.clone())?;
+            Ok(AccountName {
+                account_name: name,
+                avatar_url,
+                channels,
+                needs_channel_choice: false,
+            })
+        }
+        Err(e) => {
+            state.music.set_data_sync_id(None);
+            Err(format!(
+                "Could not switch to channel {}: {e}",
+                channel.name
+            ))
+        }
+    }
+}
+
 #[tauri::command]
 fn signin_status(state: State<'_, AppState>) -> Result<SigninStatus, String> {
     let auth = state
@@ -656,12 +1163,20 @@ fn signin_status(state: State<'_, AppState>) -> Result<SigninStatus, String> {
     Ok(SigninStatus {
         signed_in: auth.cookie.is_some(),
         account_name: auth.account_name,
+        avatar_url: auth.avatar_url,
+        channel_name: auth.channel_name,
+        data_sync_id: auth.data_sync_id,
+        channels: auth.channels,
     })
 }
 
 #[tauri::command]
-async fn sign_out(state: State<'_, AppState>) -> Result<(), String> {
+async fn sign_out(
+    app: tauri::AppHandle,
+    state: State<'_, AppState>,
+) -> Result<(), String> {
     state.music.set_cookie(None);
+    state.music.set_data_sync_id(None);
     // Clear the session visitorData too: signing out must leave no
     // signed-in session state behind in the music client.
     state.music.set_visitor_data(None).await;
@@ -669,7 +1184,12 @@ async fn sign_out(state: State<'_, AppState>) -> Result<(), String> {
         .settings
         .lock()
         .map_err(|_| "settings lock poisoned".to_string())?
-        .clear_auth()
+        .clear_auth()?;
+    // Delete the WebView2 cookies too, so a re-sign-in actually prompts
+    // again instead of silently reusing the old Google session.
+    // Best-effort: it must never fail sign-out.
+    signin_capture::clear_webview_cookies(&app);
+    Ok(())
 }
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -689,6 +1209,7 @@ pub fn run() {
             let music = InnerTubeSession::new();
             if let Some(cookie) = settings_store.auth().cookie.clone() {
                 music.set_cookie(Some(cookie));
+                music.set_data_sync_id(settings_store.auth().data_sync_id.clone());
                 if let Some(vd) = settings_store.auth().visitor_data.clone() {
                     music.set_visitor_data_blocking(Some(vd));
                 }
@@ -719,7 +1240,11 @@ pub fn run() {
         })
         .invoke_handler(tauri::generate_handler![
             get_home_feed,
+            get_home_feed_more,
             search_music,
+            search_music_more,
+            get_related,
+            get_home_personal,
             get_playlist,
             get_album,
             get_artist,
@@ -734,6 +1259,14 @@ pub fn run() {
             remove_download,
             get_library,
             like_song,
+            toggle_speed_dial,
+            export_library,
+            import_library,
+            import_csv_playlist,
+            clear_downloads,
+            export_song,
+            subscribe_artist,
+            sync_youtube,
             create_playlist,
             rename_playlist,
             delete_playlist,
@@ -752,6 +1285,8 @@ pub fn run() {
             lt_create_room,
             signin_start,
             signin_finish,
+            signin_poll_capture,
+            signin_choose_channel,
             signin_status,
             sign_out,
             local_files::pick_local_files
