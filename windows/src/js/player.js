@@ -78,6 +78,14 @@ window.AelloPlayer = (() => {
   let preamp = null;
   let master = null;
   let graphReady = false;
+  // If the graph build threw AFTER the MediaElementSources were
+  // created, the elements are captured by a dead graph forever
+  // (createMediaElementSource on the same element throws a second
+  // time) — retrying would spin forever and playback would stay
+  // silent while currentTime advances. Mark it broken, keep the
+  // reason, and never retry in this session.
+  let graphBroken = false;
+  let graphError = null;
   // 8D audio (audit #30): a StereoPannerNode after the master gain,
   // driven by a slow LFO (Android 8D pans the stereo image). Off by
   // default; the oscillator is created on enable (an OscillatorNode
@@ -106,7 +114,9 @@ window.AelloPlayer = (() => {
 
   function ensureGraph() {
     if (graphReady) return true;
+    if (graphBroken) return false; // Dead graph holds the elements (see above).
     if (actx) return false; // Tried already and failed.
+    let sourcesCreated = false;
     try {
       const Ctor =
         window.AudioContext ||
@@ -115,6 +125,7 @@ window.AelloPlayer = (() => {
       actx = new Ctor();
       srcA = actx.createMediaElementSource(audioA);
       srcB = actx.createMediaElementSource(audioB);
+      sourcesCreated = true;
       gainA = actx.createGain();
       gainB = actx.createGain();
       gainA.gain.value = 1;
@@ -156,17 +167,120 @@ window.AelloPlayer = (() => {
       apply8d();
       applyVolumeToGraph();
       return true;
-    } catch {
+    } catch (err) {
+      // A throw before the sources were created leaves the elements
+      // untouched (they still play directly); a throw after leaves
+      // them captured by this dead graph — never retry the sources,
+      // and say so visibly instead of playing silently.
+      if (sourcesCreated) {
+        graphBroken = true;
+        graphError =
+          err && err.message ? err.message : "audio engine failed to start";
+        logDiag(
+          "audio",
+          "Audio graph failed after capture: " +
+            graphError +
+            " — restart the app to restore sound.",
+        );
+        setStatus("Audio engine failed — restart the app to restore sound.");
+      }
       actx = null;
+      srcA = null;
+      srcB = null;
       return false;
     }
   }
 
-  function resumeGraph() {
-    if (actx && actx.state === "suspended") {
-      actx.resume().catch(() => {
-        /* Resume is best-effort; the element still plays directly. */
-      });
+  // Returns true when the graph is running afterwards. A suspended
+  // context silences the graph while the element's clock keeps
+  // running — progress moves, no sound — so a failed resume is a
+  // visible status + a diagnostics line, never a swallowed promise.
+  async function resumeGraph() {
+    if (graphBroken) {
+      setStatus("Audio engine failed — restart the app to restore sound.");
+      return false;
+    }
+    if (!actx) return true; // No graph: the elements play directly.
+    if (actx.state === "running") return true;
+    try {
+      await actx.resume();
+    } catch (err) {
+      logDiag(
+        "audio",
+        "AudioContext resume failed: " +
+          (err && err.message ? err.message : "unknown") +
+          " (state: " +
+          actx.state +
+          "). " +
+          audioStateLine(),
+      );
+      setStatus("Audio is blocked by the browser — tap play again.");
+      return false;
+    }
+    if (actx.state !== "running") {
+      logDiag(
+        "audio",
+        "AudioContext still " +
+          actx.state +
+          " after resume — playback will be silent until it runs. " +
+          audioStateLine(),
+      );
+      setStatus("Audio is blocked by the browser — tap play again.");
+      return false;
+    }
+    return true;
+  }
+
+  // Diagnostics sink: appends to the Rust diagnostics log file via
+  // AelloApi (fire-and-forget; a missing bridge is a no-op). Never
+  // throws — diagnostics must never break playback.
+  function logDiag(kind, message) {
+    try {
+      if (
+        window.AelloApi &&
+        typeof window.AelloApi.logDiagnostic === "function"
+      ) {
+        window.AelloApi.logDiagnostic(kind, message);
+      }
+    } catch {
+      /* Diagnostics are best-effort. */
+    }
+  }
+
+  // Everything that decides whether the element's audio reaches the
+  // speakers — the "plays but no sound" readout.
+  function getAudioState() {
+    return {
+      graphReady,
+      graphBroken,
+      graphError,
+      contextState: actx ? actx.state : null,
+      masterGain: graphReady && master ? master.gain.value : null,
+      gainA: graphReady && gainA ? gainA.gain.value : null,
+      gainB: graphReady && gainB ? gainB.gain.value : null,
+      muted,
+      userVolume,
+      sleepMultiplier,
+      effectiveVolume: effectiveVolume(),
+      elementVolumeA: audioA.volume,
+      elementMutedA: audioA.muted,
+      elementVolumeB: audioB.volume,
+      elementMutedB: audioB.muted,
+      activeIsA: activeEl === audioA,
+      activePaused: activeEl.paused,
+      activeTime: Number.isFinite(activeEl.currentTime)
+        ? activeEl.currentTime
+        : 0,
+      eightD: !!prefs.eightD,
+      normalize: !!prefs.normalize,
+    };
+  }
+
+  function audioStateLine() {
+    try {
+      return "audio state: " + JSON.stringify(getAudioState());
+    } catch {
+      return "audio state: unavailable";
     }
   }
 
@@ -496,6 +610,16 @@ window.AelloPlayer = (() => {
     audioB.removeAttribute("src");
     audioA.load();
     audioB.load();
+    // A mid-crossfade failure can leave the gains mid-ramp: restore
+    // the rest state (active full, standby silent) so the next play
+    // never inherits a ~0 gain and plays silently.
+    if (graphReady) {
+      const now = actx.currentTime;
+      activeGainNode().gain.cancelScheduledValues(now);
+      activeGainNode().gain.setValueAtTime(1, now);
+      standbyGainNode().gain.cancelScheduledValues(now);
+      standbyGainNode().gain.setValueAtTime(0, now);
+    }
     currentIndex =
       previousIndex >= 0 && previousIndex < queue.length
         ? previousIndex
@@ -514,6 +638,10 @@ window.AelloPlayer = (() => {
   // one over crossfadeSecs. When crossfade is off (or Web Audio is
   // unavailable) the new track simply starts on the active element.
   async function startWithCrossfade(url) {
+    // A pending crossfade timer from a previous switch would fire
+    // later and pause + strip the src of the element that is active
+    // by then — cancel it before starting a new switch.
+    cancelCrossfade();
     const wasPlaying = !activeEl.paused && !activeEl.ended && !!activeEl.src;
     if (
       !wasPlaying ||
@@ -522,7 +650,6 @@ window.AelloPlayer = (() => {
       !graphReady
     ) {
       // Hard switch on the active element.
-      cancelCrossfade();
       if (standbyEl.src) {
         standbyEl.pause();
         standbyEl.removeAttribute("src");
@@ -530,6 +657,17 @@ window.AelloPlayer = (() => {
       }
       activeEl.src = url;
       setSpeedOnElements();
+      // A previous crossfade or failed play can leave the per-element
+      // gains mid-ramp (incl. ~0): a hard switch must start at full
+      // gain on the active element, silence on the standby one, or
+      // the song plays with no sound while the UI shows playing.
+      if (graphReady) {
+        const now = actx.currentTime;
+        activeGainNode().gain.cancelScheduledValues(now);
+        activeGainNode().gain.setValueAtTime(1, now);
+        standbyGainNode().gain.cancelScheduledValues(now);
+        standbyGainNode().gain.setValueAtTime(0, now);
+      }
       await activeEl.play();
       return;
     }
@@ -578,7 +716,7 @@ window.AelloPlayer = (() => {
     const song = queue[index];
     if (!song) return false;
     ensureGraph();
-    resumeGraph();
+    await resumeGraph();
     const previousIndex = currentIndex;
     currentIndex = index;
     resetHistoryTimer();
@@ -660,7 +798,7 @@ window.AelloPlayer = (() => {
       return;
     }
     ensureGraph();
-    resumeGraph();
+    await resumeGraph();
     if (activeEl.paused) {
       try {
         await activeEl.play();
@@ -1322,6 +1460,9 @@ window.AelloPlayer = (() => {
     is8d,
     setNormalization,
     isNormalization,
+    // Audio diagnostics (6.1.45 exe fix): the "plays but no sound"
+    // readout — graph state, gains, volume/mute, element state.
+    getAudioState,
     // Sleep timer.
     startSleepTimer,
     clearSleepTimer,

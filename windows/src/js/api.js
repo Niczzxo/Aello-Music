@@ -550,5 +550,29 @@ window.AelloApi = (() => {
         return false;
       }
     },
+
+    // ---- diagnostics (6.1.45 exe fix) --------------------------------
+
+    // Append a line to the app's diagnostics log file
+    // (aello-diagnostics.log in the app data dir). Fire-and-forget;
+    // null when there is no bridge.
+    async logDiagnostic(kind, message) {
+      return safeCall("log_diagnostic", {
+        kind,
+        message: String(message || ""),
+      });
+    },
+
+    // Absolute path of the diagnostics log file (shown in About).
+    async diagnosticsPath() {
+      const path = await safeCall("diagnostics_path");
+      return typeof path === "string" ? path : "";
+    },
+
+    // Last lines of the diagnostics log (Copy diagnostics button).
+    async readDiagnosticsLog() {
+      const text = await safeCall("read_diagnostics_log");
+      return typeof text === "string" ? text : "";
+    },
   };
 })();
