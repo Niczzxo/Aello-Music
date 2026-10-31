@@ -1526,6 +1526,12 @@ document.addEventListener("DOMContentLoaded", () => {
         stopSigninPoll();
         setSigninFlowState("error", "Sign-in check failed — try signing in again.");
         player.setStatus("Sign-in check failed — try signing in again.");
+        api.logDiagnostic(
+          "signin",
+          "sign-in check failed: no poll result after " +
+            SIGNIN_MAX_ERRORS +
+            " tries",
+        );
         return;
       }
       signinPollTimer = setTimeout(
@@ -1538,10 +1544,29 @@ document.addEventListener("DOMContentLoaded", () => {
       case "not-signed-in":
         signinPollTimer = setTimeout(() => pollSigninCapture(0), SIGNIN_POLL_MS);
         return;
+      case "capture-error":
+        // The Rust capture itself failed (COM / timeout) — the real
+        // reason is in result.message. Keep polling a few times,
+        // then stop with the reason instead of a generic line.
+        if (errorCount + 1 >= SIGNIN_MAX_ERRORS) {
+          await closeSigninWindow();
+          stopSigninPoll();
+          const reason = result.message || "couldn't read the login window";
+          setSigninFlowState("error", "Sign-in check failed: " + reason);
+          player.setStatus("Sign-in check failed: " + reason);
+          api.logDiagnostic("signin", "sign-in check failed: " + reason);
+          return;
+        }
+        signinPollTimer = setTimeout(
+          () => pollSigninCapture(errorCount + 1),
+          SIGNIN_POLL_MS,
+        );
+        return;
       case "window-gone":
         stopSigninPoll();
         setSigninFlowState("cancelled", "Sign-in cancelled — nothing changed.");
         player.setStatus("Sign-in cancelled.");
+        api.logDiagnostic("signin", "login window closed before sign-in completed");
         return;
       case "signed-in":
         await closeSigninWindow();
@@ -1553,6 +1578,10 @@ document.addEventListener("DOMContentLoaded", () => {
         );
         player.setStatus(
           "Signed in as " + (result.accountName || "your account") + ".",
+        );
+        api.logDiagnostic(
+          "signin",
+          "signed in as " + (result.accountName || "your account"),
         );
         // Auto-sync once after a fresh sign-in (audit #45): pull the
         // YouTube library into the local library, best-effort.
@@ -1577,6 +1606,10 @@ document.addEventListener("DOMContentLoaded", () => {
         player.setStatus(
           result.message || "That sign-in didn't work — try signing in again.",
         );
+        api.logDiagnostic(
+          "signin",
+          "sign-in validation failed: " + (result.message || "unknown"),
+        );
         return;
     }
   }
@@ -1586,7 +1619,11 @@ document.addEventListener("DOMContentLoaded", () => {
       try {
         await signinLoginWindow.setFocus();
       } catch {
-        /* Window is gone; fall through and open a fresh one. */
+        // The window is gone (user closed it): drop the stale
+        // handle so we fall through and open a fresh window instead
+        // of returning silently with nothing happening — the
+        // "click does nothing, no message" failure.
+        signinLoginWindow = null;
       }
       if (signinLoginWindow) return;
     }
@@ -1617,9 +1654,11 @@ document.addEventListener("DOMContentLoaded", () => {
     if (!loginWindow) {
       setSigninFlowState("error", "Couldn't open the sign-in window — try again.");
       player.setStatus("Couldn't open the sign-in window — try again.");
+      api.logDiagnostic("signin", "login window failed to open (no WebviewWindow)");
       return;
     }
     signinLoginWindow = loginWindow;
+    api.logDiagnostic("signin", "login window opened");
     setSigninFlowState("waiting", "Sign in with Google in the login window…");
     player.setStatus("Sign in with Google in the login window…");
     signinPollTimer = setTimeout(() => pollSigninCapture(0), SIGNIN_POLL_MS);
@@ -1674,6 +1713,34 @@ document.addEventListener("DOMContentLoaded", () => {
     );
     return status;
   }
+
+  // Diagnostics (Settings → About): show the log file path and copy
+  // its contents so the user can send the actual error when sign-in
+  // or playback fails on their PC.
+  async function refreshDiagnosticsPath() {
+    const el = $("diagnostics-path");
+    if (!el) return;
+    const path = await api.diagnosticsPath();
+    el.textContent =
+      path || "Diagnostics log is not available in this build.";
+  }
+  on("diagnostics-copy", "click", async () => {
+    const text = await api.readDiagnosticsLog();
+    const body = text || "No diagnostics logged yet.";
+    if (navigator.clipboard) {
+      try {
+        await navigator.clipboard.writeText(body);
+        player.setStatus("Diagnostics copied — paste them in chat.");
+        return;
+      } catch {
+        /* Fall through to the status fallback below. */
+      }
+    }
+    player.setStatus(
+      "Couldn't copy diagnostics — open the log file at the path above.",
+    );
+  });
+  refreshDiagnosticsPath();
 
   // ---- Listen Together -----------------------------------------------------------------------
   const LT_SESSION_KEY = "aello.lt.session.v1";
