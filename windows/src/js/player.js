@@ -41,7 +41,7 @@ window.AelloPlayer = (() => {
   // carry shuffle/repeat/speed, so this is the durable store) --------
   const PREFS_KEY = "aello.player.prefs.v1";
   const QUEUE_KEY = "aello.queue.v1";
-  let prefs = { shuffle: false, repeat: "off", speed: 1 };
+  let prefs = { shuffle: false, repeat: "off", speed: 1, radio: true, eightD: false, normalize: false };
   try {
     const stored = JSON.parse(localStorage.getItem(PREFS_KEY) || "null");
     if (stored && typeof stored === "object") prefs = { ...prefs, ...stored };
@@ -78,6 +78,19 @@ window.AelloPlayer = (() => {
   let preamp = null;
   let master = null;
   let graphReady = false;
+  // 8D audio (audit #30): a StereoPannerNode after the master gain,
+  // driven by a slow LFO (Android 8D pans the stereo image). Off by
+  // default; the oscillator is created on enable (an OscillatorNode
+  // cannot restart after stop()).
+  let panner = null;
+  let lfo = null;
+  let lfoDepth = null;
+  // Normalization (audit #32): a DynamicsCompressorNode between the
+  // preamp and the master gain — an approximation of Android's
+  // per-track LoudnessEnhancer (no loudness metadata is fetched, so
+  // this is a fixed gentle compressor, not per-track gain). Off by
+  // default; ratio 1:1 + 0 dB threshold is a pass-through when off.
+  let compressor = null;
 
   const ENHANCE_BANDS = [
     { freqHz: 80, gainDb: 3.0, q: 0.7, kind: "lowshelf" },
@@ -118,8 +131,11 @@ window.AelloPlayer = (() => {
       }
       preamp = actx.createGain();
       preamp.gain.value = 1;
+      compressor = actx.createDynamicsCompressor();
       master = actx.createGain();
       master.gain.value = 1;
+      panner = actx.createStereoPanner();
+      panner.pan.value = 0;
       srcA.connect(gainA);
       srcB.connect(gainB);
       gainA.connect(eqIn);
@@ -130,10 +146,14 @@ window.AelloPlayer = (() => {
         node = band;
       });
       node.connect(preamp);
-      preamp.connect(master);
-      master.connect(actx.destination);
+      preamp.connect(compressor);
+      compressor.connect(master);
+      master.connect(panner);
+      panner.connect(actx.destination);
       graphReady = true;
       applyEq();
+      applyNormalization();
+      apply8d();
       applyVolumeToGraph();
       return true;
     } catch {
@@ -220,6 +240,83 @@ window.AelloPlayer = (() => {
       eqProfiles = settings.eqProfiles;
     }
     applyEq();
+  }
+
+  // ---- 8D audio + normalization (audit #30 / #32) ----------------------
+  function applyNormalization() {
+    if (!graphReady || !compressor) return;
+    if (prefs.normalize) {
+      compressor.threshold.value = -18;
+      compressor.knee.value = 12;
+      compressor.ratio.value = 4;
+      compressor.attack.value = 0.003;
+      compressor.release.value = 0.25;
+    } else {
+      // Pass-through: no gain reduction at any level.
+      compressor.threshold.value = 0;
+      compressor.knee.value = 0;
+      compressor.ratio.value = 1;
+      compressor.attack.value = 0.003;
+      compressor.release.value = 0.25;
+    }
+  }
+
+  function setNormalization(enabled) {
+    prefs.normalize = !!enabled;
+    savePrefs();
+    applyNormalization();
+    onChange();
+  }
+
+  function isNormalization() {
+    return !!prefs.normalize;
+  }
+
+  function apply8d() {
+    if (!graphReady || !panner) return;
+    if (prefs.eightD) {
+      if (!lfo) {
+        lfo = actx.createOscillator();
+        lfo.frequency.value = 0.07; // one full L↔R sweep ≈ 14s
+        lfoDepth = actx.createGain();
+        lfoDepth.gain.value = 0.85;
+        lfo.connect(lfoDepth);
+        lfoDepth.connect(panner.pan);
+        lfo.start();
+      }
+    } else if (lfo) {
+      try {
+        lfo.stop();
+      } catch {
+        /* Already stopped. */
+      }
+      try {
+        lfo.disconnect();
+      } catch {
+        /* Already disconnected. */
+      }
+      if (lfoDepth) {
+        try {
+          lfoDepth.disconnect();
+        } catch {
+          /* Already disconnected. */
+        }
+      }
+      lfo = null;
+      lfoDepth = null;
+      panner.pan.value = 0;
+    }
+  }
+
+  function set8d(enabled) {
+    prefs.eightD = !!enabled;
+    savePrefs();
+    apply8d();
+    onChange();
+  }
+
+  function is8d() {
+    return !!prefs.eightD;
   }
 
   // ---- volume / mute / sleep-fade multiplier ---------------------------
@@ -534,8 +631,10 @@ window.AelloPlayer = (() => {
           (err && err.message ? err.message : "playback failed to start."),
       );
     }
+    radioPrefetchFor = null;
     onChange();
     syncSnapshot();
+    maybePrefetchRadio();
     return true;
   }
 
@@ -593,6 +692,85 @@ window.AelloPlayer = (() => {
     return next;
   }
 
+  // ---- radio / autoplay (audit #28) --------------------------------------
+  // When the queue ends and radio is on, extend it from related songs
+  // (Android `PlayerConnection.startRadioSeamlessly`); the same
+  // primitive Daily Discover uses (`related_for_video`, via
+  // `get_related`). Off by the user's toggle; when it is off, or when
+  // no related songs come back, playback stops exactly as before.
+  let radioExtending = false;
+  let radioPrefetchFor = null;
+
+  function setRadio(enabled) {
+    prefs.radio = !!enabled;
+    savePrefs();
+    onChange();
+  }
+
+  function isRadio() {
+    return prefs.radio !== false;
+  }
+
+  function appendRelated(songs, limit) {
+    let added = 0;
+    const seen = new Set(queue.map((item) => item.id));
+    for (const song of songs || []) {
+      if (!song || !song.id || seen.has(song.id)) continue;
+      seen.add(song.id);
+      queue.push(song);
+      added += 1;
+      if (added >= (limit || 8)) break;
+    }
+    if (added > 0) {
+      onChange();
+      syncSnapshot();
+    }
+    return added;
+  }
+
+  // Proactive prefetch: when ≤2 tracks remain, fetch related songs
+  // for the current track in the background so the queue rarely runs
+  // dry. Fire-and-forget; a failed fetch just means no prefetch.
+  function maybePrefetchRadio() {
+    if (!isRadio() || radioExtending) return;
+    const song = currentSong();
+    if (!song || song.localPath || song.downloadedPath) return;
+    if (queue.length - 1 - currentIndex > 2) return;
+    if (radioPrefetchFor === song.id) return;
+    radioPrefetchFor = song.id;
+    radioExtending = true;
+    window.AelloApi.getRelated(song.id)
+      .then((related) => {
+        appendRelated(related, 8);
+      })
+      .catch(() => {
+        /* No prefetch — playback continues; next() retries at the end. */
+      })
+      .finally(() => {
+        radioExtending = false;
+      });
+  }
+
+  // End-of-queue extension: fetch related songs for the last track and
+  // keep playing. Returns true when playback continues.
+  async function extendRadio() {
+    if (radioExtending) return false;
+    const song = currentSong();
+    if (!song || song.localPath || song.downloadedPath) return false;
+    radioExtending = true;
+    try {
+      const related = await window.AelloApi.getRelated(song.id);
+      const added = appendRelated(related, 8);
+      if (added === 0) return false;
+      await playAt(currentIndex + 1);
+      return true;
+    } catch {
+      return false;
+    } finally {
+      radioExtending = false;
+    }
+  }
+
   function next() {
     if (queue.length === 0) return;
     if (prefs.repeat === "one") {
@@ -607,6 +785,22 @@ window.AelloPlayer = (() => {
     if (currentIndex >= queue.length - 1) {
       if (prefs.repeat === "all") {
         playAt(0);
+        return;
+      }
+      // Radio: extend the queue from related songs instead of
+      // stopping (Android autoplay). extendRadio pauses below when
+      // it cannot extend. While an extension is already in flight,
+      // do nothing — the in-flight one will continue or pause.
+      if (radioExtending) return;
+      if (isRadio()) {
+        extendRadio().then((continued) => {
+          if (!continued) {
+            activeEl.pause();
+            setStatus("Radio: no more related songs.");
+            onChange();
+            syncSnapshot();
+          }
+        });
         return;
       }
       activeEl.pause();
@@ -1120,6 +1314,14 @@ window.AelloPlayer = (() => {
     isLiked,
     toggleLike,
     downloadCurrent,
+    // Radio / autoplay.
+    setRadio,
+    isRadio,
+    // 8D audio + normalization.
+    set8d,
+    is8d,
+    setNormalization,
+    isNormalization,
     // Sleep timer.
     startSleepTimer,
     clearSleepTimer,

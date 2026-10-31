@@ -15,7 +15,10 @@
 //! call the endpoints itself — every backend call goes through a Tauri
 //! command in `lib.rs`, keeping the request path in Rust.
 
-use crate::models::{AlbumDetail, ArtistDetail, ExploreData, HomeItem, HomeSection, LyricLine, PlaylistDetail, Song};
+use crate::models::{
+    AlbumDetail, ArtistDetail, ExploreData, HomeFeed, HomeItem, HomeSection, LyricLine,
+    PlaylistDetail, SearchPage, Song,
+};
 
 /// Errors surface to the frontend as plain strings so the UI can show the
 /// real reason instead of a silent failure.
@@ -25,11 +28,34 @@ pub type ServiceResult<T> = Result<T, String>;
 /// traits are stable since Rust 1.75, so no extra async-trait crate is
 /// needed.
 pub trait MusicService: Send + Sync {
-    /// Home feed sections.
-    async fn home_feed(&self) -> ServiceResult<Vec<HomeSection>>;
+    /// Home feed sections + chips + continuation. `params` is a chip's
+    /// browse params (None = unfiltered feed, Android `YouTube.home`).
+    async fn home_feed(&self, params: Option<&str>) -> ServiceResult<HomeFeed>;
+    /// Next home page from a continuation token (Android
+    /// `YouTube.home(continuation)`).
+    async fn home_feed_more(&self, continuation: &str) -> ServiceResult<HomeFeed>;
     /// Search across songs, albums, playlists, and artists. `filter` is
-    /// "song" | "album" | "artist" | "playlist" (None = all).
-    async fn search(&self, query: &str, filter: Option<&str>) -> ServiceResult<Vec<HomeItem>>;
+    /// "song" | "album" | "artist" | "playlist" (None = all). Returns
+    /// the page + continuation token (Android `SearchResult`).
+    async fn search(&self, query: &str, filter: Option<&str>) -> ServiceResult<SearchPage>;
+    /// Next search page from a continuation token (Android
+    /// `YouTube.searchContinuation`).
+    async fn search_more(&self, continuation: &str) -> ServiceResult<SearchPage>;
+    /// A signed-in library page (Android `YouTube.library`): items +
+    /// continuation for `browse_id` at `tab_index`.
+    async fn library_page(
+        &self,
+        browse_id: &str,
+        tab_index: usize,
+    ) -> ServiceResult<SearchPage>;
+    /// Next library page from a continuation token (Android
+    /// `YouTube.libraryContinuation`).
+    async fn library_page_more(&self, continuation: &str) -> ServiceResult<SearchPage>;
+    /// Like / unlike a video on YouTube (Android `YouTube.likeVideo`).
+    async fn like_video(&self, video_id: &str, liked: bool) -> ServiceResult<()>;
+    /// Subscribe / unsubscribe a channel (Android
+    /// `YouTube.subscribeChannel`).
+    async fn subscribe_channel(&self, channel_id: &str, subscribe: bool) -> ServiceResult<()>;
     /// A playlist and its songs.
     async fn playlist(&self, id: &str) -> ServiceResult<PlaylistDetail>;
     /// An album and its songs.
@@ -46,8 +72,6 @@ pub trait MusicService: Send + Sync {
     async fn related_for_video(&self, video_id: &str) -> ServiceResult<Vec<Song>>;
     /// Timed-text transcript lines for a video (lyrics fallback).
     async fn transcript(&self, video_id: &str) -> ServiceResult<Vec<LyricLine>>;
-    /// Signed-in account display name; errors without a valid cookie.
-    async fn account_name(&self) -> ServiceResult<String>;
     /// Resolve a playable stream URL for a song. `Ok(None)` means the
     /// backend is reachable but has no playable stream for this song.
     /// `Err` carries the real reason (e.g. YouTube's playabilityStatus

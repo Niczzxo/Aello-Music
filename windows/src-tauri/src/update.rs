@@ -13,6 +13,13 @@ use crate::innertube::session::InnerTubeSession;
 use crate::models::UpdateInfo;
 
 const RELEASES_URL: &str = "https://api.github.com/repos/Niczzxo/Aello-Music/releases";
+/// Android 6.1.45 `releases/latest` redirect fallback
+/// (`vivimusicupdater.kt`): unauthenticated api.github.com returns 403
+/// on shared/CGNAT IPs, so when the API list fails, follow the
+/// `github.com/releases/latest` redirect (reqwest follows it) and read
+/// the Windows setup asset straight off the release page.
+const LATEST_RELEASE_URL: &str = "https://github.com/Niczzxo/Aello-Music/releases/latest";
+const RELEASE_DOWNLOAD_PREFIX: &str = "/Niczzxo/Aello-Music/releases/download/";
 
 fn parse_version(tag: &str) -> Option<(u64, u64, u64)> {
     let stripped = tag.strip_prefix('v').unwrap_or(tag);
@@ -44,8 +51,10 @@ pub async fn check_for_update(session: &InnerTubeSession) -> UpdateInfo {
         .await
     {
         Ok(v) => v,
-        Err(e) => {
-            return fail(format!("Update check failed: {e}"));
+        Err(api_err) => {
+            // API list failed (403 on shared/CGNAT IPs is the common
+            // one) — try the redirect fallback before giving up.
+            return check_via_latest_page(session, &current, current_ver, api_err.to_string()).await;
         }
     };
     let releases = match releases.as_array() {
@@ -125,4 +134,82 @@ pub async fn check_for_update(session: &InnerTubeSession) -> UpdateInfo {
         };
     }
     fail("Update check failed: no Windows release found".to_string())
+}
+
+/// Fallback after the api.github.com list fails: fetch the
+/// `releases/latest` page (redirect followed by reqwest) and take the
+/// first `…/releases/download/<tag>/Aello_*_x64-setup.exe` link off
+/// the page. The tag between `/download/` and the next `/` is the
+/// version. Release notes are not on this page — notes stay empty.
+/// Any failure here is a failed check (error set, never "latest").
+async fn check_via_latest_page(
+    session: &InnerTubeSession,
+    current: &str,
+    current_ver: (u64, u64, u64),
+    api_error: String,
+) -> UpdateInfo {
+    let fail = |reason: String| UpdateInfo {
+        available: false,
+        version: current.to_string(),
+        notes: String::new(),
+        exe_url: None,
+        error: Some(reason),
+    };
+    let page = match session
+        .get_text(
+            LATEST_RELEASE_URL,
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36",
+        )
+        .await
+    {
+        Ok(text) => text,
+        Err(e) => {
+            return fail(format!(
+                "Update check failed: GitHub API ({api_error}) and releases page ({e}) both unreachable"
+            ));
+        }
+    };
+    // First download link for a Windows setup exe on the page.
+    let mut search_from = 0;
+    while let Some(rel) = page[search_from..].find(RELEASE_DOWNLOAD_PREFIX) {
+        let start = search_from + rel;
+        let rest = &page[start..];
+        let Some(exe_end) = rest.find("_x64-setup.exe") else {
+            break;
+        };
+        let asset_path = &rest[..exe_end + "_x64-setup.exe".len()];
+        // Tag = the segment after /download/ up to the next /.
+        let after_prefix = &asset_path[RELEASE_DOWNLOAD_PREFIX.len()..];
+        let Some(tag) = after_prefix.split('/').next() else {
+            break;
+        };
+        if !tag.starts_with('v') {
+            search_from = start + RELEASE_DOWNLOAD_PREFIX.len();
+            continue;
+        }
+        let Some(latest_ver) = parse_version(tag) else {
+            search_from = start + RELEASE_DOWNLOAD_PREFIX.len();
+            continue;
+        };
+        let version = tag.trim_start_matches('v').to_string();
+        if is_newer(latest_ver, current_ver) {
+            return UpdateInfo {
+                available: true,
+                version,
+                notes: String::new(),
+                exe_url: Some(format!("https://github.com{asset_path}")),
+                error: None,
+            };
+        }
+        return UpdateInfo {
+            available: false,
+            version: current.to_string(),
+            notes: String::new(),
+            exe_url: None,
+            error: None,
+        };
+    }
+    fail(format!(
+        "Update check failed: GitHub API ({api_error}) and no Windows setup asset on the latest release page"
+    ))
 }

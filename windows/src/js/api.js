@@ -44,6 +44,10 @@ window.AelloApi = (() => {
     autoDownloadOnLike: false,
     ltServer: "global",
     ltUsername: "",
+    // Android 6.1.45: persisted update-check failure flag + the host's
+    // last Listen Together control mode. Defaults keep old saves valid.
+    lastUpdateCheckFailed: false,
+    ltControlMode: "owner",
   };
 
   async function call(command, args) {
@@ -63,6 +67,29 @@ window.AelloApi = (() => {
     }
   }
 
+  // Timed call (R4): long Rust commands (home/search/artist/playlist)
+  // must not hang the UI forever on a slow network — 30s, then the
+  // caller shows a timeout error instead of a blank page. Throws on
+  // timeout (unlike safeCall) so the UI can tell "timed out" apart
+  // from "empty".
+  async function timedCall(command, args, timeoutMs) {
+    if (!invoke) return null;
+    let timer = null;
+    try {
+      return await Promise.race([
+        invoke(command, args || {}),
+        new Promise((_, reject) => {
+          timer = setTimeout(
+            () => reject(new Error("Timed out after " + Math.round((timeoutMs || 30000) / 1000) + "s")),
+            timeoutMs || 30000,
+          );
+        }),
+      ]);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
+
   function asArray(value) {
     return Array.isArray(value) ? value : [];
   }
@@ -70,9 +97,37 @@ window.AelloApi = (() => {
   return {
     outsideApp,
 
-    async getHomeFeed() {
-      const sections = await safeCall("get_home_feed");
-      return asArray(sections);
+    // Home feed page { chips, sections, continuation }. `params` is a
+    // chip's browse params (undefined = unfiltered feed); a chip tap
+    // re-fetches with that chip's params, "All" re-fetches unfiltered.
+    async getHomeFeed(params) {
+      const args = {};
+      if (params) args.params = params;
+      const feed = await timedCall("get_home_feed", args);
+      if (feed && typeof feed === "object" && Array.isArray(feed.sections)) return feed;
+      // Older shape (plain section array) — wrap it.
+      if (Array.isArray(feed)) return { chips: [], sections: feed, continuation: null };
+      return { chips: [], sections: [], continuation: null };
+    },
+
+    async getHomeFeedMore(continuation) {
+      const feed = await timedCall("get_home_feed_more", { continuation });
+      if (feed && typeof feed === "object" && Array.isArray(feed.sections)) return feed;
+      return { chips: [], sections: [], continuation: null };
+    },
+
+    // Personal Home sections from the local library store — only
+    // sections with real items are rendered by the caller.
+    async getHomePersonal() {
+      const data = await safeCall("get_home_personal");
+      if (data && typeof data === "object") return data;
+      return { quickPicks: [], keepListening: [], forgottenFavorites: [], speedDial: [] };
+    },
+
+    // Related songs for one video (radio / autoplay).
+    async getRelated(videoId) {
+      const songs = await safeCall("get_related", { videoId });
+      return asArray(songs);
     },
 
     async search(query, filter) {
@@ -87,16 +142,24 @@ window.AelloApi = (() => {
       };
       const args = { query };
       if (filter) args.filter = FILTER_MAP[filter] || filter;
-      const items = await safeCall("search_music", args);
-      return asArray(items);
+      const page = await timedCall("search_music", args);
+      if (page && typeof page === "object" && Array.isArray(page.items)) return page;
+      if (Array.isArray(page)) return { items: page, continuation: null };
+      return { items: [], continuation: null };
+    },
+
+    async searchMore(continuation) {
+      const page = await timedCall("search_music_more", { continuation });
+      if (page && typeof page === "object" && Array.isArray(page.items)) return page;
+      return { items: [], continuation: null };
     },
 
     async getPlaylist(id) {
-      return safeCall("get_playlist", { id });
+      return timedCall("get_playlist", { id });
     },
 
     async getAlbum(id) {
-      return safeCall("get_album", { id });
+      return timedCall("get_album", { id });
     },
 
     // Returns a playable URL string, or null when there is none.
@@ -165,11 +228,11 @@ window.AelloApi = (() => {
     // ---- 6.1.45: catalogue & browsing ---------------------------------
 
     async getArtist(id) {
-      return safeCall("get_artist", { id });
+      return timedCall("get_artist", { id });
     },
 
     async getTrending() {
-      const sections = await safeCall("get_trending");
+      const sections = await timedCall("get_trending");
       return asArray(sections);
     },
 
@@ -181,7 +244,7 @@ window.AelloApi = (() => {
 
     // Browse a mood/genre by its InnerTube params (from get_explore).
     async browseMood(params) {
-      const items = await safeCall("browse_mood", { params });
+      const items = await timedCall("browse_mood", { params });
       return asArray(items);
     },
 
@@ -234,12 +297,13 @@ window.AelloApi = (() => {
 
     // ---- 6.1.45: library -------------------------------------------------
 
-    // Returns { likedIds, playlists, history, speedDialIds } or the
-    // empty shape when the store/command is unavailable.
+    // Returns { likedIds, playlists, history, speedDialIds,
+    // librarySongs } or the empty shape when the store/command is
+    // unavailable.
     async getLibrary() {
       const data = await safeCall("get_library");
       if (data && typeof data === "object") return data;
-      return { likedIds: [], playlists: [], history: [], speedDialIds: [] };
+      return { likedIds: [], playlists: [], history: [], speedDialIds: [], librarySongs: [] };
     },
 
     // Best-effort; returns false when the command is unavailable.
@@ -318,6 +382,93 @@ window.AelloApi = (() => {
       }
     },
 
+    // Pin / unpin a song on the Speed Dial (max 27, enforced Rust-side).
+    // Returns true when pinned afterwards, false when unpinned or when
+    // the command failed / the dial is full.
+    async toggleSpeedDial(song) {
+      if (!invoke || !song) return false;
+      try {
+        return await invoke("toggle_speed_dial", { song });
+      } catch {
+        return false;
+      }
+    },
+
+    // ---- 6.1.45: backup / restore / CSV / storage ------------------------
+
+    async exportLibrary() {
+      const text = await safeCall("export_library");
+      return typeof text === "string" ? text : null;
+    },
+
+    async importLibrary(backupJson) {
+      if (!invoke) return false;
+      try {
+        await invoke("import_library", { backupJson });
+        return true;
+      } catch {
+        return false;
+      }
+    },
+
+    async importCsvPlaylist(name, csv) {
+      if (!invoke) return null;
+      try {
+        return await invoke("import_csv_playlist", { name, csv });
+      } catch {
+        return null;
+      }
+    },
+
+    async clearDownloads() {
+      if (!invoke) return null;
+      try {
+        return await invoke("clear_downloads");
+      } catch {
+        return null;
+      }
+    },
+
+    // Copy a downloaded song to a folder the user picks. Returns the
+    // destination path, null when cancelled/unavailable.
+    async exportSong(songId) {
+      if (!invoke) return null;
+      try {
+        return await invoke("export_song", { songId });
+      } catch {
+        return null;
+      }
+    },
+
+    // ---- 6.1.45: YouTube sync + subscribe --------------------------------
+
+    // Subscribe / unsubscribe an artist channel. Returns false when
+    // not signed in or the call failed (the UI shows the real reason
+    // via the thrown message where available).
+    async subscribeArtist(channelId, subscribe) {
+      if (!invoke) return false;
+      try {
+        await invoke("subscribe_artist", { channelId, subscribe: !!subscribe });
+        return true;
+      } catch {
+        return false;
+      }
+    },
+
+    // One YouTube sync run. Returns { likedAdded, libraryAdded,
+    // playlistsAdded, errors } or null when unavailable / not signed
+    // in (the command rejects then — callers show the sign-in prompt).
+    async syncYouTube() {
+      if (!invoke) return null;
+      try {
+        const report = await invoke("sync_youtube");
+        if (report && typeof report === "object") return report;
+        return null;
+      } catch {
+        return null;
+      }
+    },
+
     // Most-played entries (top by playCount) for the Stats view.
     async getStats() {
       const entries = await safeCall("get_stats");
@@ -365,13 +516,21 @@ window.AelloApi = (() => {
       return safeCall("signin_start");
     },
 
-    // The cookie is passed straight to Rust and never stored in JS.
-    // Returns { accountName } or null on failure.
-    async signinFinish(cookie, visitorData) {
-      if (!cookie) return null;
-      const args = { cookie };
-      if (visitorData) args.visitorData = visitorData;
-      const result = await safeCall("signin_finish", args);
+    // One auto-capture poll of the login window's cookies. Returns
+    // { status, accountName, avatarUrl, channels, message } or null on
+    // a transport failure (the caller keeps polling; the cookie never
+    // crosses into JS — Rust captures and validates it).
+    async signinPollCapture() {
+      const result = await safeCall("signin_poll_capture");
+      if (result && typeof result === "object") return result;
+      return null;
+    },
+
+    // Finish a multi-channel sign-in with the picked channel's
+    // dataSyncId. Returns { accountName, ... } or null on failure.
+    async signinChooseChannel(dataSyncId) {
+      if (!dataSyncId) return null;
+      const result = await safeCall("signin_choose_channel", { dataSyncId });
       if (result && typeof result === "object") return result;
       return null;
     },

@@ -83,6 +83,20 @@ pub struct AppSettings {
     pub lt_server: String,
     #[serde(default)]
     pub lt_username: String,
+    /// Android 6.1.45 `KEY_LAST_UPDATE_CHECK_FAILED`: the last update
+    /// check failed, so Settings must show "Can't check for updates"
+    /// instead of looking up-to-date. Set by the update check itself
+    /// (lib.rs), never by the frontend form.
+    #[serde(default = "default_false")]
+    pub last_update_check_failed: bool,
+    /// Android 6.1.45 `ListenTogetherControlModeKey`: the host's last
+    /// control mode ("owner" | "everyone"), restored on the next room.
+    #[serde(default = "default_lt_control_mode")]
+    pub lt_control_mode: String,
+}
+
+fn default_lt_control_mode() -> String {
+    "owner".to_string()
 }
 
 impl Default for AppSettings {
@@ -102,6 +116,8 @@ impl Default for AppSettings {
             auto_download_on_like: false,
             lt_server: default_lt_server(),
             lt_username: String::new(),
+            last_update_check_failed: false,
+            lt_control_mode: default_lt_control_mode(),
         }
     }
 }
@@ -109,6 +125,11 @@ impl Default for AppSettings {
 /// Google sign-in state, stored in `auth.json` (never in JS storage).
 /// The cookie is the raw `Cookie` header value harvested from the
 /// login WebView; `visitor_data` is the matching visitorData.
+/// `data_sync_id` is the picked channel's identity token (Android
+/// `DataSyncIdKey`); `channels` is the account's channel list from
+/// `getAccountSwitcherEndpoint`, so the picker can re-show in Settings
+/// without a network call. `avatar_url` is the account photo URL from
+/// the `account_menu` response — never guessed.
 #[derive(Debug, Clone, Default, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AuthState {
@@ -118,6 +139,14 @@ pub struct AuthState {
     pub visitor_data: Option<String>,
     #[serde(default)]
     pub account_name: Option<String>,
+    #[serde(default)]
+    pub data_sync_id: Option<String>,
+    #[serde(default)]
+    pub channel_name: Option<String>,
+    #[serde(default)]
+    pub avatar_url: Option<String>,
+    #[serde(default)]
+    pub channels: Vec<crate::models::AccountChannel>,
 }
 
 pub struct SettingsStore {
@@ -169,18 +198,57 @@ impl SettingsStore {
         &self.auth
     }
 
-    /// Persist sign-in state (cookie + visitorData + account name).
+    /// Persist the update-check failure flag (called by the update
+    /// check in lib.rs after every run: true on failure, false on a
+    /// conclusive result). Writes settings.json directly — the
+    /// frontend never round-trips this field.
+    pub fn set_last_update_check_failed(&mut self, failed: bool) -> Result<(), String> {
+        if self.settings.last_update_check_failed == failed {
+            return Ok(());
+        }
+        self.settings.last_update_check_failed = failed;
+        let text = serde_json::to_string_pretty(&self.settings).map_err(|e| e.to_string())?;
+        if let Some(parent) = self.path.parent() {
+            fs::create_dir_all(parent).map_err(|e| e.to_string())?;
+        }
+        fs::write(&self.path, text).map_err(|e| e.to_string())
+    }
+
+    /// Persist sign-in state (cookie + visitorData + account name +
+    /// avatar + channel list). The channel identity is NOT set here:
+    /// a fresh sign-in acts as the primary identity until the user
+    /// picks a channel via [`Self::set_channel`].
     pub fn set_auth(
         &mut self,
         cookie: String,
         visitor_data: Option<String>,
         account_name: String,
+        avatar_url: Option<String>,
+        channels: Vec<crate::models::AccountChannel>,
     ) -> Result<(), String> {
         self.auth = AuthState {
             cookie: Some(cookie),
             visitor_data,
             account_name: Some(account_name),
+            data_sync_id: None,
+            channel_name: None,
+            avatar_url,
+            channels,
         };
+        self.write_auth()
+    }
+
+    /// Persist a picked channel (identity + display name) after a
+    /// successful re-validation with that identity applied.
+    pub fn set_channel(
+        &mut self,
+        data_sync_id: String,
+        channel_name: String,
+        account_name: String,
+    ) -> Result<(), String> {
+        self.auth.data_sync_id = Some(data_sync_id);
+        self.auth.channel_name = Some(channel_name);
+        self.auth.account_name = Some(account_name);
         self.write_auth()
     }
 
