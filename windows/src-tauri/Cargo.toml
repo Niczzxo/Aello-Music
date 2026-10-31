@@ -40,3 +40,9 @@ base64 = "0.22"
 # to get an SMTC instance for a window).
 [target.'cfg(windows)'.dependencies]
 windows = { version = "0.62", features = ["Media", "Foundation", "Storage_Streams", "Win32_Foundation", "Win32_System_WinRT"] }
+# Sign-in cookie capture (6.1.45): the login WebView2 window's cookies —
+# including HttpOnly SAPISID, invisible to `document.cookie` — are read
+# via ICoreWebView2CookieManager (see src/signin_capture.rs). Version
+# 0.39 matches the copy already in Cargo.lock (transitive via Tauri/wry),
+# so the offline Windows-target check resolves from the local registry.
+webview2-com = "0.39"

@@ -237,10 +237,13 @@ pub async fn resolve_stream_with_playlist(
         }
     }
 
-    // Fallback chain (guest: skip login-required clients).
+    // Fallback chain (guest: skip login-required clients; signed in:
+    // the cookie is sent, so TVHTML5 / WEB_CREATOR are usable — the
+    // APK's logged-in playback path).
+    let signed_in = session.cookie().is_some();
     let fallbacks: Vec<_> = STREAM_FALLBACK_CLIENTS
         .iter()
-        .filter(|c| !c.login_required)
+        .filter(|c| signed_in || !c.login_required)
         .collect();
     let total = fallbacks.len();
     for (i, client) in fallbacks.iter().enumerate() {

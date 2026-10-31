@@ -38,6 +38,12 @@ pub struct InnerTubeSession {
     /// the cookie is set synchronously from Tauri `setup`, which runs
     /// outside the async runtime. `None` = guest mode.
     cookie: std::sync::RwLock<Option<String>>,
+    /// Channel identity (Android `YouTube.dataSyncId`): the
+    /// `datasyncIdToken` of the channel picked in the channel picker.
+    /// Sent as `context.user.onBehalfOfUser` on login-supported clients
+    /// (Android `toContext`), so requests act as that channel. `None` =
+    /// the account's primary identity. `std` lock like `cookie`.
+    data_sync_id: std::sync::Mutex<Option<String>>,
     /// player JS URL → source text (cached; base.js is ~1MB and stable
     /// per release).
     player_js: Mutex<HashMap<String, String>>,
@@ -65,6 +71,7 @@ impl InnerTubeSession {
             http,
             visitor_data: RwLock::new(None),
             cookie: std::sync::RwLock::new(None),
+            data_sync_id: std::sync::Mutex::new(None),
             player_js: Mutex::new(HashMap::new()),
             sig_ts: Mutex::new(HashMap::new()),
             js_url_cache: Mutex::new(None),
@@ -83,6 +90,19 @@ impl InnerTubeSession {
     pub fn set_cookie(&self, cookie: Option<String>) {
         if let Ok(mut slot) = self.cookie.write() {
             *slot = cookie;
+        }
+    }
+
+    /// Current channel identity, if a channel was picked.
+    pub fn data_sync_id(&self) -> Option<String> {
+        self.data_sync_id.lock().ok().and_then(|id| id.clone())
+    }
+
+    /// Set (or clear) the channel identity. Synchronous like
+    /// [`Self::set_cookie`] so Tauri `setup` can restore it.
+    pub fn set_data_sync_id(&self, data_sync_id: Option<String>) {
+        if let Ok(mut slot) = self.data_sync_id.lock() {
+            *slot = data_sync_id;
         }
     }
 
@@ -423,7 +443,18 @@ impl InnerTubeSession {
     // ── InnerTube endpoints (InnerTube.kt) ──────────────────────────────
 
     fn context(&self, client: YouTubeClient, visitor: Option<&str>) -> Value {
-        client.context(visitor)
+        let mut ctx = client.context(visitor);
+        // Channel identity (Android `toContext`): only login-supported
+        // clients carry `user.onBehalfOfUser`, and only when a channel
+        // was picked — otherwise requests act as the primary identity.
+        if client.login_supported {
+            if let Some(id) = self.data_sync_id() {
+                if let Some(user) = ctx.get_mut("user").and_then(|u| u.as_object_mut()) {
+                    user.insert("onBehalfOfUser".to_string(), json!(id));
+                }
+            }
+        }
+        ctx
     }
 
     // NOTE: plain `search_raw` (no params) was removed in 6.1.45 —
@@ -481,6 +512,66 @@ impl InnerTubeSession {
         self.post(WEB_REMIX, "search", body).await
     }
 
+    /// Search continuation page (Android `YouTube.searchContinuation`):
+    /// POST `search` with only `{context, continuation}`. The response
+    /// carries `continuationContents.musicShelfContinuation`.
+    pub async fn search_raw_continuation(
+        &self,
+        continuation: &str,
+    ) -> Result<Value, StreamError> {
+        self.ensure_visitor_data().await;
+        let visitor = self.visitor_data().await;
+        let body = json!({
+            "context": self.context(WEB_REMIX, visitor.as_deref()),
+            "continuation": continuation,
+        });
+        self.post(WEB_REMIX, "search", body).await
+    }
+
+    /// Like / unlike a video (Android `InnerTube.likeVideo` /
+    /// `unlikeVideo`, `LikeBody`): POST `like/like` or
+    /// `like/removelike` with `{context, target: {videoId}}`. No retry
+    /// on the like call itself — a mutation, and a 5xx can happen after
+    /// the server already applied it (same rule as Android's comment).
+    /// Callers treat a failure as "local like kept, remote not pushed".
+    pub async fn like_video_raw(
+        &self,
+        video_id: &str,
+        liked: bool,
+    ) -> Result<Value, StreamError> {
+        self.ensure_visitor_data().await;
+        let visitor = self.visitor_data().await;
+        let body = json!({
+            "context": self.context(WEB_REMIX, visitor.as_deref()),
+            "target": { "videoId": video_id },
+        });
+        let endpoint = if liked { "like/like" } else { "like/removelike" };
+        self.post(WEB_REMIX, endpoint, body).await
+    }
+
+    /// Subscribe / unsubscribe a channel (Android
+    /// `InnerTube.subscribeChannel` / `unsubscribeChannel`,
+    /// `SubscribeBody`): POST `subscription/subscribe` or
+    /// `subscription/unsubscribe` with `{context, channelIds: [id]}`.
+    pub async fn subscribe_raw(
+        &self,
+        channel_id: &str,
+        subscribe: bool,
+    ) -> Result<Value, StreamError> {
+        self.ensure_visitor_data().await;
+        let visitor = self.visitor_data().await;
+        let body = json!({
+            "context": self.context(WEB_REMIX, visitor.as_deref()),
+            "channelIds": [channel_id],
+        });
+        let endpoint = if subscribe {
+            "subscription/subscribe"
+        } else {
+            "subscription/unsubscribe"
+        };
+        self.post(WEB_REMIX, endpoint, body).await
+    }
+
     /// Raw `next` call for a video id (Android `YouTube.next`).
     /// The response's tab 2 endpoint is the `related` browse endpoint.
     pub async fn next_raw(&self, video_id: &str) -> Result<Value, StreamError> {
@@ -503,6 +594,78 @@ impl InnerTubeSession {
             "context": self.context(WEB_REMIX, visitor.as_deref()),
         });
         self.post(WEB_REMIX, "account/account_menu", body).await
+    }
+
+    /// Authenticated GET to an absolute music.youtube.com URL, with the
+    /// same Cookie + SAPISIDHASH headers `post()` sends (Android
+    /// `ytClient(setLogin = true)` on a GET). The account-switcher
+    /// endpoint answers `)]}'\n{json}` — the prefix is stripped before
+    /// parsing, exactly as Android does.
+    async fn get_authed(&self, url: &str) -> Result<Value, StreamError> {
+        self.ensure_visitor_data().await;
+        let visitor = self.visitor_data().await;
+        let cookie = self.cookie();
+        let mut attempt = 0;
+        loop {
+            let mut req = self
+                .http
+                .get(url)
+                .header("X-Origin", ORIGIN_YOUTUBE_MUSIC)
+                .header("Referer", REFERER_YOUTUBE_MUSIC)
+                .header("User-Agent", WEB_REMIX.user_agent);
+            if let Some(v) = &visitor {
+                req = req.header("X-Goog-Visitor-Id", v);
+            }
+            if let Some(c) = &cookie {
+                req = req.header("Cookie", c.clone());
+                if let Some(sapisid) = cookie_value(c, "SAPISID") {
+                    let ts = std::time::SystemTime::now()
+                        .duration_since(std::time::UNIX_EPOCH)
+                        .map(|d| d.as_secs())
+                        .unwrap_or(0);
+                    let hash = sha1_hex(&format!("{ts} {sapisid} {ORIGIN_YOUTUBE_MUSIC}"));
+                    req = req.header("Authorization", format!("SAPISIDHASH {ts}_{hash}"));
+                }
+            }
+            match req.send().await {
+                Ok(resp) => {
+                    let status = resp.status();
+                    if status.is_success() {
+                        let text = resp.text().await.map_err(|e| {
+                            StreamError::Parse(format!("{url} response text: {e}"))
+                        })?;
+                        let json_text = text.strip_prefix(")]}'\n").unwrap_or(&text);
+                        return serde_json::from_str(json_text).map_err(|e| {
+                            StreamError::Parse(format!("{url} response JSON: {e}"))
+                        });
+                    }
+                    if (status == StatusCode::TOO_MANY_REQUESTS || status.is_server_error())
+                        && attempt + 1 < MAX_ATTEMPTS
+                    {
+                        attempt += 1;
+                        Self::backoff(attempt - 1, None).await;
+                        continue;
+                    }
+                    return Err(StreamError::Http(status.as_u16()));
+                }
+                Err(e) => {
+                    if Self::retryable_reqwest(&e) && attempt + 1 < MAX_ATTEMPTS {
+                        attempt += 1;
+                        Self::backoff(attempt - 1, None).await;
+                        continue;
+                    }
+                    return Err(StreamError::Network(e.to_string()));
+                }
+            }
+        }
+    }
+
+    /// Raw `GET music.youtube.com/getAccountSwitcherEndpoint` (Android
+    /// `InnerTube.getAccountSwitcherEndpoint`) — the channel list for
+    /// the signed-in account. Fails without a valid cookie.
+    pub async fn account_channels_raw(&self) -> Result<Value, StreamError> {
+        self.get_authed("https://music.youtube.com/getAccountSwitcherEndpoint")
+            .await
     }
 
     /// Timed-text transcript for a video (Android `InnerTube.getTranscript`

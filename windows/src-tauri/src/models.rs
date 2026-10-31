@@ -6,6 +6,24 @@
 
 use serde::{Deserialize, Serialize};
 
+/// A YouTube channel the signed-in Google account can act as (Android
+/// `AccountInfo` from `YouTube.getAccountChannels`). `data_sync_id` is
+/// the identity token: when set, InnerTube requests carry it as
+/// `context.user.onBehalfOfUser` (Android `toContext`), so the account
+/// acts as that channel. `None` means the primary identity.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct AccountChannel {
+    #[serde(default)]
+    pub name: String,
+    #[serde(default)]
+    pub channel_handle: Option<String>,
+    #[serde(default)]
+    pub thumbnail_url: Option<String>,
+    #[serde(default)]
+    pub data_sync_id: Option<String>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Artwork {
@@ -95,6 +113,63 @@ pub struct HomeSection {
     pub items: Vec<HomeItem>,
 }
 
+/// One Home chip (Android `HomePage.Chip`): the title shown on the chip
+/// and the browse `params` a tap re-fetches the feed with. `params`
+/// None = the chip carries no params (treated as "All").
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HomeChip {
+    pub title: String,
+    pub params: Option<String>,
+}
+
+/// Home feed page (Android `HomePage`): chips + sections + the
+/// continuation token for "load more" home sections, if YouTube served
+/// one. `continuation` None means there is no next page.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct HomeFeed {
+    pub chips: Vec<HomeChip>,
+    pub sections: Vec<HomeSection>,
+    pub continuation: Option<String>,
+}
+
+/// One page of search results (Android `SearchResult`): items + the
+/// continuation token for the next page, if YouTube served one.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SearchPage {
+    pub items: Vec<HomeItem>,
+    pub continuation: Option<String>,
+}
+
+/// Personal Home sections (audit #3), built entirely from the local
+/// library store — liked ∪ recent ∪ most-played + history. A section
+/// is omitted by the frontend when its list is empty; nothing here is
+/// invented.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct PersonalSections {
+    pub quick_picks: Vec<Song>,
+    pub keep_listening: Vec<Song>,
+    pub forgotten_favorites: Vec<Song>,
+    pub speed_dial: Vec<Song>,
+}
+
+/// Result of one YouTube sync run (audit #45). Additive only: remote
+/// items are merged INTO the local library; nothing local is deleted
+/// and nothing local is uploaded except likes the user taps (see
+/// `like_video`). `errors` carries per-step failures — a partial sync
+/// still reports what did land.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct SyncReport {
+    pub liked_added: usize,
+    pub library_added: usize,
+    pub playlists_added: usize,
+    pub errors: Vec<String>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct PlaylistDetail {
@@ -174,6 +249,11 @@ pub struct LibraryPlaylist {
     pub name: String,
     pub song_ids: Vec<String>,
     pub created_at: String,
+    /// YouTube browse id of a playlist imported by sync (`None` for
+    /// local-only playlists). Used to skip re-importing it on the next
+    /// sync run.
+    #[serde(default)]
+    pub browse_id: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -193,6 +273,10 @@ pub struct LibraryData {
     pub playlists: Vec<LibraryPlaylist>,
     pub history: Vec<HistoryEntry>,
     pub speed_dial_ids: Vec<String>,
+    /// Songs in the YouTube library (synced `FEmusic_liked_videos`)
+    /// that are not necessarily liked. Empty until a sync runs.
+    #[serde(default)]
+    pub library_songs: Vec<Song>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

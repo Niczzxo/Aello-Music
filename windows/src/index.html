@@ -7,6 +7,13 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+<div id="boot-loader" class="boot-loader" aria-hidden="true">
+  <div class="boot-logo">
+    <img src="img/logo.png" alt="">
+    <span class="boot-ring"></span>
+  </div>
+  <p class="boot-text">Aello</p>
+</div>
 <p id="bridge-notice" class="bridge-notice" hidden>
   Preview mode: this page is running in a plain browser, so the desktop
   bridge is unavailable. The interface works, but no music can load until
@@ -71,6 +78,7 @@
       <h1 id="home-greeting">Good evening</h1>
       <p class="view-sub">Unwind with your favorite vibes</p>
       <p id="home-status" class="status" role="status">Loading…</p>
+      <div id="home-chips" class="home-chips" role="group" aria-label="Home filters"></div>
       <div id="home-sections"></div>
     </section>
 
@@ -165,6 +173,7 @@
               <option value="everyone">Everyone</option>
             </select>
           </label>
+          <button id="lt-extend" type="button" class="btn-ghost" hidden>Extend session</button>
           <button id="lt-leave" type="button" class="btn-danger">Leave room</button>
         </div>
         <div class="lt-grid">
@@ -201,6 +210,11 @@
       <div class="library-toolbar">
         <button id="library-open-files" type="button" class="btn-ghost">Open audio files…</button>
         <span class="muted">Local files play from this computer.</span>
+        <button id="library-export" type="button" class="btn-ghost">Export backup</button>
+        <button id="library-import" type="button" class="btn-ghost">Import backup</button>
+        <button id="library-import-csv" type="button" class="btn-ghost">Import CSV playlist</button>
+        <input id="library-import-file" type="file" accept=".json,application/json" hidden>
+        <input id="library-csv-file" type="file" accept=".csv,text/csv" hidden>
       </div>
       <!-- Auto-playlist cards: static placeholder content, replaced by JS at runtime. -->
       <div id="library-list">
@@ -235,7 +249,13 @@
         <fieldset>
           <legend>Account</legend>
           <div id="account-block">
-            <p class="muted">Not signed in. Sign in with Google to sync your liked songs, library, and playlists.</p>
+            <div class="account-identity">
+              <img id="account-avatar" class="account-avatar" hidden alt="Account photo">
+              <div class="account-identity-text">
+                <p id="account-name" class="account-name">Not signed in</p>
+                <p id="account-signin-status" class="signin-status" data-state="idle" role="status">Sign in with Google to use your YouTube account in Aello.</p>
+              </div>
+            </div>
             <div class="row-actions">
               <button id="account-signin" type="button" class="btn-primary">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" x2="3" y1="12" y2="12"/></svg>
@@ -246,9 +266,14 @@
                 <span>Sign out</span>
               </button>
             </div>
-            <label class="field">Channel
+            <label class="field channel-picker">Channel
               <select id="account-channel" hidden></select>
             </label>
+            <div class="row-actions">
+              <button id="account-sync" type="button" class="btn-ghost">Sync with YouTube now</button>
+              <p class="status" id="account-sync-status" role="status"></p>
+            </div>
+            <p class="muted">Sync pulls your YouTube liked songs, library songs, and saved playlists into this library. It never deletes anything here and uploads nothing except likes you tap. Sign-in is required.</p>
           </div>
         </fieldset>
         <fieldset>
@@ -300,6 +325,14 @@
           <label class="field">Custom server
             <input id="setting-lt-custom-server" type="text" placeholder="wss://your-server.example" autocomplete="off" spellcheck="false">
           </label>
+        </fieldset>
+        <fieldset>
+          <legend>Storage</legend>
+          <div class="row-actions">
+            <button id="settings-clear-downloads" type="button" class="btn-ghost">Clear all downloads</button>
+            <p class="status" id="settings-storage-status" role="status"></p>
+          </div>
+          <p class="muted">Removes every downloaded song file. Your liked songs, playlists, and history are untouched — use Export backup in the Library to keep those.</p>
         </fieldset>
         <fieldset>
           <legend>Updates</legend>
@@ -368,6 +401,13 @@
               <button id="fp-lyrics-toggle" type="button" class="icon-btn" aria-label="Lyrics" aria-pressed="false">
                 <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" x2="12" y1="19" y2="22"/></svg>
               </button>
+              <button id="fp-radio" type="button" class="icon-btn" aria-label="Radio (autoplay similar songs)" aria-pressed="true">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="2"/><path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"/></svg>
+                <span class="speed-label">Radio</span>
+              </button>
+              <button id="fp-pin" type="button" class="icon-btn" aria-label="Pin to Speed Dial" aria-pressed="false">
+                <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16h14v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1z"/></svg>
+              </button>
             </div>
           </div>
         </div>
@@ -380,6 +420,13 @@
             </div>
             <div id="lyrics-lines" class="lyrics-lines" tabindex="0" aria-label="Synced lyrics"></div>
             <div class="lyrics-controls">
+              <label class="field">Lyrics style
+                <select id="lyrics-style">
+                  <option value="default" selected>Default</option>
+                  <option value="fade">Fade</option>
+                  <option value="glow">Glow</option>
+                </select>
+              </label>
               <label id="lyrics-offset-label" for="lyrics-offset">Sync offset: 0 ms</label>
               <input id="lyrics-offset" type="range" min="-5000" max="5000" step="100" value="0" aria-label="Lyrics sync offset in milliseconds">
               <button id="lyrics-scroll-current" type="button" class="btn-ghost">Scroll to current line</button>
@@ -391,6 +438,8 @@
             <div class="panel-head">
               <h3>Equalizer</h3>
               <label class="check-inline"><input id="eq-enhance" type="checkbox" checked> Sound Enhance</label>
+              <label class="check-inline"><input id="eq-8d" type="checkbox"> 8D audio</label>
+              <label class="check-inline"><input id="eq-normalize" type="checkbox"> Normalize volume</label>
             </div>
             <div class="eq-presets-row">
               <label class="field">Preset
@@ -405,6 +454,8 @@
               </label>
               <button id="eq-save-preset" type="button" class="btn-ghost">Save preset</button>
               <button id="eq-delete-preset" type="button" class="btn-ghost">Delete preset</button>
+              <button id="eq-import-apo" type="button" class="btn-ghost">Import APO file</button>
+              <input id="eq-apo-file" type="file" accept=".txt" hidden>
             </div>
             <p id="eq-live-note" class="status" role="status" hidden>Live (unsaved) — this curve is playing but not saved. Save it as a preset to keep it.</p>
             <div id="eq-bands" class="eq-bands">
@@ -492,9 +543,13 @@
         </p>
         <p class="muted">
           Cast is not available on Windows — there is no Cast SDK for this
-          desktop stack. Everything else in this build — account sign-in,
-          downloads, synced lyrics, the equalizer, Listen Together, and the
-          sleep timer — runs on the desktop.
+          desktop stack. Also not available on this platform: Listen
+          Together LAN mode, Android home-screen widgets, song
+          recognition (Shazam), JioSaavn, desktop Wi-Fi Sync, DJ mixing,
+          skip silence, ringtones, and always-on display. Everything
+          else in this build — account sign-in, YouTube sync, downloads,
+          synced lyrics, the equalizer, Listen Together, and the sleep
+          timer — runs on the desktop.
         </p>
       </div>
     </section>
@@ -505,6 +560,7 @@
       <h2>Queue</h2>
       <div class="row-actions">
         <button id="queue-shuffle-play" type="button" class="btn-ghost">Shuffle play</button>
+        <button id="queue-radio" type="button" class="btn-ghost" aria-pressed="true">Radio: on</button>
         <button id="queue-clear" type="button" class="btn-ghost">Clear</button>
       </div>
     </div>
@@ -613,5 +669,13 @@
 <script src="js/player.js"></script>
 <script src="js/views.js"></script>
 <script src="js/app.js"></script>
+<script>
+  // Boot-loader fallback: app.js hides the loader once the shell is
+  // ready. If app.js fails to load, never trap the user behind it.
+  setTimeout(function () {
+    var loader = document.getElementById("boot-loader");
+    if (loader) loader.classList.add("done");
+  }, 5000);
+</script>
 </body>
 </html>
