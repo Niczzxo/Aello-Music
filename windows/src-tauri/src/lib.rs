@@ -17,6 +17,7 @@
 //! port notes).
 
 mod innertube;
+mod diagnostics;
 mod library;
 mod local_files;
 mod lyrics;
@@ -168,6 +169,7 @@ async fn browse_mood(state: State<'_, AppState>, params: String) -> Result<Vec<H
 
 #[tauri::command]
 async fn resolve_stream(
+    app: tauri::AppHandle,
     state: State<'_, AppState>,
     song_id: String,
 ) -> Result<Option<String>, String> {
@@ -181,7 +183,36 @@ async fn resolve_stream(
         .lock()
         .map(|store| store.current().audio_quality.clone())
         .unwrap_or_else(|_| "auto".to_string());
-    MusicService::resolve_stream(&state.music, &song_id, &audio_quality).await
+    match MusicService::resolve_stream(&state.music, &song_id, &audio_quality).await {
+        Ok(url) => Ok(url),
+        Err(e) => {
+            // Resolve failures are the "song won't play" evidence:
+            // log the song + the real YouTube reason (bot-check,
+            // unavailable, no format) so the diagnostics file shows
+            // whether it is a code bug or a YouTube-side flag.
+            diagnostics::append_log(&app, "resolve", &format!("{song_id}: {e}"));
+            Err(e)
+        }
+    }
+}
+
+/// Append a diagnostics line (sign-in / audio / playback failures) to
+/// the app's diagnostics log file. Best-effort; never fails the caller.
+#[tauri::command]
+fn log_diagnostic(app: tauri::AppHandle, kind: String, message: String) {
+    diagnostics::append_log(&app, &kind, &message);
+}
+
+/// Absolute path of the diagnostics log file (shown in Settings → About).
+#[tauri::command]
+fn diagnostics_path(app: tauri::AppHandle) -> String {
+    diagnostics::log_path(&app).to_string_lossy().to_string()
+}
+
+/// Last ~200 lines of the diagnostics log (Copy diagnostics button).
+#[tauri::command]
+fn read_diagnostics_log(app: tauri::AppHandle) -> String {
+    diagnostics::read_tail(&app, 200)
 }
 
 /// Related songs for one seed, or empty when there is no seed / the
@@ -964,7 +995,7 @@ struct SigninStatus {
 #[serde(rename_all = "camelCase")]
 struct SigninPoll {
     /// `not-signed-in` | `window-gone` | `signed-in` |
-    /// `needs-channel` | `validation-failed`
+    /// `needs-channel` | `validation-failed` | `capture-error`
     status: &'static str,
     account_name: Option<String>,
     avatar_url: Option<String>,
@@ -1061,7 +1092,10 @@ async fn signin_finish(
 /// polling), and `signed-in` / `needs-channel` once the SAPISID cookie
 /// was captured AND validated. `validation-failed` means SAPISID was
 /// captured but `account_menu` rejected it — the frontend stops polling
-/// and asks the user to try again.
+/// and asks the user to try again. `capture-error` means the capture
+/// itself failed (COM / timeout) — the reason rides in `message` so
+/// the UI can show it instead of a generic line; the frontend keeps
+/// polling a few times, then stops with that reason.
 #[tauri::command]
 async fn signin_poll_capture(
     app: tauri::AppHandle,
@@ -1074,7 +1108,24 @@ async fn signin_poll_capture(
         channels: Vec::new(),
         message: None,
     };
-    match signin_capture::capture_signin_cookie(&app, "aello-signin").await? {
+    // A capture failure is a poll result, not a command error: the
+    // frontend's safeCall swallows command errors as null, which used
+    // to lose the real reason ("cookie capture timed out" / COM
+    // error) and end in a generic "Sign-in check failed".
+    let capture = match signin_capture::capture_signin_cookie(&app, "aello-signin").await {
+        Ok(outcome) => outcome,
+        Err(e) => {
+            diagnostics::append_log(&app, "signin", &format!("capture error: {e}"));
+            return Ok(SigninPoll {
+                status: "capture-error",
+                account_name: None,
+                avatar_url: None,
+                channels: Vec::new(),
+                message: Some(e),
+            });
+        }
+    };
+    match capture {
         CaptureOutcome::NotSignedIn => Ok(none("not-signed-in")),
         CaptureOutcome::WindowGone => Ok(none("window-gone")),
         CaptureOutcome::SignedIn(cookie) => match finish_signin(&state, cookie, None).await {
@@ -1089,13 +1140,16 @@ async fn signin_poll_capture(
                 channels: done.channels,
                 message: None,
             }),
-            Err(e) => Ok(SigninPoll {
-                status: "validation-failed",
-                account_name: None,
-                avatar_url: None,
-                channels: Vec::new(),
-                message: Some(e),
-            }),
+            Err(e) => {
+                diagnostics::append_log(&app, "signin", &format!("validation failed: {e}"));
+                Ok(SigninPoll {
+                    status: "validation-failed",
+                    account_name: None,
+                    avatar_url: None,
+                    channels: Vec::new(),
+                    message: Some(e),
+                })
+            }
         },
     }
 }
@@ -1289,6 +1343,9 @@ pub fn run() {
             signin_choose_channel,
             signin_status,
             sign_out,
+            log_diagnostic,
+            diagnostics_path,
+            read_diagnostics_log,
             local_files::pick_local_files
         ])
         .run(tauri::generate_context!())
